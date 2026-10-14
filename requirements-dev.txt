@@ -1,0 +1,6 @@
+# Everything needed to develop and test the project.
+-r scraper/requirements.txt
+
+pytest==9.1.1
+pytest-asyncio==1.4.0   # async tests (crawler)
+respx==0.23.1           # mocks httpx requests

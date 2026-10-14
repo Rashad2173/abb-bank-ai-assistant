@@ -1,0 +1,6 @@
+# Runtime dependencies of the scraper (Python >= 3.10)
+httpx[http2]==0.28.1    # async HTTP client with HTTP/2
+beautifulsoup4==4.15.0  # HTML parsing
+lxml==6.1.3             # fast parser backend for BeautifulSoup
+tenacity==9.2.1         # retries with exponential back-off
+pydantic==2.14.1        # typed data models / JSON serialization
