@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -37,6 +37,25 @@ class Section(BaseModel):
 class FaqItem(BaseModel):
     question: str
     answer: str
+    also_on: list[str] = Field(default_factory=list)
+    """Other pages showing the same item. Items repeated on many pages are stored
+    once (on the most general page); this keeps the link to the other products."""
+
+
+class Document(BaseModel):
+    """A file (mostly PDF: tariffs, terms, reports) linked from the page."""
+
+    title: str
+    url: str
+
+
+class Validity(BaseModel):
+    """When a time-limited offer (campaign) applies."""
+
+    valid_from: date | None = None
+    valid_until: date | None = None
+    is_active: bool | None = None
+    """``None`` when the page gives no information."""
 
 
 class Page(BaseModel):
@@ -50,6 +69,13 @@ class Page(BaseModel):
     category: str
     sections: list[Section] = Field(default_factory=list)
     faq: list[FaqItem] = Field(default_factory=list)
+    documents: list[Document] = Field(default_factory=list)
+    validity: Validity | None = None
+    """Only for campaigns."""
+    published: date | None = None
+    """News, press releases, CSR and tenders: the date shown on the page."""
+    coordinates: tuple[float, float] | None = None
+    """``(lat, lng)`` — only for branches."""
     last_modified: str | None = None
     fetched_at: datetime
     content_hash: str

@@ -5,7 +5,7 @@ import httpx
 import pytest
 import respx
 
-from abb_scraper.extract.service_network import city_of, service_network_documents
+from abb_scraper.extract.service_network import service_network_documents
 from abb_scraper.service_network import ServiceNetworkError, fetch_service_network
 
 BASE = "https://abb-bank.az"
@@ -25,24 +25,12 @@ DATA = {
     "abroad_offices": [],
     "branch_filters": {"Həftəsonu işləyən filiallar": [288]},
     "atms": [
-        {"address": "Gəncə ş., Atatürk prospekti 1", "atmCashIn": True, "fullDay": True},
-        {"address": "Gəncə, Nizami küçəsi 5", "atmCashIn": False, "workOnWeekend": True},
+        {"address": "Gəncə ş., Atatürk prospekti 1", "atmCashIn": True, "fullDay": True,
+         "location": {"lat": 40.68, "lon": 46.36}},
+        {"address": "GANCA, Nizami küçəsi 5", "atmCashIn": False, "workOnWeekend": True},
     ],
     "terminals": [],
 }
-
-
-@pytest.mark.parametrize(("address", "city"), [
-    ("Zaqatala, Vidadi küçəsi 28a", "Zaqatala"),
-    ("Bakı şəhəri, Suraxanı rayonu, Əmircan qəsəbəsi", "Bakı"),
-    ("Xətai rayonu, Babək prospekti 10", "Bakı"),          # a district of Baku
-    ("Khurshidbanu Natavan Monument, Baku", "Bakı"),
-    ("Abşeron r., Xırdalan ş., Sahə 1287", "Abşeron"),
-    ("Gəncə ş., Atatürk prospekti 1", "Gəncə"),
-    ("", "Digər"),
-])
-def test_city_of(address, city):
-    assert city_of(address) == city
 
 
 class TestDocuments:
@@ -69,14 +57,18 @@ class TestDocuments:
         texts = [b.text for b in documents[f"{BASE}/filiallar#sobe-288"].blocks]
         assert not any(t.startswith("Siyahılar") for t in texts)
 
-    def test_atms_are_grouped_by_city(self, documents):
+    def test_atms_are_grouped_by_city_whatever_the_spelling(self, documents):
         doc = documents[f"{BASE}/atm#gence"]
         assert [b.text for b in doc.blocks] == [
             "ABB bankomatları (ATM) — Gəncə",
             "Gəncə üzrə 2 nöqtə; onlardan 1-i nağd pul mədaxili (cash-in) qəbul edir.",
-            "Gəncə ş., Atatürk prospekti 1 — nağd pul mədaxili (cash-in), 24/7",
-            "Gəncə, Nizami küçəsi 5 — həftə sonu işləyir",
+            "GANCA, Nizami küçəsi 5 — həftə sonu işləyir",
+            "Gəncə ş., Atatürk prospekti 1 — nağd pul mədaxili (cash-in), 24/7"
+            " — xəritə: https://www.google.com/maps?q=40.68,46.36",
         ]
+
+    def test_branch_documents_carry_coordinates(self, documents):
+        assert documents[f"{BASE}/filiallar#filial-288"].coordinates == (41.62, 46.64)
 
     def test_overview_has_totals_and_filters(self, documents):
         texts = [b.text for b in documents[f"{BASE}/filiallar"].blocks]

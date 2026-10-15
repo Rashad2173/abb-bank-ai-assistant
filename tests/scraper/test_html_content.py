@@ -31,8 +31,7 @@ class TestParseProductPage:
             "Nağd kreditin üstünlükləri",
             "Rahat şərtlər",
             "Banka gəlmədən tam onlayn əldə edin.",
-            "Məbləğ | Müddət",
-            "70 000 AZN | 60 ay",
+            "Məbləğ: 70 000 AZN; Müddət: 60 ay",
             "- Zaminsiz",
         ]
 
@@ -66,6 +65,57 @@ def test_title_falls_back_to_html_title_without_headings():
 def test_drops_carousel_step_numbers_and_separators():
     parsed = parse_html(page_html("<div><p>1</p><p>•</p><p>937</p><p>Addım</p></div>"))
     assert texts(parsed.blocks) == ["937", "Addım"]
+
+
+class TestTables:
+    def test_header_row_in_td_cells_and_empty_cells_keep_their_column(self):
+        """The CMS writes headers as <td>; an empty cell must not shift the next value."""
+        table = ("<table><tr><td>Müddət</td><td>Aylıq</td><td>Müddətin sonu</td></tr>"
+                 "<tr><td>1 ay</td><td></td><td>6.5%</td></tr>"
+                 "<tr><td>3 ay</td><td>7%</td><td>7.25%</td></tr></table>")
+        assert texts(parse_html(page_html(table)).blocks) == [
+            "Müddət: 1 ay; Aylıq: –; Müddətin sonu: 6.5%",
+            "Müddət: 3 ay; Aylıq: 7%; Müddətin sonu: 7.25%",
+        ]
+
+    def test_two_column_key_value_table_has_no_header(self):
+        """Fitch ratings: the first row is data, even though it has no digits."""
+        table = ("<table><tr><td>Uzunmüddətli defolt reytinqi</td><td>BB+</td></tr>"
+                 "<tr><td>Qısamüddətli reytinq</td><td>B</td></tr></table>")
+        assert texts(parse_html(page_html(table)).blocks) == [
+            "Uzunmüddətli defolt reytinqi | BB+",
+            "Qısamüddətli reytinq | B",
+        ]
+
+    def test_table_without_header_keeps_empty_cells(self):
+        table = "<table><tr><td>Komissiya</td><td>1%</td></tr><tr><td>SMS</td><td></td></tr></table>"
+        assert texts(parse_html(page_html(table)).blocks) == ["Komissiya | 1%", "SMS | –"]
+
+    def test_merged_header_cells_label_every_column(self):
+        table = ('<table><tr><th>Kart</th><th colspan="2">Limit</th></tr>'
+                 "<tr><td>Gold</td><td>AZN</td><td>USD</td></tr></table>")
+        assert texts(parse_html(page_html(table)).blocks) == ["Kart: Gold; Limit: AZN; Limit: USD"]
+
+
+class TestInlineSpacing:
+    def test_tags_inside_a_word_add_no_space(self):
+        parsed = parse_html(page_html("<p>Məxfilik Siyas<span>ə</span>tinin <b>m</b>əqsədi</p>"))
+        assert texts(parsed.blocks) == ["Məxfilik Siyasətinin məqsədi"]
+
+    def test_spacing_of_the_html_is_kept(self):
+        parsed = parse_html(page_html("<p>Kredit <a href='/x'>kalkulyatoru</a> ilə hesablayın</p>"))
+        assert texts(parsed.blocks) == ["Kredit kalkulyatoru ilə hesablayın"]
+
+    def test_line_breaks_and_block_styled_spans_separate_words(self):
+        parsed = parse_html(page_html(
+            '<p>70 000 AZN-dək<br>Məbləğ</p><p><span class="lg:block">60 ay</span><span class="block">Müddət</span></p>'
+        ))
+        assert texts(parsed.blocks) == ["70 000 AZN-dək Məbləğ", "60 ay Müddət"]
+
+
+def test_links_to_documents_keep_their_url():
+    parsed = parse_html(page_html('<p>Kart <a href="https://cdn.abb-bank.az/tarif.pdf">tarifləri</a></p>'))
+    assert texts(parsed.blocks) == ["Kart tarifləri (https://cdn.abb-bank.az/tarif.pdf)"]
 
 
 def test_drops_truncated_preview_of_text_that_is_on_the_page():

@@ -5,6 +5,7 @@ Usage (from the ``scraper/`` directory)::
     python -m abb_scraper crawl     # download the site + service network into data/raw/
     python -m abb_scraper network   # only (re-)download the service network (branches, ATMs)
     python -m abb_scraper extract   # build data/abb_pages.jsonl from the cache
+    python -m abb_scraper check     # data quality report (evaluation/reports/00_data_quality.md)
     python -m abb_scraper run       # crawl + extract
 """
 
@@ -19,6 +20,7 @@ from pathlib import Path
 from .config import ScraperConfig
 from .crawler import Crawler
 from .pipeline import run_extraction
+from .quality import run_quality_checks
 from .service_network import fetch_service_network
 from .storage import RawPageStore
 
@@ -45,11 +47,14 @@ def main() -> None:
         asyncio.run(fetch_service_network(config))
     if args.command in ("extract", "run"):
         run_extraction(config, store)
+    if args.command == "check":
+        report = run_quality_checks(config, store, config.reports_dir / "00_data_quality.md")
+        logging.getLogger("abb_scraper").info("Data quality report: %s", report)
 
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="abb_scraper", description="Scrape the textual content of abb-bank.az")
-    parser.add_argument("command", choices=("crawl", "network", "extract", "run"))
+    parser.add_argument("command", choices=("crawl", "network", "extract", "check", "run"))
     parser.add_argument("--concurrency", type=int, help="parallel requests (default: 6)")
     parser.add_argument("--workers", type=int, help="parallel processes for extraction (default: CPU count - 1)")
     parser.add_argument("--max-pages", type=int, help="stop after this many URLs (for trial runs)")

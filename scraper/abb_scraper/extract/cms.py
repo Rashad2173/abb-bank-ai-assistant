@@ -18,15 +18,15 @@ from typing import Any
 
 from .html_content import Block, html_fragment_to_text
 from .rsc import iter_dicts
-from .text import fingerprint
+from .text import fingerprint, is_document_url
 
 # Components that hold no textual content of their own (widgets, link lists,
-# calculators, application forms).
+# calculators, application forms, the app download banner).
 EXCLUDED_COMPONENTS = frozenset({
     "tabs.loan-calculator", "tabs.deposit-calculator", "tabs.car-loan-calculator",
     "tabs.mortgage-calculator", "ui-sections.divider", "ui-sections.quick-links",
     "ui-sections.our-services", "ui-sections.relevant-now", "ui-sections.campaigns",
-    "ui-sections.currency", "full-page.service-network",
+    "ui-sections.currency", "full-page.service-network", "ui-sections.app-banner",
 })
 EXCLUDED_COMPONENT_PREFIXES = ("forms.",)
 
@@ -134,6 +134,9 @@ class _Renderer:
             return
 
         heading = self._heading(node)
+        if heading and (documents := _document_urls(node)):
+            # e.g. a report list item: its title plus the PDF file it links to
+            heading += " " + " ".join(f"({url})" for url in documents)
         fields = list(self._text_fields(node))
         child_blocks = [
             block
@@ -224,6 +227,16 @@ def _clean(text: str) -> str:
 
 def _is_media(node: dict[str, Any]) -> bool:
     return "mime" in node or "formats" in node
+
+
+def _document_urls(node: dict[str, Any]) -> list[str]:
+    """URLs of document files (PDF …) attached directly to the node."""
+    urls = []
+    for value in node.values():
+        for item in value if isinstance(value, list) else [value]:
+            if isinstance(item, dict) and _is_media(item) and is_document_url(str(item.get("url", ""))):
+                urls.append(item["url"])
+    return list(dict.fromkeys(urls))
 
 
 def _is_faq_item(node: dict[str, Any]) -> bool:

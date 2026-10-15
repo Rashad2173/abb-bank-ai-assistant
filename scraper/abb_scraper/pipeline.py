@@ -20,6 +20,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import re
 from collections import Counter, defaultdict
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass, field
@@ -33,6 +34,8 @@ from .extract.html_content import Block
 from .extract.page import PageContent, extract_page
 from .extract.service_network import service_network_documents
 from .extract.text import detect_language, fingerprint
+from .extract.dates import published_date
+from .extract.validity import campaign_validity
 from .models import FaqItem, FetchRecord, Language, Page, Section
 from .storage import RawPageStore
 
@@ -40,6 +43,13 @@ log = logging.getLogger(__name__)
 
 RepeatKey = tuple[str, str]
 """``(language, fingerprint)`` — repetition is counted per language."""
+
+_MIN_WORDS_OF_BOILERPLATE = 4
+"""Shorter blocks are labels ("Məbləğ"), which belong next to each page's own values."""
+_MIN_WORDS_OF_A_STATEMENT = 3
+"""A lone heading without content is kept as text only from this length on."""
+_CONTACT_LINE_RE = re.compile(r"^[^:]{2,30}:\s*\S")
+_DATED_CATEGORIES = frozenset({"news", "press_releases", "csr", "procurement"})
 
 
 @dataclass
@@ -159,20 +169,27 @@ def _find_frequent_blocks(drafts: list[_Draft], config: ScraperConfig) -> dict[R
     """Blocks that occur on many pages of the same language → ``{key: example text}``."""
     page_counts: Counter[RepeatKey] = Counter()
     example: dict[RepeatKey, str] = {}
-    pages_per_lang: Counter[str] = Counter(d.lang for d in drafts)
 
     for draft in drafts:
         keys = {}
         for block in draft.content.blocks:
-            keys.setdefault((draft.lang, fingerprint(block.text)), block.text)
+            if _can_be_boilerplate(block):
+                keys.setdefault((draft.lang, fingerprint(block.text)), block.text)
         page_counts.update(keys.keys())
         for key, text in keys.items():
             example.setdefault(key, text)
 
-    def threshold(lang: str) -> float:
-        return max(config.boilerplate_min_pages, config.boilerplate_page_ratio * pages_per_lang[lang])
+    return {key: example[key] for key, count in page_counts.items() if count >= config.boilerplate_min_pages}
 
-    return {key: example[key] for key, count in page_counts.items() if count >= threshold(key[0])}
+
+def _can_be_boilerplate(block: Block) -> bool:
+    """Only sentence-like body text (banners, legal boilerplate) is de-duplicated across pages.
+
+    Headings ("Tariflər") and short labels ("Məbləğ", "Faiz dərəcəsi") repeat on
+    every product page too, but each time next to that page's own values —
+    removing them would leave "70 000 AZN-dək" without saying what it is.
+    """
+    return not block.is_heading and len(block.text.split()) >= _MIN_WORDS_OF_BOILERPLATE
 
 
 class _KeepOnce:
@@ -192,10 +209,38 @@ class _KeepOnce:
 # Step 4 — assemble
 # --------------------------------------------------------------------------- #
 
+def _faq_key(lang: str, item: FaqItem) -> RepeatKey:
+    return (lang, fingerprint(f"{item.question}\n{item.answer}"))
+
+
+def _pages_per_faq_item(drafts: list[_Draft]) -> dict[RepeatKey, list[str]]:
+    """Every FAQ item → the pages showing it, most general page first."""
+    pages: dict[RepeatKey, list[str]] = defaultdict(list)
+    for draft in drafts:
+        for key in dict.fromkeys(_faq_key(draft.lang, item) for item in draft.content.faq):
+            pages[key].append(draft.url)
+    return pages
+
+
+def _faq_for_page(draft: _Draft, faq_pages: dict[RepeatKey, list[str]], config: ScraperConfig) -> list[FaqItem]:
+    """FAQ items shown on a few product pages stay on each of them (they describe those
+    products); items repeated across many pages are kept once, on the most general
+    page, and remember the other pages in ``also_on``."""
+    kept = []
+    for item in draft.content.faq:
+        urls = faq_pages[_faq_key(draft.lang, item)]
+        if len(urls) <= config.faq_max_shared_pages:
+            kept.append(item)
+        elif urls[0] == draft.url:
+            kept.append(item.model_copy(update={"also_on": urls[1:]}))
+    return kept
+
+
 def _assemble_pages(
     drafts: list[_Draft], frequent: set[RepeatKey], config: ScraperConfig, report: ExtractionReport
 ) -> list[Page]:
     keep_once = _KeepOnce()
+    faq_pages = _pages_per_faq_item(drafts)
     seen_content: dict[str, str] = {}
     pages: list[Page] = []
 
@@ -207,21 +252,21 @@ def _assemble_pages(
         ]
         if _is_home_page(draft.url):
             blocks += _contact_blocks(content.footer_blocks)
-        # Every FAQ repetition counts: shared FAQ lists would otherwise flood search results.
-        faq = [
-            item for item in content.faq
-            if keep_once.first_time((draft.lang, fingerprint(f"{item.question}\n{item.answer}")))
-        ]
 
+        category = category_of(draft.url)
         page = _make_page(
             url=draft.url,
             lang=draft.lang,
-            category=category_of(draft.url),
+            category=category,
             title=content.title,
             description=content.description,
             breadcrumbs=content.breadcrumbs,
             blocks=blocks,
-            faq=faq,
+            faq=_faq_for_page(draft, faq_pages, config),
+            documents=content.documents,
+            validity=(campaign_validity([b.text for b in content.blocks], draft.record.fetched_at)
+                      if category == "campaigns" else None),
+            published=published_date(b.text for b in content.blocks) if category in _DATED_CATEGORIES else None,
             last_modified=draft.record.last_modified,
             fetched_at=draft.record.fetched_at,
         )
@@ -244,8 +289,8 @@ def _service_network_pages(config: ScraperConfig) -> list[Page]:
     fetched_at = datetime.fromisoformat(data["fetched_at"])
     return [
         _make_page(url=doc.url, lang="az", category="service_network", title=doc.title, description=None,
-                   breadcrumbs=doc.breadcrumbs, blocks=doc.blocks, faq=[], last_modified=None,
-                   fetched_at=fetched_at)
+                   breadcrumbs=doc.breadcrumbs, blocks=doc.blocks, faq=[], coordinates=doc.coordinates,
+                   last_modified=None, fetched_at=fetched_at)
         for doc in service_network_documents(data)
     ]
 
@@ -268,47 +313,78 @@ def _is_home_page(url: str) -> bool:
     return urlsplit(url).path.strip("/") in ("", "en", "ru")
 
 
+
+
 def _contact_blocks(footer_blocks: list[Block]) -> list[Block]:
-    """The footer (phone, e-mail, address …) as its own section of the home page."""
-    if not footer_blocks:
+    """The footer's contact lines ("Tel: …", "E-poçt: …", "Ünvan: …") as a section of the home page.
+
+    The rest of the footer is link menus and app-store teasers.
+    """
+    contacts = [b for b in footer_blocks if _CONTACT_LINE_RE.match(b.text)]
+    if not contacts:
         return []
-    return [Block("ABB — contact information / əlaqə", heading_level=2), *footer_blocks]
+    return [Block("ABB — contact information / əlaqə", heading_level=2), *contacts]
 
 
 def build_sections(blocks: list[Block]) -> list[Section]:
     """Group body blocks under the heading hierarchy that precedes them.
 
-    A heading that gets no content of its own before the next heading of the
-    same or a higher level is not a section title but a list item styled as a
-    heading (e.g. the steps of "How to order": each step is an ``<h3>``). It
-    becomes a paragraph of the enclosing section instead of being lost.
+    Headings that get no content of their own:
+
+    * a **run of two or more sibling** empty headings is a list styled as
+      headings (the steps of "How to order" are ``<h3>`` each) — they become
+      paragraphs of the enclosing section;
+    * a **single** empty heading of one or two words is a widget label (a tab
+      "Detallar" whose content went to the FAQ, an "ABB mobile" banner title
+      whose text was kept on another page) — it is dropped; a longer one is a
+      statement ("Pul köçürməsi həqiqətən sürətlidir") and is kept.
     """
     sections: list[Section] = []
-    heading_stack: list[tuple[int, str]] = []
-    top_is_empty = False  # the innermost heading has no content yet
+    stack: list[tuple[int, str]] = []
+    top_is_empty = False   # the innermost heading has no content yet
+    empty_siblings: list[str] = []  # empty headings directly before the current one, same level
 
-    def add_paragraph(text: str) -> None:
-        path = [heading for _, heading in heading_stack]
+    def add_paragraph(text: str, path: list[str]) -> None:
         if not sections or sections[-1].heading_path != path:
             sections.append(Section(heading_path=path))
         sections[-1].paragraphs.append(text)
 
+    def settle_empty_siblings(path: list[str]) -> None:
+        is_list = len(empty_siblings) >= 2
+        for text in empty_siblings:
+            if is_list or len(text.split()) >= _MIN_WORDS_OF_A_STATEMENT:
+                add_paragraph(text, path)
+        empty_siblings.clear()
+
+    def path(entries: list[tuple[int, str]]) -> list[str]:
+        return [heading for _, heading in entries]
+
     for block in blocks:
-        if block.is_heading:
-            if heading_stack and fingerprint(heading_stack[-1][1]) == fingerprint(block.text):
-                continue  # e.g. a tab "Tariflər" directly inside a section "Tariflər"
-            if top_is_empty and block.heading_level <= heading_stack[-1][0]:
-                add_paragraph(heading_stack.pop()[1])
-            while heading_stack and heading_stack[-1][0] >= block.heading_level:
-                heading_stack.pop()
-            heading_stack.append((block.heading_level, block.text))
-            top_is_empty = True
-        else:
-            add_paragraph(block.text)
+        if not block.is_heading:
+            if top_is_empty:  # the current heading is a real one; its empty siblings before it are settled
+                settle_empty_siblings(path(stack[:-1]))
+            add_paragraph(block.text, path(stack))
             top_is_empty = False
+            continue
+
+        if stack and fingerprint(stack[-1][1]) == fingerprint(block.text):
+            continue  # e.g. a tab "Tariflər" directly inside a section "Tariflər"
+        if top_is_empty:
+            level = stack[-1][0]
+            if block.heading_level > level:      # the empty heading turns out to be a parent
+                settle_empty_siblings(path(stack[:-1]))
+            else:                                # it stays empty: one more in the run
+                empty_siblings.append(stack.pop()[1])
+                if block.heading_level < level:  # the run of siblings ends here
+                    settle_empty_siblings(path(stack))
+        while stack and stack[-1][0] >= block.heading_level:
+            stack.pop()
+        stack.append((block.heading_level, block.text))
+        top_is_empty = True
 
     if top_is_empty:
-        add_paragraph(heading_stack.pop()[1])
+        empty_siblings.append(stack.pop()[1])
+    settle_empty_siblings(path(stack))
     return sections
 
 

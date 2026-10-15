@@ -19,9 +19,12 @@ class TestNormalizeText:
     def test_decodes_html_entities_left_by_double_escaping(self):
         assert normalize_text("genişləndirmək &uuml;çün") == "genişləndirmək üçün"
 
-    def test_keeps_only_markdown_link_text(self):
-        text = "[Azərbaycan Kredit Bürosu](https://cdn.abb-bank.az/AKB.pdf) vasitəsilə"
-        assert normalize_text(text) == "Azərbaycan Kredit Bürosu vasitəsilə"
+    def test_removes_markdown_emphasis(self):
+        assert normalize_text("Tarifləri **Yükləyin** və __oxuyun__") == "Tarifləri Yükləyin və oxuyun"
+
+    def test_markdown_links_keep_their_text_and_document_urls(self):
+        assert normalize_text("[ASAN Finans](https://asan.az) vasitəsilə") == "ASAN Finans vasitəsilə"
+        assert normalize_text("[Yüklə](https://cdn.abb-bank.az/tarif.pdf)") == "Yüklə (https://cdn.abb-bank.az/tarif.pdf)"
 
 
 class TestFingerprint:

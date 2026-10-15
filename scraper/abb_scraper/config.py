@@ -29,12 +29,15 @@ class ScraperConfig:
     # Extraction
     extract_workers: int = field(default_factory=lambda: max(1, (os.cpu_count() or 2) - 1))
     """Parallel processes for HTML parsing (CPU bound)."""
+    faq_max_shared_pages: int = 3
+    """An FAQ item on up to this many pages stays on each of them (product context);
+    more widely repeated items are kept once, on the most general page."""
     min_page_chars: int = 150
     """Pages with less extracted text than this are treated as empty."""
     boilerplate_min_pages: int = 25
-    boilerplate_page_ratio: float = 0.10
-    """A text block is boilerplate when it occurs on at least ``boilerplate_min_pages``
-    pages *and* on at least this share of all pages in the same language."""
+    """A text block that occurs on at least this many pages of one language is
+    boilerplate (banners, teasers) and is kept only once. An absolute count, not
+    a share: most pages are tenders and news, where banners never appear."""
 
     data_dir: Path = field(default=PROJECT_ROOT / "data")
 
@@ -61,6 +64,10 @@ class ScraperConfig:
     @property
     def pages_path(self) -> Path:
         return self.data_dir / "abb_pages.jsonl"
+
+    @property
+    def reports_dir(self) -> Path:
+        return PROJECT_ROOT / "evaluation" / "reports"
 
     @property
     def report_path(self) -> Path:

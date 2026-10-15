@@ -15,20 +15,17 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from .html_content import Block
+from .places import CityResolver
 from .text import fingerprint, normalize_text
 
 BASE_URL = "https://abb-bank.az"
 BREADCRUMB_ROOT = "Xidmət şəbəkəsi"
 
-# Districts of Baku — an address naming one of them is in Baku.
-_BAKU_DISTRICTS = frozenset(fingerprint(name) for name in (
-    "Binəqədi", "Qaradağ", "Xəzər", "Səbail", "Sabunçu", "Suraxanı", "Nərimanov", "Nəsimi",
-    "Nizami", "Pirallahı", "Xətai", "Yasamal",
-))
-_PLACE_SUFFIX_RE = re.compile(r"\s+(şəhəri|şəh\.?|ş\.?|rayonu|r\.?|qəsəbəsi|kəndi)$", re.IGNORECASE)
 _PHONE_RE = re.compile(r"[\d\s()+\-]*\d[\d\s()+\-]*")
 _COORDINATES_RE = re.compile(r"\d+\.\d+,\s*\d+\.\d+")
 _ASCII = str.maketrans("əğıöüşçƏĞIİÖÜŞÇ", "egiouscEGIIOUSC")
+
+Coordinates = tuple[float, float]
 
 
 @dataclass
@@ -37,42 +34,41 @@ class NetworkDocument:
     title: str
     breadcrumbs: list[str]
     blocks: list[Block] = field(default_factory=list)
+    coordinates: Coordinates | None = None
 
 
 def service_network_documents(data: dict[str, Any]) -> list[NetworkDocument]:
+    branches = data.get("branches", [])
+    cities = CityResolver((b.get("address", ""), coordinates_of(b)) for b in branches)
+
     filters_by_branch: dict[int, list[str]] = defaultdict(list)
     for filter_title, branch_ids in data.get("branch_filters", {}).items():
         for branch_id in branch_ids:
             filters_by_branch[branch_id].append(filter_title)
 
-    documents = [_overview(data)]
+    documents = [_overview(data, cities)]
     # The filters refer to branch ids; sub-branches and offices have their own id range.
-    documents += [_branch_document(b, "filial", "Filiallar", filters_by_branch[b.get("id")])
-                  for b in data.get("branches", [])]
-    documents += [_branch_document(b, "sobe", "Şöbələr", []) for b in data.get("sub_branches", [])]
-    documents += [_branch_document(b, "xarici-ofis", "Xaricdəki ofislər", []) for b in data.get("abroad_offices", [])]
-    documents += _grouped_by_city(data.get("atms", []), "atm", "Bankomatlar", "ABB bankomatları (ATM)")
-    documents += _grouped_by_city(data.get("terminals", []), "terminallar", "Ödəniş terminalları",
+    documents += [_branch_document(b, "filial", "Filiallar", cities, filters_by_branch[b.get("id")])
+                  for b in branches]
+    documents += [_branch_document(b, "sobe", "Şöbələr", cities) for b in data.get("sub_branches", [])]
+    documents += [_branch_document(b, "xarici-ofis", "Xaricdəki ofislər", None)
+                  for b in data.get("abroad_offices", [])]
+    documents += _grouped_by_city(data.get("atms", []), cities, "atm", "Bankomatlar", "ABB bankomatları (ATM)")
+    documents += _grouped_by_city(data.get("terminals", []), cities, "terminallar", "Ödəniş terminalları",
                                   "ABB ödəniş terminalları")
     return documents
 
 
-def city_of(address: str) -> str:
-    """City of an address; Baku district names and spellings ("Bakı ş.", "Baku") map to "Bakı"."""
-    parts = [part.strip() for part in address.split(",") if part.strip()]
-    if any("baki" in fingerprint(part) or "baku" in fingerprint(part) for part in parts):
-        return "Bakı"
-    if not parts:
-        return "Digər"
-    place = _PLACE_SUFFIX_RE.sub("", parts[0]).strip()
-    if fingerprint(place) in _BAKU_DISTRICTS:
-        return "Bakı"
-    return place or "Digər"
+def coordinates_of(point: dict[str, Any]) -> Coordinates | None:
+    """Branches store ``coordinates: {lat, lng}``, ATMs ``location: {lat, lon}``."""
+    raw = point.get("coordinates") or point.get("location") or {}
+    lat, lng = raw.get("lat"), raw.get("lng", raw.get("lon"))
+    return (float(lat), float(lng)) if lat is not None and lng is not None else None
 
 
 # --------------------------------------------------------------------------- #
 
-def _overview(data: dict[str, Any]) -> NetworkDocument:
+def _overview(data: dict[str, Any], cities: CityResolver) -> NetworkDocument:
     branches, atms = data.get("branches", []), data.get("atms", [])
     terminals = data.get("terminals", [])
     title = "ABB xidmət şəbəkəsi: filiallar, şöbələr, bankomatlar və terminallar"
@@ -87,7 +83,7 @@ def _overview(data: dict[str, Any]) -> NetworkDocument:
     ]
     by_city: dict[str, list[str]] = defaultdict(list)
     for branch in branches:
-        by_city[city_of(branch.get("address", ""))].append(_text(branch.get("title")))
+        by_city[cities.city_of(branch.get("address", ""), coordinates_of(branch))].append(_text(branch.get("title")))
     blocks += [Block(f"{city}: {', '.join(sorted(names))}") for city, names in sorted(by_city.items())]
 
     names_by_id = {b.get("id"): _text(b.get("title")) for b in branches}
@@ -98,12 +94,15 @@ def _overview(data: dict[str, Any]) -> NetworkDocument:
     return NetworkDocument(f"{BASE_URL}/filiallar", title, [BREADCRUMB_ROOT], blocks)
 
 
-def _branch_document(branch: dict[str, Any], url_kind: str, label: str, filters: list[str]) -> NetworkDocument:
+def _branch_document(
+    branch: dict[str, Any], url_kind: str, label: str, cities: CityResolver | None, filters: Iterable[str] = ()
+) -> NetworkDocument:
     title = _text(branch.get("title")) or label
     address = _text(branch.get("address"))
+    coordinates = coordinates_of(branch)
     lines = [
         ("Ünvan", address),
-        ("Şəhər", city_of(address) if address else ""),
+        ("Şəhər", cities.city_of(address, coordinates) if cities and address else ""),
         ("İş saatları", _join(item.get("text") for item in branch.get("work_time") or [])),
         ("Telefon", _join(_phones(item.get("text") for item in branch.get("phone_numbers") or []))),
         ("E-poçt", _join(item.get("text") for item in branch.get("emails") or [])),
@@ -112,17 +111,19 @@ def _branch_document(branch: dict[str, Any], url_kind: str, label: str, filters:
         ("Xidmətlər", _join(_name(s) for s in branch.get("services") or [])),
         ("Siyahılar", _join(filters)),
         ("Filial kodu", str(branch.get("branch_code") or "")),
-        ("Xəritədə", _maps_link(branch.get("coordinates"))),
+        ("Xəritədə", _maps_link(coordinates)),
     ]
     blocks = [Block(title, 1)] + [Block(f"{name}: {value}") for name, value in lines if value]
     url = f"{BASE_URL}/filiallar#{url_kind}-{branch.get('id')}"
-    return NetworkDocument(url, title, [BREADCRUMB_ROOT, label], blocks)
+    return NetworkDocument(url, title, [BREADCRUMB_ROOT, label], blocks, coordinates)
 
 
-def _grouped_by_city(points: list[dict[str, Any]], page: str, label: str, title_prefix: str) -> list[NetworkDocument]:
+def _grouped_by_city(
+    points: list[dict[str, Any]], cities: CityResolver, page: str, label: str, title_prefix: str
+) -> list[NetworkDocument]:
     by_city: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for point in points:
-        by_city[city_of(point.get("address", ""))].append(point)
+        by_city[cities.city_of(point.get("address", ""), coordinates_of(point))].append(point)
 
     documents = []
     for city, items in sorted(by_city.items()):
@@ -133,11 +134,11 @@ def _grouped_by_city(points: list[dict[str, Any]], page: str, label: str, title_
             Block(f"{city} üzrə {len(items)} nöqtə; onlardan {cash_in}-i nağd pul mədaxili (cash-in) qəbul edir."),
         ]
         blocks += [Block(_point_line(p)) for p in sorted(items, key=lambda p: p.get("address", ""))]
-        documents.append(NetworkDocument(f"{BASE_URL}/{page}#{_slug(city)}", title, [BREADCRUMB_ROOT, label], blocks))
+        documents.append(NetworkDocument(f"{BASE_URL}/{page}#{slug(city)}", title, [BREADCRUMB_ROOT, label], blocks))
     return documents
 
 
-def _slug(text: str) -> str:
+def slug(text: str) -> str:
     """URL-safe ASCII form: "Gəncə" → "gence", "Şəki" → "seki"."""
     return re.sub(r"[^a-z0-9]+", "-", text.translate(_ASCII).lower()).strip("-") or "diger"
 
@@ -152,8 +153,11 @@ def _point_line(point: dict[str, Any]) -> str:
         features.append(f"iş vaxtı: {_text(point.get('workingTime'))}")
     if point.get("workOnWeekend"):
         features.append("həftə sonu işləyir")
-    address = _text(point.get("address"))
-    return f"{address} — {', '.join(features)}" if features else address
+    line = _text(point.get("address"))
+    if features:
+        line += f" — {', '.join(features)}"
+    maps = _maps_link(coordinates_of(point))
+    return f"{line} — xəritə: {maps}" if maps else line
 
 
 def _is_24_7(point: dict[str, Any]) -> bool:
@@ -178,10 +182,8 @@ def _name(item: Any) -> str:
     return _text(item)
 
 
-def _maps_link(coordinates: dict[str, Any] | None) -> str:
-    if not coordinates or coordinates.get("lat") is None or coordinates.get("lng") is None:
-        return ""
-    return f"https://www.google.com/maps?q={coordinates['lat']},{coordinates['lng']}"
+def _maps_link(coordinates: Coordinates | None) -> str:
+    return f"https://www.google.com/maps?q={coordinates[0]},{coordinates[1]}" if coordinates else ""
 
 
 def _join(values: Iterable[str | None]) -> str:

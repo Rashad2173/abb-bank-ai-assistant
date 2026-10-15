@@ -52,7 +52,7 @@ def test_tariff_rows_become_label_value_lines():
     assert blocks == [
         ("Tariflər", 3),
         ("İllik faiz dərəcəsi: 22%", None),
-        ("Komissiya: Yüklə", None),
+        ("Komissiya: Yüklə (https://cdn.abb-bank.az/tarif.pdf)", None),  # document links are kept
     ]
 
 
@@ -99,8 +99,8 @@ def test_items_whose_only_children_are_media_keep_their_title():
     ]}
     assert render([section]) == [
         ("Hesabatlar", 2),
-        ("Bank kapitalının strukturu - 2026, I rüb", None),
-        ("İllik hesabat - 2025", None),
+        ("Bank kapitalının strukturu - 2026, I rüb (https://cdn.abb-bank.az/report.pdf)", None),
+        ("İllik hesabat - 2025 (https://cdn.abb-bank.az/report.pdf)", None),
     ]
 
 
@@ -116,8 +116,7 @@ def test_rich_text_bodies_and_row_references():
                "content": [{"body": "<p><strong>Şərtlər</strong></p><ul><li>VÖEN</li></ul>"}]}
     assert render([section], rows=rows) == [
         ("Paketlər", 2),
-        ("Xidmət | Çevik", None),
-        ("Hesab açılışı | ✔", None),
+        ("Xidmət: Hesab açılışı; Çevik: ✔", None),
         ("Şərtlər", None),
         ("- VÖEN", None),
     ]

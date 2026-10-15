@@ -17,7 +17,9 @@ _SCHWA_LOOKALIKES = str.maketrans({
 
 _INVISIBLE_RE = re.compile("[​‌‍⁠﻿­]")
 _WHITESPACE_RE = re.compile(r"\s+")
-_MARKDOWN_LINK_RE = re.compile(r"\[([^\]]+)\]\([^)]+\)")
+_MARKDOWN_LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
+_MARKDOWN_EMPHASIS_RE = re.compile(r"(\*\*|__)(.+?)\1")
+_DOCUMENT_URL_RE = re.compile(r"^https?://\S+\.(pdf|docx?|xlsx?|pptx?)(\?\S*)?$", re.IGNORECASE)
 
 
 def normalize_text(text: str) -> str:
@@ -25,12 +27,37 @@ def normalize_text(text: str) -> str:
 
     HTML entities are decoded as well — some CMS texts are escaped twice
     (``&amp;uuml;``), so they still contain ``&uuml;`` after HTML parsing.
+    Markdown emphasis (``**Yükləyin**``) is removed; markdown links keep only
+    their text, except links to documents (tariff PDFs …), which keep the URL:
+    ``Yüklə (https://…/tarif.pdf)``.
     """
     text = unicodedata.normalize("NFC", html.unescape(text))
     text = text.translate(_SCHWA_LOOKALIKES)
     text = _INVISIBLE_RE.sub("", text)
-    text = _MARKDOWN_LINK_RE.sub(r"\1", text)
+    text = _MARKDOWN_EMPHASIS_RE.sub(r"\2", text)
+    text = _MARKDOWN_LINK_RE.sub(_render_markdown_link, text)
     return _WHITESPACE_RE.sub(" ", text).strip()
+
+
+_PLACEHOLDER_RE = re.compile(
+    r"^(dummy|test(\s+test)*|lorem ipsum.*)$|bura\s+m[eə]tn\s+yaz[ıi]lmal[ıi]d[ıi]r",
+    re.IGNORECASE,
+)
+
+
+def is_placeholder(text: str) -> bool:
+    """Text an editor left in the CMS instead of content ("dummy", "test test",
+    "Bura mətn yazılmalıdır" = "text goes here")."""
+    return bool(_PLACEHOLDER_RE.search(normalize_text(text)))
+
+
+def is_document_url(url: str) -> bool:
+    return bool(_DOCUMENT_URL_RE.match(url.strip()))
+
+
+def _render_markdown_link(match: re.Match) -> str:
+    label, url = match.groups()
+    return f"{label} ({url})" if is_document_url(url) else label
 
 
 # Azerbaijani has dotted/dotless I (İ/i, I/ı); plain casefold() turns "İ" into

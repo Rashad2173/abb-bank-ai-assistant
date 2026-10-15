@@ -38,7 +38,11 @@ The scraper design follows from what the site analysis showed:
 | The sitemap is large (~7k URLs) but not complete | Links found on pages are crawled as well |
 | Many EN/RU pages were never translated (≈3 000 tenders, news, campaigns show the Azerbaijani text) | The text's real language is detected; a copy is dropped when the original exists |
 | Branch/ATM locator pages are empty in the HTML — the browser loads the data via **Next.js Server Actions** and a REST API | The scraper calls the same endpoints; action ids are looked up by name in the site's JavaScript (they change with every deployment) |
-| Some list items are styled as headings without text below them (steps of "how to order") | They are kept as list items instead of being dropped as empty sections |
+| Some list items are styled as headings without text below them (steps of "how to order") | Runs of such headings are kept as list items; a lone label ("Detallar") is dropped |
+| Tables use `<td>` for headers and leave cells empty | Rows are written as `Column: value; …` with `–` for empty cells, so a value never shifts into the wrong column |
+| 98 % of the campaign pages are over | Each campaign gets `validity` (period, `is_active`) from its dates and status notes |
+| PDFs (tariffs, reports) are linked everywhere | Links are kept in the text and listed per page (`documents`) |
+| Addresses of ATMs are free text ("Gence", "Sumqayt", "Babək pr.") | Cities resolved with a place-name list, falling back to the nearest branch's coordinates |
 
 ## Pipeline
 
@@ -74,6 +78,9 @@ re-run in seconds against the cache without downloading the site again.
 | `extract/page.py` | Combines HTML, CMS and FAQ for one page |
 | `extract/service_network.py` | Service network data → one document per branch, ATMs/terminals per city, overview |
 | `extract/text.py` | Normalization (Azerbaijani-aware), fingerprints, language detection |
+| `extract/places.py` | City of an address (place names + nearest-branch fallback) |
+| `extract/validity.py` | Campaign period and status |
+| `quality.py` | Data quality checks and report |
 | `pipeline.py` | Extract phase orchestration, de-duplication, output |
 
 ## Output
@@ -109,19 +116,23 @@ its context after it is split into chunks for the vector database.
 category, skipped empty/duplicate pages, failed fetches, pages without CMS data
 and the list of repeated blocks that were kept only once.
 
-## Result (crawl of 2026-10-14)
+## Result (crawl of 2026-10-14, extraction of 2026-10-15)
 
 | Metric | Value |
 |--------|-------|
 | URLs discovered | 7 397 (sitemap 7 187 + 209 found via links + home) |
 | Fetched | 7 232 × HTTP 200, 165 × 404 (dead sitemap entries), 0 failures |
 | Unique pages | 7 178 (98 redirects) |
-| Written documents | **4 420** — 3 996 web pages + 424 service-network documents |
-| Dropped | 3 003 untranslated copies, 106 duplicates, 73 empty pages |
-| Text / FAQ | 8.7 M characters, 1 550 FAQ items |
-| Service network | 79 branches, 8 sub-branches, 2 offices abroad, 941 ATMs, 277 terminals |
-| **CMS coverage** | **100 %** of 16 240 CMS text lines (803 pages) are in the output — 97.9 % on their page, 2.1 % kept once on a more general page |
+| Written documents | **4 225** — 4 006 web pages + 219 service-network documents |
+| Dropped | ~3 000 untranslated copies, duplicates and empty pages |
+| FAQ / documents | 1 611 FAQ items; 744 linked documents (PDF) kept as links in the text |
+| Campaigns | 517 pages with validity: 506 ended, 11 active |
+| Service network | 79 branches, 8 sub-branches, 2 offices abroad, 941 ATMs in 72 cities, 277 terminals |
+| **CMS coverage** | **99.9 %** of 15 645 CMS text lines are in the output; the rest are titles of calculators and FAQ groups |
 | Run time | crawl ≈ 30 min (4 pages/s, polite), extract ≈ 2 min (parallel) |
+
+`python -m abb_scraper check` re-measures all of this and writes
+`evaluation/reports/00_data_quality.md`.
 
 ## Politeness
 

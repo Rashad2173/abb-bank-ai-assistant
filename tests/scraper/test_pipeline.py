@@ -32,7 +32,12 @@ def test_build_sections_follows_heading_hierarchy():
     ]
 
 
-def test_build_sections_keeps_headings_without_content_as_list_items():
+def sections_of(blocks):
+    return [(s.heading_path, s.paragraphs) for s in build_sections(blocks)]
+
+
+def test_build_sections_keeps_a_run_of_empty_headings_as_list_items():
+    """The steps of "How to order" are headings without text below them."""
     blocks = [
         Block("Kart", 1),
         Block("Necə sifariş etmək olar?", 2),
@@ -40,12 +45,38 @@ def test_build_sections_keeps_headings_without_content_as_list_items():
         Block("FLYMC2 yazın", 3),
         Block("Sifarişi tamamlayın", 3),
         Block("Şərtlər", 2),
-        Block("Pulsuz", 3),
+        Block("Pulsuz çatdırılma", 3),
+        Block("Kuryerlə 1 iş günündə.", None),
     ]
-    sections = [(s.heading_path, s.paragraphs) for s in build_sections(blocks)]
-    assert sections == [
+    assert sections_of(blocks) == [
         (["Kart", "Necə sifariş etmək olar?"], ["Promokod xanasına klikləyin", "FLYMC2 yazın", "Sifarişi tamamlayın"]),
-        (["Kart", "Şərtlər"], ["Pulsuz"]),
+        (["Kart", "Şərtlər", "Pulsuz çatdırılma"], ["Kuryerlə 1 iş günündə."]),
+    ]
+
+
+def test_build_sections_drops_a_single_empty_heading():
+    """E.g. a tab label "Detallar" whose content went to the FAQ."""
+    blocks = [
+        Block("Mikro kredit", 1),
+        Block("500 000 AZN-dək", None),
+        Block("Tez-tez verilən suallar", 2),
+        Block("Detallar", 3),
+        Block("ABB mobile", 1),
+    ]
+    assert sections_of(blocks) == [(["Mikro kredit"], ["500 000 AZN-dək"])]
+
+
+def test_build_sections_empty_siblings_before_a_real_heading_are_a_list():
+    blocks = [
+        Block("Üstünlüklər", 2),
+        Block("Pulsuz", 3),
+        Block("Onlayn", 3),
+        Block("Keşbek", 3),
+        Block("10%-dək keşbek qazanın.", None),
+    ]
+    assert sections_of(blocks) == [
+        (["Üstünlüklər"], ["Pulsuz", "Onlayn"]),
+        (["Üstünlüklər", "Keşbek"], ["10%-dək keşbek qazanın."]),
     ]
 
 
@@ -77,9 +108,9 @@ def test_run_extraction_end_to_end(config):
     assert "reytinqə" in page_text("https://abb-bank.az/")
     assert "reytinqə" not in page_text("https://abb-bank.az/ferdi/kartlar")
 
-    # The shared FAQ item is kept once as well.
+    # An FAQ item shown on only a few product pages stays on each of them.
     assert [f.answer for f in pages["https://abb-bank.az/ferdi/kartlar"].faq] == ["Onlayn müraciət ilə."]
-    assert pages["https://abb-bank.az/ferdi/kartlar/tam"].faq == []
+    assert [f.answer for f in pages["https://abb-bank.az/ferdi/kartlar/tam"].faq] == ["Onlayn müraciət ilə."]
 
     # The footer's contact details become part of the home page.
     assert "Tel: 937" in page_text("https://abb-bank.az/")
@@ -91,7 +122,50 @@ def test_run_extraction_end_to_end(config):
 
     summary = json.loads(config.report_path.read_text("utf-8"))
     assert summary["pages_written"] == 3
-    assert summary["faq_items"] == 1
+    assert summary["faq_items"] == 2
+
+
+def test_short_labels_stay_on_every_page_while_repeated_sentences_are_kept_once(config):
+    store = RawPageStore(config.raw_dir, config.manifest_path)
+    banner = "<p>ABB mobile yükləmək üçün QR kodu skan edin.</p>"
+    for i, amount in enumerate(["30 000 AZN-dək", "50 000 AZN-dək", "70 000 AZN-dək"]):
+        body = f"<h1>Kredit {i}</h1><p>{amount}</p><p>Məbləğ</p><p>{LONG_TEXT} {i}</p>{banner}"
+        cache_page(store, f"https://abb-bank.az/ferdi/kreditler/k{i}", page_html(body))
+
+    run_extraction(config, store)
+
+    pages = [Page.model_validate_json(line) for line in config.pages_path.read_text("utf-8").splitlines()]
+    texts = [[p for s in page.sections for p in s.paragraphs] for page in pages]
+    assert all("Məbləğ" in t for t in texts)                                            # label kept everywhere
+    assert sum("ABB mobile yükləmək üçün QR kodu skan edin." in t for t in texts) == 1  # banner kept once
+
+
+def test_widely_repeated_faq_is_kept_once_and_remembers_the_other_pages(config):
+    config = replace(config, faq_max_shared_pages=1)
+    store = RawPageStore(config.raw_dir, config.manifest_path)
+    cache_page(store, "https://abb-bank.az/ferdi/kartlar", page_html(f"<h1>Kartlar</h1><p>{LONG_TEXT} A</p>" + FAQ))
+    cache_page(store, "https://abb-bank.az/ferdi/kartlar/tam", page_html(f"<h1>Tam</h1><p>{LONG_TEXT} B</p>" + FAQ))
+
+    run_extraction(config, store)
+
+    pages = {p.url: p for p in map(Page.model_validate_json, config.pages_path.read_text("utf-8").splitlines())}
+    general = pages["https://abb-bank.az/ferdi/kartlar"].faq
+    assert [(f.answer, f.also_on) for f in general] == [("Onlayn müraciət ilə.", ["https://abb-bank.az/ferdi/kartlar/tam"])]
+    assert pages["https://abb-bank.az/ferdi/kartlar/tam"].faq == []
+
+
+def test_campaign_pages_get_validity_and_documents(config):
+    store = RawPageStore(config.raw_dir, config.manifest_path)
+    body = (f"<h1>Yay kampaniyası</h1><p>01.06.2024 - 31.08.2024</p><p>Aktiv deyil</p><p>{LONG_TEXT}</p>"
+            '<p>Qaydalar: <a href="https://cdn.abb-bank.az/qaydalar.pdf">Yüklə</a></p>')
+    cache_page(store, "https://abb-bank.az/kampaniyalar/yay", page_html(body))
+
+    run_extraction(config, store)
+
+    page = Page.model_validate_json(config.pages_path.read_text("utf-8").splitlines()[0])
+    assert page.validity.is_active is False
+    assert str(page.validity.valid_until) == "2024-08-31"
+    assert [(d.title, d.url) for d in page.documents] == [("Qaydalar", "https://cdn.abb-bank.az/qaydalar.pdf")]
 
 
 AZ_TENDER = (

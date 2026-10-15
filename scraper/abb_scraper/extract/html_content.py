@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 from bs4 import BeautifulSoup, NavigableString, Tag
 from bs4.element import PreformattedString
 
-from .text import decode_cf_email, fingerprint, normalize_text
+from .text import decode_cf_email, fingerprint, is_document_url, normalize_text
 
 BLOCK_TAGS = (
     "address", "article", "aside", "blockquote", "dd", "div", "dl", "dt",
@@ -31,6 +31,7 @@ NON_CONTENT_TAGS = (
 )
 NON_CONTENT_SELECTORS = (
     "#rate-this-page",               # "Rate this page" widget
+    "[id^=app-banner]",              # "Download ABB mobile / scan the QR code" banner
     "[role=dialog]",
     "[class*=typography-body-button]",  # call-to-action button labels
 )
@@ -45,6 +46,9 @@ HEADING_CLASS_LEVELS = (
 _STREAM_SWAP_RE = re.compile(r'\$RC\("(B:\d+)","(S:\d+)"\)')
 _STEP_NUMBER_RE = re.compile(r"\d{1,2}")
 _MIN_PREVIEW_CHARS = 30
+_EMPTY_CELL = "–"
+# Tailwind classes that render an inline tag on its own line/box ("lg:block" counts as well).
+_BLOCK_LAYOUT_CLASSES = frozenset({"block", "flex", "grid", "inline-block", "inline-flex", "table", "list-item"})
 
 
 @dataclass(frozen=True)
@@ -74,6 +78,8 @@ def parse_html(html: str) -> ParsedHtml:
     soup = BeautifulSoup(html, "lxml")
     _decode_cf_emails(soup)
     _inline_streamed_segments(soup, html)
+    _inline_document_links(soup)
+    _mark_visual_breaks(soup)
 
     breadcrumbs = _extract_breadcrumbs(soup)
     footer_blocks = _extract_footer(soup)
@@ -97,6 +103,8 @@ def html_fragment_to_text(fragment: str) -> str:
         lines = (normalize_text(line) for line in fragment.splitlines())
         return "\n".join(line for line in lines if line)
     soup = BeautifulSoup(fragment, "lxml")
+    _inline_document_links(soup)
+    _mark_visual_breaks(soup)
     root = soup.body or soup
     return "\n".join(block.text for block in _dedupe(iter_blocks(root)))
 
@@ -105,8 +113,10 @@ def iter_blocks(node: Tag) -> Iterator[Block]:
     """Yield the text blocks below ``node`` in reading order.
 
     An element that contains no block-level descendants is treated as one
-    block (its inline children — links, bold text … — are joined). Tables are
-    flattened row by row as ``cell | cell | cell``.
+    block; its inline children (links, bold text, a ``<span>`` around one
+    letter …) are joined exactly as the HTML spaces them — inserting a space at
+    every tag boundary would turn ``Siyas<span>ə</span>tinin`` into
+    "Siyas ə tinin". Tables become one block per row (see :func:`_table_blocks`).
     """
     for child in node.children:
         if isinstance(child, PreformattedString):  # comments, CDATA, doctype
@@ -124,7 +134,7 @@ def iter_blocks(node: Tag) -> Iterator[Block]:
         elif child.find(BLOCK_TAGS):
             yield from iter_blocks(child)
         else:
-            text = normalize_text(child.get_text(" "))
+            text = normalize_text(child.get_text(""))
             if _is_noise(text):
                 continue
             if child.name == "li":
@@ -140,6 +150,34 @@ def _decode_cf_emails(soup: BeautifulSoup) -> None:
     """Replace Cloudflare e-mail protection placeholders with the real address."""
     for node in soup.select("[data-cfemail]"):
         node.replace_with(decode_cf_email(node["data-cfemail"]))
+
+
+def _mark_visual_breaks(soup: BeautifulSoup) -> None:
+    """Put a space where the browser shows a break between inline elements.
+
+    ``<br>`` and inline tags laid out as blocks by CSS classes (``block``,
+    ``flex`` … — e.g. a statistic's value and label in two ``<span>``) are
+    separated; all other inline boundaries keep the HTML's own spacing.
+    """
+    for br in soup.find_all("br"):
+        br.replace_with(" ")
+    for tag in soup.find_all(_is_laid_out_as_block):
+        tag.insert_before(" ")
+        tag.insert_after(" ")
+
+
+def _is_laid_out_as_block(tag: Tag) -> bool:
+    if tag.name in BLOCK_TAGS:
+        return False  # real block elements are separated by iter_blocks anyway
+    return any(cls.rsplit(":", 1)[-1] in _BLOCK_LAYOUT_CLASSES for cls in tag.get("class", []))
+
+
+def _inline_document_links(soup: BeautifulSoup) -> None:
+    """Keep the URL of links to documents in the text: "Tariflər (https://…/tarif.pdf)"."""
+    for link in soup.find_all("a", href=True):
+        href = link["href"].strip()
+        if is_document_url(href) and href not in link.get_text():
+            link.append(f" ({href})")
 
 
 def _inline_streamed_segments(soup: BeautifulSoup, html: str) -> None:
@@ -184,11 +222,61 @@ def _remove_non_content(root: Tag) -> None:
 
 
 def _table_blocks(table: Tag) -> Iterator[Block]:
-    for row in table.find_all("tr"):
-        cells = [normalize_text(cell.get_text(" ")) for cell in row.find_all(["th", "td"])]
-        cells = [cell for cell in cells if cell]
-        if cells:
-            yield Block(" | ".join(cells))
+    """One block per row, each row readable on its own.
+
+    With a header row, every value is labelled with its column:
+    ``Müddət: 1 ay; Aylıq: –; Müddətin sonu: 6.5%``. Empty cells are kept as
+    "–" — dropping them would shift values into the wrong column (e.g. an
+    end-of-term rate read as a monthly one).
+    """
+    rows = [_row_cells(row) for row in table.find_all("tr")]
+    rows = [row for row in rows if any(row)]
+    if not rows:
+        return
+
+    header, body = (rows[0], rows[1:]) if _is_header(table, rows) else (None, rows)
+    if header is None:
+        for row in rows:
+            yield Block(" | ".join(cell or _EMPTY_CELL for cell in row))
+        return
+    for row in body:
+        pairs = [f"{label}: {cell or _EMPTY_CELL}" for label, cell in zip(header, row) if label or cell]
+        yield Block("; ".join(pairs))
+
+
+def _row_cells(row: Tag) -> list[str]:
+    """Cell texts of a row; a cell spanning several columns is repeated for each of them."""
+    cells = []
+    for cell in row.find_all(["th", "td"]):
+        text = normalize_text(cell.get_text(""))
+        span = int(cell.get("colspan", 1)) if str(cell.get("colspan", 1)).isdigit() else 1
+        cells += [text] * max(span, 1)
+    return cells
+
+
+def _is_header(table: Tag, rows: list[list[str]]) -> bool:
+    """Is the first row a header?
+
+    Marked with ``<th>``: yes. The CMS writes ``<td>`` everywhere, so otherwise
+    the first row must look like column labels above data: three or more
+    columns, no empty cell, no digit — while most rows below contain digits
+    (rates, amounts, terms). Two-column tables are key–value lists
+    ("Uzunmüddətli reytinq | BB+"): their first row is data, not a header.
+    """
+    if len(rows) < 2:
+        return False
+    first_row = table.find("tr")
+    if first_row is not None and first_row.find("th") and not first_row.find("td"):
+        return True
+    first, body = rows[0], rows[1:]
+    rows_with_digits = sum(any(char.isdigit() for cell in row for char in cell) for row in body)
+    return (
+        len(first) >= 3
+        and all(first)
+        and not any(char.isdigit() for cell in first for char in cell)
+        and all(len(row) == len(first) for row in body)
+        and rows_with_digits * 2 >= len(body)
+    )
 
 
 def _heading_level(tag: Tag) -> int | None:
