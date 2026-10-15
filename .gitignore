@@ -15,3 +15,9 @@ data/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Review reports produced by external tools (kept locally only)
+docs/ABB_DATA_QUALITY_*
+
+# Personal notes (kept locally only)
+docs/DEVELOPMENT_LOG.md

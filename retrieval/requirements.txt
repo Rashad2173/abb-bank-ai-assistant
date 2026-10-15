@@ -1,0 +1,14 @@
+# Runtime dependencies of the retrieval package (Python >= 3.10)
+#
+# PyTorch with GPU support is installed from the PyTorch index:
+#   pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cu128
+torch==2.11.0
+transformers==5.20.0           # tokenizer for chunk sizes
+FlagEmbedding==1.4.2           # bge-m3 (dense + sparse) and bge-reranker-v2-m3
+sentence-transformers==6.1.0   # multilingual-e5-large-instruct
+openai==3.31.0                 # text-embedding-3-large
+python-dotenv==1.2.4           # OPENAI_API_KEY from .env
+numpy==2.5.4
+scipy==1.18.1                  # sparse vectors
+pydantic==2.14.1
+pymilvus==3.0.2                # Milvus client

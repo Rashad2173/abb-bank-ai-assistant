@@ -47,6 +47,13 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 | Embedding model chosen by **benchmark on Azerbaijani data** (bge-m3, text-embedding-3-large, multilingual-e5 candidates) | Site content is mostly Azerbaijani; accuracy over cost |
 | Scraped chunks must be **human-reviewable** | Chunks will be checked manually |
 
+## Notes for answer generation
+- Some source pages contradict themselves (DigiDeposit 9.5 % vs 10 %, TamKart Gold
+  grace period "60 ay" vs "60 gün"). The scraper keeps the source text; the generation
+  prompt must prefer tariff tables and mention a conflict instead of picking silently.
+- Campaigns carry `is_active`; news carry a publication date — answers about current
+  offers must not present ended or old offers as valid.
+
 ## Known constraints / risks
 - Browser `localStorage` is limited to ~5–10 MB per origin; the full site dump
   (3 languages, ~7k URLs) may exceed it → needs compression and/or a scoped upload.
