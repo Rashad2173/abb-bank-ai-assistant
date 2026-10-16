@@ -22,7 +22,7 @@ def load_pages(path: Path) -> list[dict]:
 
 def chunk_corpus(pages: list[dict], count_tokens: TokenCounter, config: ChunkingConfig) -> list[Chunk]:
     chunks = [chunk for index, page in enumerate(pages) for chunk in chunk_page(page, index, count_tokens, config)]
-    return merge_repeated_chunks(chunks, config)
+    return merge_repeated_chunks(chunks, config, count_tokens)
 
 
 def write_jsonl(path: Path, items: Iterable[BaseModel]) -> None:

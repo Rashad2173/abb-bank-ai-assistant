@@ -142,11 +142,12 @@ def test_sections_shared_by_many_tenders_become_one_common_chunk():
 
     common = "Qara siyahı meyarları bütün təchizatçılara şamil olunur."
     chunks = [tender(i, common) for i in range(3)] + [tender(9, "Lot 1 üzrə 100 manat iştirak haqqı.")]
-    merged = merge_shared_sections(chunks, config)
+    merged = merge_shared_sections(chunks, config, words)
 
     assert len(merged) == 2
     shared = merged[0]
     assert shared.text.startswith("Satınalmalar (bütün tenderlər üçün ümumi)\nTələblər\n\n")
+    assert shared.token_count == words(shared.text)  # recounted for the new header
     assert len(shared.related_urls) == 2 and len({a.url for a in shared.aliases}) == 3
     assert merged[1].text.startswith("Tender 9")  # a tender's own facts stay with the tender
 

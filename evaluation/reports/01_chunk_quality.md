@@ -10,8 +10,8 @@ Settings: target 350 tokens, max 512, overlap 1 paragraph(s), tokenizer `BAAI/bg
 | Source pages | 4223 |
 | By type | section: 7977, faq: 1627 |
 | By language | az: 5822, ru: 2229, en: 1553 |
-| Tokens p10 / p50 / p90 / p99 / max | 71 / 341 / 494 / 504 / 504 |
-| Total tokens | 3,034,941 |
+| Tokens p10 / p50 / p90 / p99 / max | 71 / 341 / 493 / 504 / 504 |
+| Total tokens | 3,034,240 |
 | Over the 512-token limit | 0 |
 | Pages split into more than 10 chunks | 93 |
 
@@ -37,11 +37,11 @@ Settings: target 350 tokens, max 512, overlap 1 paragraph(s), tokenizer `BAAI/bg
 | Tokens | Chunks | |
 |--------|-------:|---|
 | 0–49 | 243 | █ |
-| 50–99 | 1355 | ██████ |
+| 50–99 | 1356 | ██████ |
 | 100–199 | 1098 | █████ |
-| 200–299 | 1367 | ██████ |
-| 300–399 | 1443 | ██████ |
-| 400–511 | 4098 | █████████████████ |
+| 200–299 | 1366 | ██████ |
+| 300–399 | 1444 | ██████ |
+| 400–511 | 4097 | █████████████████ |
 | 512–… | 0 |  |
 
 ## Random samples

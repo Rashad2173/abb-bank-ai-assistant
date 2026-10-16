@@ -19,6 +19,7 @@ from collections import defaultdict
 from .config import ChunkingConfig
 from .models import Chunk, ChunkAlias
 from .text import fingerprint
+from .tokens import TokenCounter
 
 COMMON_SECTION_TITLES = {
     "az": "Satınalmalar (bütün tenderlər üçün ümumi)",
@@ -27,8 +28,8 @@ COMMON_SECTION_TITLES = {
 }
 
 
-def merge_repeated_chunks(chunks: list[Chunk], config: ChunkingConfig) -> list[Chunk]:
-    return merge_identical_chunks(merge_shared_sections(chunks, config))
+def merge_repeated_chunks(chunks: list[Chunk], config: ChunkingConfig, count_tokens: TokenCounter) -> list[Chunk]:
+    return merge_identical_chunks(merge_shared_sections(chunks, config, count_tokens))
 
 
 def merge_identical_chunks(chunks: list[Chunk]) -> list[Chunk]:
@@ -40,7 +41,7 @@ def merge_identical_chunks(chunks: list[Chunk]) -> list[Chunk]:
     return list(kept.values())
 
 
-def merge_shared_sections(chunks: list[Chunk], config: ChunkingConfig) -> list[Chunk]:
+def merge_shared_sections(chunks: list[Chunk], config: ChunkingConfig, count_tokens: TokenCounter) -> list[Chunk]:
     groups: dict[tuple[str, str], list[Chunk]] = defaultdict(list)
     for chunk in chunks:
         if chunk.category in config.shared_section_categories:
@@ -50,7 +51,7 @@ def merge_shared_sections(chunks: list[Chunk], config: ChunkingConfig) -> list[C
               if len({c.url for c in group}) >= config.shared_section_min_pages}
     merged_ids: dict[str, Chunk] = {}
     for (lang, _), group in shared.items():
-        common = _common_chunk(group[0], lang)
+        common = _common_chunk(group[0], lang, count_tokens)
         for other in group[1:]:
             _absorb(common, other)
         for chunk in group:
@@ -70,12 +71,14 @@ def body_of(chunk: Chunk) -> str:
     return chunk.text.split("\n\n", 1)[-1]
 
 
-def _common_chunk(first: Chunk, lang: str) -> Chunk:
+def _common_chunk(first: Chunk, lang: str, count_tokens: TokenCounter) -> Chunk:
     title = COMMON_SECTION_TITLES.get(lang, COMMON_SECTION_TITLES["az"])
     header = "\n".join([title, " > ".join(first.heading_path)]) if first.heading_path else title
+    text = f"{header}\n\n{body_of(first)}"
     return first.model_copy(update={
         "title": title,
-        "text": f"{header}\n\n{body_of(first)}",
+        "text": text,
+        "token_count": count_tokens(text),  # the header changed
         "published": None,  # common to tenders of many dates
         "aliases": [*first.aliases, ChunkAlias(url=first.url, page_index=first.page_index,
                                                sources=first.sources, category=first.category)],
