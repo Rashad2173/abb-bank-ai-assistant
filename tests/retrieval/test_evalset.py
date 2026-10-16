@@ -6,6 +6,7 @@ from abb_retrieval.evalset import (
     attach_chunks,
     freeze_evidence,
     parse_question_set,
+    parse_snippet_set,
     position_text,
     table_cells,
 )
@@ -205,3 +206,21 @@ def test_attach_chunks_reports_unmapped_evidence():
     problems = attach_chunks(frozen_questions(), [], [])
     assert len(problems) == 3
     assert problems[0].startswith("ABB-Q001")
+
+
+def test_snippet_set_evidence_is_found_by_url_and_snippet():
+    """Set B: a source is a URL plus verbatim snippets — no corpus positions."""
+    questions = parse_snippet_set([{
+        "id": "B-001", "question": "?", "lang": "az", "category": "simple", "expected_answer": "",
+        "evidence": [{"url": "u", "contains": ["Rəhbər: Ramil Alıyev"]}],
+    }])
+    hit = make_chunk("branch", "u", 0, [])
+    hit.text = "Filiallar\n\nÜnvan: Gədəbəy\nRəhbər:  Ramil   Alıyev"
+    other_page = make_chunk("other", "v", 0, [])
+    other_page.text = hit.text
+
+    problems = attach_chunks(questions, [hit, other_page], [])
+
+    assert problems == []
+    assert questions[0].evidence[0].page_index is None
+    assert questions[0].evidence[0].chunk_ids == ["branch"]

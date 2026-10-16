@@ -24,30 +24,32 @@ OPENAI_PRICE_PER_MILLION = 0.13  # USD, text-embedding-3-large
 
 
 def write_benchmark_report(
-    result: BenchmarkResult, questions: list[Question], chunks: list[Chunk], directory: Path
+    result: BenchmarkResult, questions: list[Question], chunks: list[Chunk], directory: Path,
+    name: str = "02_embedding_benchmark", source: str = "evaluation/abb_100_soru_kaynakli.md",
 ) -> Path:
+    """Write ``<name>.md``, ``<name>.json`` and ``<name>_per_question.csv``; ``source`` names the question set."""
     directory.mkdir(parents=True, exist_ok=True)
     summaries = {method: summarize(results) for method, results in result.results.items()}
     ordered = sorted(summaries, key=lambda m: (-summaries[m].recall[5], -summaries[m].mrr))
 
-    markdown = directory / "02_embedding_benchmark.md"
-    markdown.write_text(_markdown(result, summaries, ordered, questions, chunks), encoding="utf-8")
-    (directory / "02_embedding_benchmark.json").write_text(json.dumps({
+    markdown = directory / f"{name}.md"
+    markdown.write_text(_markdown(result, summaries, ordered, questions, chunks, source), encoding="utf-8")
+    (directory / f"{name}.json").write_text(json.dumps({
         "chunks": result.chunk_count,
         "questions": result.question_count,
         "models": [asdict(s) for s in result.model_stats],
         "methods": {m: _summary_dict(summaries[m]) for m in ordered},
     }, ensure_ascii=False, indent=1), encoding="utf-8")
-    _write_per_question_csv(result, questions, ordered, directory / "02_embedding_benchmark_per_question.csv")
+    _write_per_question_csv(result, questions, ordered, directory / f"{name}_per_question.csv")
     return markdown
 
 
-def _markdown(result, summaries: dict[str, Summary], ordered: list[str], questions, chunks) -> str:
+def _markdown(result, summaries: dict[str, Summary], ordered: list[str], questions, chunks, source: str) -> str:
     best = ordered[0]
     lines = [
         "# Embedding benchmark",
         "",
-        f"{result.question_count} questions (evaluation/abb_100_soru_kaynakli.md) against "
+        f"{result.question_count} questions ({source}) against "
         f"{result.chunk_count:,} chunks. Exact search over all chunks — no index approximation. "
         f"Rerankers re-score the top {RERANK_CANDIDATES} candidates of a method.",
         "",

@@ -52,6 +52,14 @@ class Paths:
         return self.evaluation_dir / "questions.jsonl"
 
     @property
+    def question_set_b(self) -> Path:
+        return self.evaluation_dir / "question_set_b.json"
+
+    @property
+    def questions_b(self) -> Path:
+        return self.evaluation_dir / "questions_b.jsonl"
+
+    @property
     def evidence_additions(self) -> Path:
         return self.evaluation_dir / "evidence_additions.json"
 

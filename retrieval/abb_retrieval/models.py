@@ -53,9 +53,10 @@ class EvidenceRef(BaseModel):
     """One source a question needs. Multi-source questions have several."""
 
     url: str
-    page_index: int
-    positions: list[str]
-    """Same notation as :attr:`Chunk.sources` — valid for the corpus version the set was written for."""
+    page_index: int | None = None
+    positions: list[str] = Field(default_factory=list)
+    """Same notation as :attr:`Chunk.sources` — valid for the corpus version the set was written for.
+    Empty for snippet-only evidence (question set B), which is identified by :attr:`alternatives`."""
     texts: list[str] = Field(default_factory=list)
     """The paragraph / FAQ texts at ``positions``. They identify the evidence in any later corpus version."""
     section_paths: list[list[str]] = Field(default_factory=list)

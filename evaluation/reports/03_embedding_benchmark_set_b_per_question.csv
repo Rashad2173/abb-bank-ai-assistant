@@ -1,0 +1,101 @@
+﻿question_id,category,lang,question,bge-m3 dense + BM25 + reranker · first rank,bge-m3 dense + reranker · first rank,bge-m3 dense + sparse + reranker · first rank,multilingual-e5-large-instruct dense + reranker · first rank,text-embedding-3-large dense + BM25 + reranker · first rank,multilingual-e5-large-instruct dense + BM25 + reranker · first rank,text-embedding-3-large dense + reranker · first rank,bge-m3 sparse + reranker · first rank,bge-m3 dense + sparse · first rank,bge-m3 dense · first rank,bge-m3 dense + BM25 · first rank,multilingual-e5-large-instruct dense + BM25 · first rank,bge-m3 sparse · first rank,multilingual-e5-large-instruct dense · first rank,text-embedding-3-large dense + BM25 · first rank,text-embedding-3-large dense · first rank,BM25 · first rank
+B-001,paraphrase,az,ABB mobile-dan işıq və qaz pulunu ödəyəndə əlavə komissiya çıxılır?,1,1,1,1,1,1,1,1,1,1,1,2,4,1,1,1,6
+B-002,terminology,az,ADR nədir və hansı valyutada denominasiya olunur?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+B-003,numeric,az,TamKart Platinum Kredit kartı ilə xaricdə Azercell-dən nə qədər pulsuz internet ala bilərəm?,1,1,1,1,1,1,1,1,1,4,1,2,1,1,1,6,7
+B-004,paraphrase,az,Maşınım avtoyumada işçi tərəfindən təsadüfən zədələnib. Sığorta bunu ödəyəcəkmi?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2
+B-005,simple,az,Torpaq sahəsi almaq üçün ABB-nin ipoteka krediti varmı?,3,3,3,3,3,3,3,3,6,11,3,1,4,1,9,26,2
+B-006,simple,az,Sığorta hadisəsi baş verərsə dollarla olan əmanətə kompensasiya hansı valyutada ödənilir?,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1
+B-007,numeric,az,TamKart Visa Infinite debet kartında qalığa illik nə qədər gəlir verilir və xidmət haqqı nə qədərdir?,2,2,2,2,2,2,2,2,4,6,1,2,8,9,2,11,1
+B-008,numeric,az,ABB-Qarabağ FK Standard kartının virtual versiyası neçəyədir?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+B-009,paraphrase,az,Tam Visa-nı başqa debet kartlardan ayıran əsas şey nədir?,2,2,2,2,2,2,2,2,1,1,2,2,3,1,2,1,3
+B-010,multilingual,en,Can I compare flights and prices of different airlines in DigiTravel?,>50,>50,>50,18,>50,>50,>50,>50,>50,44,>50,31,>50,23,>50,44,>50
+B-011,simple,az,Banka pul qoymaq üçün nə etməliyəm?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1
+B-012,numeric,az,Avto kreditlə alınan maşının istehsal tarixi neçə ildən çox olmamalıdır?,1,1,1,1,1,1,1,1,1,1,1,2,1,2,2,3,1
+B-013,paraphrase,az,AZAL Miles kartı ilə topladığım milləri başqa aviaşirkətin biletinə xərcləyə bilərəm?,6,6,>50,2,5,2,6,>50,33,6,6,10,>50,3,9,3,39
+B-014,numeric,az,ABB-AZAL Miles Visa Platinum kartında neçə manat ödənişə 1 mil yazılır və neçə xoşgəldin mili verilir?,4,4,4,4,4,4,4,4,3,3,5,12,3,15,8,7,13
+B-015,numeric,az,American Express Gold kartında faizsiz kredit xətti neçə günədək ola bilər?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2
+B-016,multilingual,ru,Сколько раз в год владелец TamKart Platinum Debet может бесплатно пройти в бизнес-залы DragonPass?,4,4,4,>50,>50,>50,4,4,1,4,19,>50,1,>50,35,23,>50
+B-017,simple,az,Kredit müraciətimin nəticəsini haradan izləyə bilərəm?,1,1,1,1,1,1,1,1,1,1,2,2,1,1,2,1,5
+B-018,numeric,az,DigiTransfer ilə neçə ölkəyə pul göndərmək olar?,6,6,6,5,5,5,6,6,4,9,4,4,6,6,6,13,6
+B-019,numeric,az,ABB-Sea Breeze Visa Infinite kartı ilə ildə neçə dəfə Fast Track keçidi pulsuzdur?,2,2,2,2,2,2,2,2,2,2,2,1,2,2,1,2,2
+B-020,simple,az,ABB-AZAL Miles Visa Platinum Abunəlik kartı kimlər üçün uyğundur?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+B-021,numeric,az,UPT ilə xaricə ad-soyada pul göndərəndə komissiya neçə faizdən başlayır?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+B-022,paraphrase,az,Filiala növbəsiz getmək üçün eyni anda bir neçə randevu kodu götürə bilərəm?,1,1,1,1,1,1,1,1,1,3,1,1,1,1,1,1,1
+B-023,numeric,az,TamKart Premium Kredit kartının səyahət sığortası hansı məbləğədəkdir?,2,2,2,2,2,2,2,2,6,12,4,5,4,6,3,2,6
+B-024,multilingual,en,What are the advantages of ABB premium bank cards?,>50,>50,>50,>50,13,>50,13,>50,>50,>50,>50,>50,>50,>50,26,13,>50
+B-025,numeric,az,ABB-Sea Breeze Visa Signature kart sahiblərinə Crocus Fitness-də nə qədər endirim edilir?,1,1,1,1,1,1,1,1,2,5,2,1,1,1,1,1,1
+B-026,numeric,az,ABB-də korporativ kreditlər minimum hansı məbləğdən verilir?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,1,26
+B-027,simple,az,Korporativ Mastercard Business kartı hansı müddətlərə və valyutalarda buraxılır?,3,3,3,3,3,3,3,3,1,2,2,4,1,2,1,1,7
+B-028,numeric,az,İxraca dəstək kreditinin maksimum məbləği nə qədərdir?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+B-029,simple,az,Müştərinin bank sirri Hesablama Palatasına açıqlana bilərmi?,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,2,1
+B-030,simple,az,Biznes müştərisi kimi filialda hansı xarici valyutaları alıb-sata bilərəm?,2,2,2,2,2,2,2,>50,12,1,2,6,>50,2,3,1,>50
+B-031,numeric,az,XÖHKS sistemi ilə bir köçürmədə maksimum nə qədər göndərmək olar?,3,3,3,3,3,3,3,3,3,3,3,3,3,3,5,6,10
+B-032,simple,az,Mikro kredit kimlər üçün nəzərdə tutulub?,2,2,2,2,2,2,2,2,3,7,3,2,1,3,4,8,8
+B-033,paraphrase,az,Siqaret satıram; aksiz ödənişini ABB Biz-də edəndə DataMatrix kodlarını yenidən skan etməliyəm?,3,3,3,2,3,3,2,3,2,3,2,2,2,2,1,1,1
+B-034,numeric,az,Kiçik və orta biznes ABB biznes krediti ilə maksimum nə qədər və neçə ayadək kredit ala bilər?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4,2
+B-035,simple,az,Təcili tender qarantiyası nə qədər müddətdə və hansı şərtlərlə verilir?,5,5,5,5,5,5,5,5,4,4,3,5,5,5,3,4,8
+B-036,numeric,az,Biznes refinans krediti ilə maksimum nə qədər məbləğ yenidən maliyyələşdirilə bilər?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+B-037,simple,az,Valyuta mübadiləsi lisenziyası üçün xüsusi hesab açılarkən nizamnamə necə təqdim edilməlidir?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2
+B-038,numeric,az,Visa Business kartı ilə Google Ads reklamlarına nə qədər endirim var?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2
+B-039,multilingual,en,What can a company do with ABB Internet Banking?,4,4,4,>50,>50,>50,>50,>50,19,9,21,>50,>50,>50,>50,>50,>50
+B-040,numeric,az,Mastercard Corporate Travel & Expense kartı ilə Booking.com-da nə qədər wallet krediti qazanmaq olar?,1,1,1,1,1,1,1,1,2,2,2,1,1,1,1,1,2
+B-041,simple,az,Onlayn aviabilet alarkən baqaj şərtlərini əvvəlcədən görmək olur?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+B-042,paraphrase,az,"Kreditlə televizor götürmək istəyirəm, seçəndə nəyə fikir verim?",1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,2,2
+B-043,multilingual,ru,"Нужен ли поручитель или залог, чтобы купить туристический пакет в кредит?",4,4,4,4,4,>50,4,>50,16,4,14,35,>50,22,17,9,>50
+B-044,simple,az,Təkcə şəxsiyyət vəsiqəsi ilə kredit götürmək olar?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,4
+B-045,paraphrase,az,Xaricdə eSIM istifadə etsəm öz SIM kartımı telefondan çıxarmalıyam?,1,1,1,1,1,1,1,1,4,9,3,1,6,1,2,7,1
+B-046,numeric,az,Travel Card sahibləri Costa Coffee-də ildə neçə dəfə pulsuz kofe ala bilir?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1
+B-047,simple,az,“Səyahətdə 4% Keşbek” kampaniyasında hansı kartlar iştirak edə bilməz?,1,1,1,1,1,1,1,1,1,1,1,1,2,1,2,2,1
+B-048,simple,az,5000 AZN kreditin şərtləri nəyə əsasən təyin olunur?,1,1,1,1,1,1,1,1,2,1,1,1,3,1,1,1,2
+B-049,paraphrase,az,Nağd kredit götürənə bank əlavə olaraq nə hədiyyə edir?,4,3,4,4,4,4,3,4,4,3,1,2,18,2,2,6,6
+B-050,numeric,az,Depozit faizləri səhifəsinə görə 12 aylıq AZN depozitində müddətin sonunda faiz nə qədərdir?,1,1,1,1,1,1,1,1,4,1,1,1,15,1,1,2,4
+B-051,simple,az,ABB-nin Samux filialının ünvanı nədir?,2,2,2,2,2,2,2,2,4,3,4,3,7,8,1,1,3
+B-052,numeric,az,Zaqatalada ABB-nin neçə bankomatı var və onlardan neçəsi nağd pul mədaxili qəbul edir?,1,1,1,1,1,1,1,1,1,1,6,3,1,1,3,1,>50
+B-053,paraphrase,az,Gəncədə həftə sonu da işləyən və karta pul yatırmaq olan bankomat haradadır?,5,5,>50,5,>50,4,5,>50,31,4,28,29,>50,4,34,7,>50
+B-054,simple,az,Ağstafa filialının yanında bankomat varmı?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2
+B-055,simple,az,ABB-nin Gədəbəy filialının rəhbəri kimdir?,2,2,2,2,2,2,2,1,3,14,2,3,4,19,1,1,3
+B-056,simple,az,Xankəndidə ABB-nin filialı varmı?,>50,13,12,8,>50,>50,>50,9,9,16,35,44,7,28,>50,>50,>50
+B-057,simple,az,Saatlıda ABB-nin ödəniş terminalları harada yerləşir?,1,1,1,1,1,1,1,1,1,1,3,5,1,1,8,1,>50
+B-058,paraphrase,az,Şənbə günü Şəmkirdə ABB filialına gedə bilərəm?,4,4,4,4,3,4,3,4,4,3,1,1,7,30,1,1,23
+B-059,simple,az,Sumqayıtda Araz marketdəki ABB bankomatına nağd pul yatırmaq olur?,1,1,1,1,1,1,1,1,1,1,2,3,2,3,3,10,12
+B-060,simple,az,Bakıda Respublika Uşaq Stomatoloji Mərkəzinin yanında ABB bankomatı varmı?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+B-061,paraphrase,az,“ABB Play - Master Liqa” kampaniyasında vergi ödənişləri hesaba düşürmü?,1,1,1,1,1,1,>50,1,4,9,6,4,1,9,17,>50,5
+B-062,paraphrase,az,Başqa bankdakı kreditimi ABB-yə keçirsəm faizdə nə qədər endirim olar?,1,1,1,1,1,1,1,1,1,1,1,1,1,3,2,16,2
+B-063,multilingual,en,How do I set up a Kids profile for my child in ABB mobile?,2,2,2,2,2,2,2,>50,21,3,16,28,>50,14,14,3,>50
+B-064,multilingual,ru,"Какой первоначальный взнос нужен, чтобы купить квартиру в Green by Avant?",2,2,2,2,2,2,2,2,2,2,2,5,3,5,4,5,6
+B-065,numeric,az,Moody’s 2021-ci ildə ABB-nin kredit ödəmə qabiliyyəti reytinqini hansı səviyyəyə qaldırdı?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,10,1
+B-066,numeric,az,2021-ci ildə səhiyyə işçilərinə nağd kredit hansı faizlə təklif olunurdu?,1,1,1,1,1,1,1,1,2,3,4,5,1,2,6,4,10
+B-067,simple,az,Yenilənmiş Gəncə filialı hansı ünvanda xidmət göstərir?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,1
+B-068,numeric,az,ABB-də xərclərin gəlirlərə nisbəti əmsalı neçə faiz olub?,1,1,1,1,1,1,>50,1,4,18,3,2,4,10,6,>50,1
+B-069,numeric,az,ABB-nin dəstəklədiyi kraudfandinq startap müsabiqəsində neçə qalib seçildi?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+B-070,simple,az,ABB Brandon Hall Group mükafatlarını hansı proqramına görə aldı?,1,1,1,1,1,1,1,1,1,2,1,1,1,2,1,2,1
+B-071,terminology,az,Hecinq alətləri haqqında hesabatı harada tapa bilərəm?,1,1,1,1,1,1,>50,1,1,1,1,1,1,1,5,>50,1
+B-072,simple,az,ABB-nin Audit Komitəsinin sədri kimdir?,2,2,2,2,2,2,2,2,3,17,2,1,5,8,1,1,1
+B-073,simple,az,Müşahidə Şurasının üzvü Xalid Əhədov harada MBA alıb?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+B-074,multilingual,en,What is a forward contract that ABB offers and what is it used for?,>50,>50,>50,>50,>50,>50,>50,>50,>50,>50,>50,>50,>50,>50,>50,>50,>50
+B-075,simple,az,Fiziki şəxslər üçün tarif cədvəlini haradan yükləyə bilərəm?,1,1,1,1,>50,1,>50,1,1,1,1,5,1,1,>50,>50,35
+B-076,simple,az,“Azərikard” MMC-də ABB-nin payı nə qədərdir və şirkət nə ilə məşğuldur?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+B-077,simple,az,ABB-nin 2026-cı il II rüb mənfəət və zərər hesabatına haradan baxa bilərəm?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,3,1
+B-078,simple,az,“Rəqəmsal Jurnalistikaya doğru” proqramının media tərəfdaşı kim idi?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+B-079,simple,az,“Sahibkar vaxtı” layihəsi haqqında KOBİA-dan kim fikir bildirib?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+B-080,simple,az,Elektrik avadanlıqlarının torpaqlayıcı konturlarının müqavimətinin ölçülməsi üçün kotirovka sorğusu nə vaxt elan olunub?,3,3,3,3,3,3,3,3,2,2,2,3,3,3,3,3,2
+B-081,simple,az,PaloAlto avadanlığı tenderində iddiaçının nümayəndəsi iştirak etmək üçün nə təqdim etməlidir?,1,1,1,1,1,1,1,1,1,1,3,1,1,1,3,4,17
+B-082,numeric,az,Windows Server lisenziyaları tenderində bank təminatı hansı həcmdə tələb olunur?,2,2,2,2,2,2,2,2,1,1,3,1,2,1,3,2,4
+B-083,paraphrase,az,ABB podratçını hansı hallarda qara siyahıya sala bilər?,>50,24,>50,>50,>50,>50,>50,>50,35,17,33,>50,>50,32,>50,>50,>50
+B-084,simple,az,ABB mobile-da ABB səhmlərinin təkrar bazarı nə vaxt istifadəyə verildi?,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,6,1
+B-085,simple,az,Korporativ müştərilər investisiya xidmətlərindən hansı platforma ilə istifadə edə bilər?,2,2,2,2,2,2,2,2,2,2,3,3,2,1,1,2,14
+B-086,multilingual,en,What is the maximum monthly cashback I can earn with the ABB-Qarabağ FK Standard card?,3,3,3,>50,3,>50,3,3,4,3,11,>50,13,45,20,9,>50
+B-087,multilingual,en,Is the Shamkir branch open on weekends?,2,2,2,2,2,2,2,2,1,1,1,10,1,3,4,1,>50
+B-088,multilingual,ru,В сколько стран можно отправить деньги через UPT?,4,5,5,3,4,>50,4,4,3,3,11,46,3,28,16,2,>50
+B-089,multilingual,ru,Сколько стоит обслуживание карты ABB-Sea Breeze Visa Infinite?,5,5,5,>50,5,>50,5,5,5,5,4,31,6,>50,6,12,14
+B-090,multilingual,ru,Чем eSIM отличается от роуминга?,2,2,2,2,2,2,2,1,8,1,9,18,20,13,16,9,39
+B-091,multi_source,az,Samux və Gədəbəy filiallarının rəhbərləri kimlərdir?,1,1,1,1,1,1,1,1,1,1,2,1,2,1,1,1,6
+B-092,multi_source,az,TamKart Premium Kredit və ABB-Sea Breeze Visa Infinite kartlarında ildə neçə dəfə Fast Track pulsuzdur?,2,3,2,2,2,2,2,2,2,2,2,2,1,9,3,5,1
+B-093,multi_source,az,UPT və DigiTransfer ilə xaricə köçürmələrin komissiyalarını müqayisə edin.,1,1,1,1,1,1,1,1,2,1,1,2,2,2,1,2,2
+B-094,multi_source,az,Zaqatala və Ağstafada nağd pul mədaxili qəbul edən neçə ABB bankomatı var?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,2
+B-095,multi_source,az,İxraca dəstək krediti ilə biznes refinans kreditinin minimum faiz dərəcələrini müqayisə edin.,1,1,1,1,1,1,1,1,2,3,1,1,3,1,1,1,1
+B-096,multi_source,az,American Express Gold və ABB-AZAL Miles Visa Platinum kartlarının xidmət haqlarını müqayisə edin.,8,6,6,1,2,2,2,8,2,3,9,9,4,11,7,1,31
+B-097,multi_source,az,Visa Business kartının Google Ads endirimi ilə Mastercard Corporate Travel & Expense kartının Booking.com bonusunu müqayisə edin.,1,1,1,1,1,1,1,1,2,1,3,1,2,1,1,1,3
+B-098,multi_source,az,2021-ci ildə səhiyyə işçiləri üçün nağd kredit kampaniyası ilə hazırkı “Nağd kreditə 7%-dək endirim” kampaniyası nə təklif edir?,1,1,1,1,1,1,1,1,1,1,1,2,1,2,3,4,3
+B-099,multi_source,az,Gəncə filialının yeni ünvanı haradır və Gəncədə həftə sonu işləyən cash-in bankomat varmı?,1,1,1,1,1,1,1,1,4,5,3,3,1,4,4,5,3
+B-100,multi_source,az,ABB 2021-ci ildə Moody’s-dən və 2024-cü ildə Brandon Hall Group-dan hansı nəticələri aldı?,1,1,1,1,1,1,1,1,2,4,2,2,1,4,1,1,1

@@ -1,0 +1,964 @@
+{
+ "chunks": 9604,
+ "questions": 100,
+ "models": [
+  {
+   "model": "bge-m3",
+   "dimension": 1024,
+   "documents_seconds": 97.4,
+   "query_ms": 6.0,
+   "api_tokens": 0
+  },
+  {
+   "model": "multilingual-e5-large-instruct",
+   "dimension": 1024,
+   "documents_seconds": 116.5,
+   "query_ms": 2.0,
+   "api_tokens": 0
+  },
+  {
+   "model": "text-embedding-3-large",
+   "dimension": 3072,
+   "documents_seconds": 177.8,
+   "query_ms": 28.0,
+   "api_tokens": 5611289
+  }
+ ],
+ "methods": {
+  "bge-m3 dense + BM25 + reranker": {
+   "recall": {
+    "1": 0.56,
+    "3": 0.795,
+    "5": 0.91,
+    "10": 0.945
+   },
+   "complete": {
+    "1": 0.52,
+    "3": 0.77,
+    "5": 0.9,
+    "10": 0.94
+   },
+   "mrr": 0.7281,
+   "by_category": {
+    "multi_source": {
+     "recall@5": 0.8,
+     "mrr": 0.8625
+    },
+    "multilingual": {
+     "recall@5": 0.7692,
+     "mrr": 0.2718
+    },
+    "numeric": {
+     "recall@5": 0.9615,
+     "mrr": 0.8365
+    },
+    "paraphrase": {
+     "recall@5": 0.8571,
+     "mrr": 0.6214
+    },
+    "simple": {
+     "recall@5": 0.9714,
+     "mrr": 0.8057
+    },
+    "terminology": {
+     "recall@5": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "by_lang": {
+    "az": {
+     "recall@5": 0.931,
+     "mrr": 0.7963
+    },
+    "en": {
+     "recall@5": 0.5714,
+     "mrr": 0.2262
+    },
+    "ru": {
+     "recall@5": 1.0,
+     "mrr": 0.325
+    }
+   }
+  },
+  "bge-m3 dense + reranker": {
+   "recall": {
+    "1": 0.56,
+    "3": 0.805,
+    "5": 0.905,
+    "10": 0.94
+   },
+   "complete": {
+    "1": 0.52,
+    "3": 0.78,
+    "5": 0.89,
+    "10": 0.93
+   },
+   "mrr": 0.7272,
+   "by_category": {
+    "multi_source": {
+     "recall@5": 0.75,
+     "mrr": 0.85
+    },
+    "multilingual": {
+     "recall@5": 0.7692,
+     "mrr": 0.2679
+    },
+    "numeric": {
+     "recall@5": 0.9615,
+     "mrr": 0.8365
+    },
+    "paraphrase": {
+     "recall@5": 0.8571,
+     "mrr": 0.6274
+    },
+    "simple": {
+     "recall@5": 0.9714,
+     "mrr": 0.8057
+    },
+    "terminology": {
+     "recall@5": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "by_lang": {
+    "az": {
+     "recall@5": 0.9253,
+     "mrr": 0.7958
+    },
+    "en": {
+     "recall@5": 0.5714,
+     "mrr": 0.2262
+    },
+    "ru": {
+     "recall@5": 1.0,
+     "mrr": 0.3167
+    }
+   }
+  },
+  "bge-m3 dense + sparse + reranker": {
+   "recall": {
+    "1": 0.56,
+    "3": 0.795,
+    "5": 0.9,
+    "10": 0.925
+   },
+   "complete": {
+    "1": 0.52,
+    "3": 0.77,
+    "5": 0.89,
+    "10": 0.92
+   },
+   "mrr": 0.7243,
+   "by_category": {
+    "multi_source": {
+     "recall@5": 0.8,
+     "mrr": 0.8667
+    },
+    "multilingual": {
+     "recall@5": 0.7692,
+     "mrr": 0.2679
+    },
+    "numeric": {
+     "recall@5": 0.9615,
+     "mrr": 0.8365
+    },
+    "paraphrase": {
+     "recall@5": 0.7857,
+     "mrr": 0.5952
+    },
+    "simple": {
+     "recall@5": 0.9714,
+     "mrr": 0.8057
+    },
+    "terminology": {
+     "recall@5": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "by_lang": {
+    "az": {
+     "recall@5": 0.9195,
+     "mrr": 0.7925
+    },
+    "en": {
+     "recall@5": 0.5714,
+     "mrr": 0.2262
+    },
+    "ru": {
+     "recall@5": 1.0,
+     "mrr": 0.3167
+    }
+   }
+  },
+  "multilingual-e5-large-instruct dense + reranker": {
+   "recall": {
+    "1": 0.565,
+    "3": 0.82,
+    "5": 0.895,
+    "10": 0.92
+   },
+   "complete": {
+    "1": 0.52,
+    "3": 0.8,
+    "5": 0.88,
+    "10": 0.92
+   },
+   "mrr": 0.7339,
+   "by_category": {
+    "multi_source": {
+     "recall@5": 0.85,
+     "mrr": 0.95
+    },
+    "multilingual": {
+     "recall@5": 0.4615,
+     "mrr": 0.1987
+    },
+    "numeric": {
+     "recall@5": 1.0,
+     "mrr": 0.8378
+    },
+    "paraphrase": {
+     "recall@5": 0.9286,
+     "mrr": 0.6571
+    },
+    "simple": {
+     "recall@5": 0.9714,
+     "mrr": 0.8093
+    },
+    "terminology": {
+     "recall@5": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "by_lang": {
+    "az": {
+     "recall@5": 0.9598,
+     "mrr": 0.8139
+    },
+    "en": {
+     "recall@5": 0.2857,
+     "mrr": 0.1429
+    },
+    "ru": {
+     "recall@5": 0.6667,
+     "mrr": 0.2639
+    }
+   }
+  },
+  "text-embedding-3-large dense + BM25 + reranker": {
+   "recall": {
+    "1": 0.55,
+    "3": 0.8,
+    "5": 0.895,
+    "10": 0.91
+   },
+   "complete": {
+    "1": 0.51,
+    "3": 0.77,
+    "5": 0.88,
+    "10": 0.91
+   },
+   "mrr": 0.7163,
+   "by_category": {
+    "multi_source": {
+     "recall@5": 0.85,
+     "mrr": 0.9
+    },
+    "multilingual": {
+     "recall@5": 0.6154,
+     "mrr": 0.2333
+    },
+    "numeric": {
+     "recall@5": 1.0,
+     "mrr": 0.8378
+    },
+    "paraphrase": {
+     "recall@5": 0.8571,
+     "mrr": 0.6155
+    },
+    "simple": {
+     "recall@5": 0.9429,
+     "mrr": 0.7771
+    },
+    "terminology": {
+     "recall@5": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "by_lang": {
+    "az": {
+     "recall@5": 0.9368,
+     "mrr": 0.7885
+    },
+    "en": {
+     "recall@5": 0.4286,
+     "mrr": 0.1905
+    },
+    "ru": {
+     "recall@5": 0.8333,
+     "mrr": 0.2833
+    }
+   }
+  },
+  "multilingual-e5-large-instruct dense + BM25 + reranker": {
+   "recall": {
+    "1": 0.56,
+    "3": 0.8,
+    "5": 0.875,
+    "10": 0.89
+   },
+   "complete": {
+    "1": 0.52,
+    "3": 0.77,
+    "5": 0.86,
+    "10": 0.89
+   },
+   "mrr": 0.7207,
+   "by_category": {
+    "multi_source": {
+     "recall@5": 0.85,
+     "mrr": 0.9
+    },
+    "multilingual": {
+     "recall@5": 0.3077,
+     "mrr": 0.1538
+    },
+    "numeric": {
+     "recall@5": 1.0,
+     "mrr": 0.8378
+    },
+    "paraphrase": {
+     "recall@5": 0.9286,
+     "mrr": 0.6488
+    },
+    "simple": {
+     "recall@5": 0.9714,
+     "mrr": 0.8057
+    },
+    "terminology": {
+     "recall@5": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "by_lang": {
+    "az": {
+     "recall@5": 0.9598,
+     "mrr": 0.8054
+    },
+    "en": {
+     "recall@5": 0.2857,
+     "mrr": 0.1429
+    },
+    "ru": {
+     "recall@5": 0.3333,
+     "mrr": 0.1667
+    }
+   }
+  },
+  "text-embedding-3-large dense + reranker": {
+   "recall": {
+    "1": 0.52,
+    "3": 0.78,
+    "5": 0.865,
+    "10": 0.9
+   },
+   "complete": {
+    "1": 0.48,
+    "3": 0.75,
+    "5": 0.85,
+    "10": 0.9
+   },
+   "mrr": 0.6927,
+   "by_category": {
+    "multi_source": {
+     "recall@5": 0.85,
+     "mrr": 0.9
+    },
+    "multilingual": {
+     "recall@5": 0.6923,
+     "mrr": 0.2526
+    },
+    "numeric": {
+     "recall@5": 0.9231,
+     "mrr": 0.7981
+    },
+    "paraphrase": {
+     "recall@5": 0.7857,
+     "mrr": 0.5738
+    },
+    "simple": {
+     "recall@5": 0.9429,
+     "mrr": 0.7771
+    },
+    "terminology": {
+     "recall@5": 0.5,
+     "mrr": 0.5
+    }
+   },
+   "by_lang": {
+    "az": {
+     "recall@5": 0.8908,
+     "mrr": 0.7584
+    },
+    "en": {
+     "recall@5": 0.4286,
+     "mrr": 0.1905
+    },
+    "ru": {
+     "recall@5": 1.0,
+     "mrr": 0.325
+    }
+   }
+  },
+  "bge-m3 sparse + reranker": {
+   "recall": {
+    "1": 0.58,
+    "3": 0.775,
+    "5": 0.86,
+    "10": 0.89
+   },
+   "complete": {
+    "1": 0.54,
+    "3": 0.75,
+    "5": 0.85,
+    "10": 0.88
+   },
+   "mrr": 0.7205,
+   "by_category": {
+    "multi_source": {
+     "recall@5": 0.8,
+     "mrr": 0.8625
+    },
+    "multilingual": {
+     "recall@5": 0.5385,
+     "mrr": 0.2333
+    },
+    "numeric": {
+     "recall@5": 0.9615,
+     "mrr": 0.8365
+    },
+    "paraphrase": {
+     "recall@5": 0.7857,
+     "mrr": 0.5952
+    },
+    "simple": {
+     "recall@5": 0.9429,
+     "mrr": 0.8089
+    },
+    "terminology": {
+     "recall@5": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "by_lang": {
+    "az": {
+     "recall@5": 0.908,
+     "mrr": 0.7933
+    },
+    "en": {
+     "recall@5": 0.2857,
+     "mrr": 0.119
+    },
+    "ru": {
+     "recall@5": 0.8333,
+     "mrr": 0.3667
+    }
+   }
+  },
+  "bge-m3 dense + sparse": {
+   "recall": {
+    "1": 0.495,
+    "3": 0.705,
+    "5": 0.835,
+    "10": 0.885
+   },
+   "complete": {
+    "1": 0.48,
+    "3": 0.68,
+    "5": 0.81,
+    "10": 0.87
+   },
+   "mrr": 0.6477,
+   "by_category": {
+    "multi_source": {
+     "recall@5": 0.75,
+     "mrr": 0.625
+    },
+    "multilingual": {
+     "recall@5": 0.4615,
+     "mrr": 0.2622
+    },
+    "numeric": {
+     "recall@5": 0.9615,
+     "mrr": 0.7244
+    },
+    "paraphrase": {
+     "recall@5": 0.7857,
+     "mrr": 0.5357
+    },
+    "simple": {
+     "recall@5": 0.9143,
+     "mrr": 0.7651
+    },
+    "terminology": {
+     "recall@5": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "by_lang": {
+    "az": {
+     "recall@5": 0.8908,
+     "mrr": 0.7053
+    },
+    "en": {
+     "recall@5": 0.2857,
+     "mrr": 0.1786
+    },
+    "ru": {
+     "recall@5": 0.6667,
+     "mrr": 0.3597
+    }
+   }
+  },
+  "bge-m3 dense": {
+   "recall": {
+    "1": 0.495,
+    "3": 0.71,
+    "5": 0.8,
+    "10": 0.88
+   },
+   "complete": {
+    "1": 0.47,
+    "3": 0.68,
+    "5": 0.77,
+    "10": 0.86
+   },
+   "mrr": 0.6385,
+   "by_category": {
+    "multi_source": {
+     "recall@5": 0.7,
+     "mrr": 0.6617
+    },
+    "multilingual": {
+     "recall@5": 0.6923,
+     "mrr": 0.3316
+    },
+    "numeric": {
+     "recall@5": 0.8462,
+     "mrr": 0.6818
+    },
+    "paraphrase": {
+     "recall@5": 0.7143,
+     "mrr": 0.498
+    },
+    "simple": {
+     "recall@5": 0.8571,
+     "mrr": 0.7493
+    },
+    "terminology": {
+     "recall@5": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "by_lang": {
+    "az": {
+     "recall@5": 0.8161,
+     "mrr": 0.6844
+    },
+    "en": {
+     "recall@5": 0.4286,
+     "mrr": 0.254
+    },
+    "ru": {
+     "recall@5": 1.0,
+     "mrr": 0.4222
+    }
+   }
+  },
+  "bge-m3 dense + BM25": {
+   "recall": {
+    "1": 0.47,
+    "3": 0.735,
+    "5": 0.8,
+    "10": 0.87
+   },
+   "complete": {
+    "1": 0.45,
+    "3": 0.7,
+    "5": 0.77,
+    "10": 0.86
+   },
+   "mrr": 0.6317,
+   "by_category": {
+    "multi_source": {
+     "recall@5": 0.6,
+     "mrr": 0.6278
+    },
+    "multilingual": {
+     "recall@5": 0.2308,
+     "mrr": 0.1432
+    },
+    "numeric": {
+     "recall@5": 0.9615,
+     "mrr": 0.716
+    },
+    "paraphrase": {
+     "recall@5": 0.7143,
+     "mrr": 0.619
+    },
+    "simple": {
+     "recall@5": 0.9714,
+     "mrr": 0.7357
+    },
+    "terminology": {
+     "recall@5": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "by_lang": {
+    "az": {
+     "recall@5": 0.8851,
+     "mrr": 0.7047
+    },
+    "en": {
+     "recall@5": 0.1429,
+     "mrr": 0.1429
+    },
+    "ru": {
+     "recall@5": 0.3333,
+     "mrr": 0.1435
+    }
+   }
+  },
+  "multilingual-e5-large-instruct dense + BM25": {
+   "recall": {
+    "1": 0.48,
+    "3": 0.695,
+    "5": 0.8,
+    "10": 0.845
+   },
+   "complete": {
+    "1": 0.46,
+    "3": 0.67,
+    "5": 0.79,
+    "10": 0.84
+   },
+   "mrr": 0.6209,
+   "by_category": {
+    "multi_source": {
+     "recall@5": 0.8,
+     "mrr": 0.6444
+    },
+    "multilingual": {
+     "recall@5": 0.0769,
+     "mrr": 0.0231
+    },
+    "numeric": {
+     "recall@5": 0.9615,
+     "mrr": 0.7429
+    },
+    "paraphrase": {
+     "recall@5": 0.7857,
+     "mrr": 0.5964
+    },
+    "simple": {
+     "recall@5": 0.9429,
+     "mrr": 0.7338
+    },
+    "terminology": {
+     "recall@5": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "by_lang": {
+    "az": {
+     "recall@5": 0.908,
+     "mrr": 0.7103
+    },
+    "en": {
+     "recall@5": 0.0,
+     "mrr": 0.0143
+    },
+    "ru": {
+     "recall@5": 0.1667,
+     "mrr": 0.0333
+    }
+   }
+  },
+  "bge-m3 sparse": {
+   "recall": {
+    "1": 0.485,
+    "3": 0.68,
+    "5": 0.76,
+    "10": 0.845
+   },
+   "complete": {
+    "1": 0.46,
+    "3": 0.65,
+    "5": 0.73,
+    "10": 0.83
+   },
+   "mrr": 0.6262,
+   "by_category": {
+    "multi_source": {
+     "recall@5": 0.7,
+     "mrr": 0.7083
+    },
+    "multilingual": {
+     "recall@5": 0.3077,
+     "mrr": 0.2179
+    },
+    "numeric": {
+     "recall@5": 0.8846,
+     "mrr": 0.7484
+    },
+    "paraphrase": {
+     "recall@5": 0.5714,
+     "mrr": 0.4209
+    },
+    "simple": {
+     "recall@5": 0.9143,
+     "mrr": 0.7244
+    },
+    "terminology": {
+     "recall@5": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "by_lang": {
+    "az": {
+     "recall@5": 0.8276,
+     "mrr": 0.6872
+    },
+    "en": {
+     "recall@5": 0.1429,
+     "mrr": 0.1429
+    },
+    "ru": {
+     "recall@5": 0.5,
+     "mrr": 0.3056
+    }
+   }
+  },
+  "multilingual-e5-large-instruct dense": {
+   "recall": {
+    "1": 0.51,
+    "3": 0.695,
+    "5": 0.735,
+    "10": 0.825
+   },
+   "complete": {
+    "1": 0.49,
+    "3": 0.69,
+    "5": 0.72,
+    "10": 0.82
+   },
+   "mrr": 0.625,
+   "by_category": {
+    "multi_source": {
+     "recall@5": 0.65,
+     "mrr": 0.5611
+    },
+    "multilingual": {
+     "recall@5": 0.1538,
+     "mrr": 0.041
+    },
+    "numeric": {
+     "recall@5": 0.8077,
+     "mrr": 0.7453
+    },
+    "paraphrase": {
+     "recall@5": 0.7857,
+     "mrr": 0.5734
+    },
+    "simple": {
+     "recall@5": 0.8857,
+     "mrr": 0.77
+    },
+    "terminology": {
+     "recall@5": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "by_lang": {
+    "az": {
+     "recall@5": 0.8218,
+     "mrr": 0.7123
+    },
+    "en": {
+     "recall@5": 0.1429,
+     "mrr": 0.0476
+    },
+    "ru": {
+     "recall@5": 0.1667,
+     "mrr": 0.0333
+    }
+   }
+  },
+  "text-embedding-3-large dense + BM25": {
+   "recall": {
+    "1": 0.43,
+    "3": 0.645,
+    "5": 0.73,
+    "10": 0.845
+   },
+   "complete": {
+    "1": 0.4,
+    "3": 0.61,
+    "5": 0.7,
+    "10": 0.84
+   },
+   "mrr": 0.5842,
+   "by_category": {
+    "multi_source": {
+     "recall@5": 0.6,
+     "mrr": 0.706
+    },
+    "multilingual": {
+     "recall@5": 0.1538,
+     "mrr": 0.0513
+    },
+    "numeric": {
+     "recall@5": 0.8462,
+     "mrr": 0.6433
+    },
+    "paraphrase": {
+     "recall@5": 0.7143,
+     "mrr": 0.5794
+    },
+    "simple": {
+     "recall@5": 0.8857,
+     "mrr": 0.7044
+    },
+    "terminology": {
+     "recall@5": 1.0,
+     "mrr": 0.6
+    }
+   },
+   "by_lang": {
+    "az": {
+     "recall@5": 0.8161,
+     "mrr": 0.6638
+    },
+    "en": {
+     "recall@5": 0.1429,
+     "mrr": 0.0357
+    },
+    "ru": {
+     "recall@5": 0.1667,
+     "mrr": 0.0694
+    }
+   }
+  },
+  "text-embedding-3-large dense": {
+   "recall": {
+    "1": 0.365,
+    "3": 0.6,
+    "5": 0.68,
+    "10": 0.815
+   },
+   "complete": {
+    "1": 0.34,
+    "3": 0.58,
+    "5": 0.65,
+    "10": 0.79
+   },
+   "mrr": 0.533,
+   "by_category": {
+    "multi_source": {
+     "recall@5": 0.7,
+     "mrr": 0.6483
+    },
+    "multilingual": {
+     "recall@5": 0.3077,
+     "mrr": 0.1821
+    },
+    "numeric": {
+     "recall@5": 0.7308,
+     "mrr": 0.535
+    },
+    "paraphrase": {
+     "recall@5": 0.5714,
+     "mrr": 0.5204
+    },
+    "simple": {
+     "recall@5": 0.8286,
+     "mrr": 0.636
+    },
+    "terminology": {
+     "recall@5": 0.5,
+     "mrr": 0.5
+    }
+   },
+   "by_lang": {
+    "az": {
+     "recall@5": 0.7356,
+     "mrr": 0.5855
+    },
+    "en": {
+     "recall@5": 0.2857,
+     "mrr": 0.2063
+    },
+    "ru": {
+     "recall@5": 0.3333,
+     "mrr": 0.1537
+    }
+   }
+  },
+  "BM25": {
+   "recall": {
+    "1": 0.335,
+    "3": 0.52,
+    "5": 0.57,
+    "10": 0.72
+   },
+   "complete": {
+    "1": 0.32,
+    "3": 0.48,
+    "5": 0.53,
+    "10": 0.71
+   },
+   "mrr": 0.4739,
+   "by_category": {
+    "multi_source": {
+     "recall@5": 0.4,
+     "mrr": 0.5167
+    },
+    "multilingual": {
+     "recall@5": 0.0,
+     "mrr": 0.0128
+    },
+    "numeric": {
+     "recall@5": 0.6923,
+     "mrr": 0.5645
+    },
+    "paraphrase": {
+     "recall@5": 0.5714,
+     "mrr": 0.3833
+    },
+    "simple": {
+     "recall@5": 0.7143,
+     "mrr": 0.5717
+    },
+    "terminology": {
+     "recall@5": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "by_lang": {
+    "az": {
+     "recall@5": 0.6552,
+     "mrr": 0.5427
+    },
+    "en": {
+     "recall@5": 0.0,
+     "mrr": 0.0
+    },
+    "ru": {
+     "recall@5": 0.0,
+     "mrr": 0.0278
+    }
+   }
+  }
+ }
+}

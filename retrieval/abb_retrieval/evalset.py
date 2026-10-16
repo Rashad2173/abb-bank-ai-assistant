@@ -1,4 +1,4 @@
-"""The evaluation question set: parse it, freeze its evidence, map it to chunks.
+"""The evaluation question sets: parse them, freeze their evidence, map it to chunks.
 
 The set (``evaluation/abb_100_soru_kaynakli.md``) is a human-readable Markdown
 document written against one exact corpus version (its SHA-256 is stated in
@@ -12,6 +12,10 @@ shifts the indices), so the set is used in two steps:
    position is stored with the question in ``evaluation/questions.jsonl``.
 2. **attach** (after every re-chunking): evidence is found by *page URL +
    text*, which survives changes of the corpus structure.
+
+Set B (``evaluation/question_set_b.json``) is an independent second set, written
+directly against the chunks: each source is a page URL plus verbatim snippets,
+so it needs no freeze step (see :func:`parse_snippet_set`).
 """
 
 from __future__ import annotations
@@ -100,6 +104,24 @@ def _parse_block(question_id: str, category: str, block: str) -> Question:
     )
 
 
+def parse_snippet_set(items: list[dict]) -> list[Question]:
+    """Questions whose sources are ``{"url": …, "contains": [snippet, …]}``.
+
+    A chunk of that URL holding any of the snippets counts as the evidence.
+    """
+    return [
+        Question(
+            id=item["id"],
+            question=item["question"],
+            lang=item["lang"],
+            category=item["category"],
+            expected_answer=item["expected_answer"],
+            evidence=[EvidenceRef(url=source["url"], alternatives=source["contains"]) for source in item["evidence"]],
+        )
+        for item in items
+    ]
+
+
 # --------------------------------------------------------------------------- #
 # Step 1 — freeze the evidence texts
 # --------------------------------------------------------------------------- #
@@ -179,12 +201,13 @@ def attach_chunks(questions: list[Question], chunks: list[Chunk], pages: list[di
     problems = []
     for question in questions:
         for ref in question.evidence:
-            if not ref.texts:
+            if not (ref.texts or ref.alternatives):
                 raise ValueError(f"{question.id}: evidence is not frozen yet (run the freeze step first)")
             ids = _chunks_with_evidence(ref, index, by_id) + _chunks_with_alternatives(ref, chunks_of_url)
             ref.chunk_ids = list(dict.fromkeys(ids))
             if not ref.chunk_ids:
-                problems.append(f"{question.id}: no chunk of {ref.url} contains the evidence {ref.texts[0][:60]!r}")
+                evidence = (ref.texts or ref.alternatives)[0]
+                problems.append(f"{question.id}: no chunk of {ref.url} contains the evidence {evidence[:60]!r}")
     return problems
 
 

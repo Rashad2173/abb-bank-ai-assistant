@@ -1,0 +1,101 @@
+﻿question_id,category,lang,question,text-embedding-3-large dense + reranker · first rank,text-embedding-3-large dense + BM25 + reranker · first rank,bge-m3 dense + sparse + reranker · first rank,bge-m3 dense + BM25 + reranker · first rank,multilingual-e5-large-instruct dense + reranker · first rank,bge-m3 dense + reranker · first rank,multilingual-e5-large-instruct dense + BM25 + reranker · first rank,bge-m3 sparse + reranker · first rank,text-embedding-3-large dense · first rank,bge-m3 dense · first rank,multilingual-e5-large-instruct dense · first rank,bge-m3 dense + BM25 · first rank,bge-m3 dense + sparse · first rank,multilingual-e5-large-instruct dense + BM25 · first rank,text-embedding-3-large dense + BM25 · first rank,bge-m3 sparse · first rank,BM25 · first rank
+ABB-Q001,simple,az,Alpha Card sifarişini kim həyata keçirir?,1,1,1,1,1,1,1,1,1,3,1,4,2,2,1,1,7
+ABB-Q002,simple,az,Tam DigiCard ilə keşbek qazanmaq üçün hansı paketlərdən yararlanmaq olar?,2,6,6,6,5,6,6,6,3,4,5,9,2,7,3,4,16
+ABB-Q003,simple,az,TamGənc Debet kartının yeni sifarişi qəbul olunurmu?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+ABB-Q004,simple,az,Travel Card bonus balansını ABB mobile-da haradan yoxlamaq olar?,1,1,1,1,1,1,1,1,1,2,1,2,1,1,1,1,3
+ABB-Q005,simple,az,TamKart Max borcunu başqa bankın kartı ilə ödəmək mümkündürmü?,1,1,1,1,1,1,1,1,1,1,1,1,6,1,1,15,1
+ABB-Q006,simple,az,DigiHesab hansı valyutalarda açıla bilər?,1,1,1,1,1,1,1,1,1,1,1,5,1,4,6,1,19
+ABB-Q007,simple,az,DigiHesabdakı vəsaiti nağd şəkildə haradan götürə bilərəm?,1,1,1,1,1,1,1,1,1,1,1,1,1,4,5,1,>50
+ABB-Q008,simple,az,ABB mobile-da Dama-dama yığım hesabı açmaq üçün hansı addımları atmalıyam?,1,1,1,1,1,1,1,1,2,5,2,3,3,3,3,1,3
+ABB-Q009,simple,az,DigiHesab Max hesabından filialda pul çıxaranda həmin günə qədər qazandığım faiz itirilirmi?,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1
+ABB-Q010,simple,az,ABB-də əmanət seyfi icarəyə götürmək üçün nə təqdim etməliyəm?,>50,1,1,1,1,1,1,1,>50,20,3,2,5,1,11,3,1
+ABB-Q011,simple,az,ABB filialında cari hesab açmaq üçün hansı sənəd tələb olunur?,3,3,3,3,3,3,3,3,8,3,1,3,3,3,6,2,22
+ABB-Q012,simple,az,ABB mobile-da onlayn kredit müraciəti imkanını necə söndürmək olar?,1,1,1,1,1,1,1,>50,3,1,1,5,8,5,5,36,34
+ABB-Q013,simple,az,Nağd kredit müraciətinin nəticəsi müştəriyə necə bildirilir?,2,2,2,2,2,2,2,>50,1,2,2,3,20,2,3,>50,10
+ABB-Q014,simple,az,Avans kreditinin avtomatik ödənişi nə zaman həyata keçirilir?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+ABB-Q015,simple,az,"“İndi al, sonra ödə” xidmətinin partnyor mağazalarının siyahısını haradan görə bilərəm?",1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1
+ABB-Q016,simple,az,"“İndi al, sonra ödə” borcunu vaxtından əvvəl ödəsəm, məbləğ necə nəzərə alınır?",1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,1
+ABB-Q017,simple,az,Faydalı Klub keşbeklərini harada görə bilərəm?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+ABB-Q018,simple,az,ABB-nin ePOS xidmətində veb-sayt kart ödənişləri hansı təhlükəsizlik protokolu ilə qorunur?,1,1,1,1,1,1,1,1,1,2,3,1,1,1,1,1,1
+ABB-Q019,simple,az,Mobil POS üçün yaradılmış müqaviləni imzalamaq üçün filiala getməliyəmmi?,1,1,1,1,1,1,1,1,3,1,3,1,1,1,1,2,3
+ABB-Q020,simple,az,QR kodla qəbul edilmiş ödənişi ABB Biz-də geri qaytarmaq olar?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+ABB-Q021,simple,az,ABB-nin inkasso xidmətindən istifadə etməyə başlamaq üçün nə lazımdır?,1,1,1,1,1,1,1,1,22,1,2,1,1,2,2,2,2
+ABB-Q022,simple,az,Ani kreditin geri ödəniş forması necədir?,1,1,1,1,1,1,1,1,2,2,2,1,1,2,1,2,2
+ABB-Q023,simple,az,DigiTransfer ilə xaricə pul göndərmək üçün mütləq filiala getmək lazımdırmı?,1,1,1,1,1,1,1,1,2,2,1,1,2,1,1,8,1
+ABB-Q024,simple,az,ABB-nin Zaqatala filialının ünvanı haradır?,3,3,3,3,3,3,3,3,3,5,4,5,6,4,3,8,5
+ABB-Q025,simple,az,ABB-nin Qazax filialının iş saatları necədir?,1,1,1,1,1,1,1,1,3,2,5,2,2,2,2,2,1
+ABB-Q026,paraphrase,az,Uşağım ev tapşırıqlarını yerinə yetirdikcə ona cib xərcliyi vermək və öz balansını izləməsinə imkan yaratmaq istəyirəm. Alpha Card-da buna uyğun imkan varmı?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+ABB-Q027,paraphrase,az,"Tam DigiCard sifariş etsəm, kartı götürmək üçün mütləq banka gəlməliyəm, yoxsa evə gətirirlər?",4,4,4,4,2,4,2,2,4,5,3,3,1,3,3,2,6
+ABB-Q028,paraphrase,az,Gündəlik xərclərimdən qalan xırda məbləğləri və qazandığım keşbeki öz-özünə yığıma yönəltmək istəyirəm. Dama-dama bunu edə bilir?,2,2,2,2,2,2,2,2,3,1,1,2,1,1,2,3,4
+ABB-Q029,paraphrase,az,"Filiala getmədən manat, dollar və avro üçün hesab açmaq istəyirəm. ABB-də bunu telefondan necə edə bilərəm?",4,4,5,4,5,5,5,5,8,2,6,9,3,15,18,15,>50
+ABB-Q030,paraphrase,az,"Pul başqa bankın kartındadır. Onu DigiHesab Max-a tətbiqdən keçirsəm, məndən mədaxil haqqı tutulacaq?",1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+ABB-Q031,paraphrase,az,DigiDeposit-in vaxtı bitəndə hər dəfə yenidən müqavilə bağlamaq istəmirəm. Uzadılmanı əvvəlcədən avtomatik seçmək olur?,2,2,2,2,2,2,2,2,3,2,2,1,1,2,2,1,13
+ABB-Q032,paraphrase,az,"DigiDeposit-dəki pulu razılaşdığımız vaxtdan tez götürsəm, yığılmış faiz də mənə veriləcək?",1,1,1,1,1,1,1,1,1,1,1,6,1,8,6,7,35
+ABB-Q033,paraphrase,az,"Bir nağd kreditim hələ bağlanmayıb, amma yenidən pula ehtiyacım yaranıb. İkincisi üçün müraciət edə bilərəm?",1,1,1,1,1,1,1,1,1,1,1,1,4,1,1,27,3
+ABB-Q034,paraphrase,az,"Əvvəl tətbiqdən kredit götürməyi özüm bağlamışdım. İndi yenə müraciət etmək istəyirəm, nəyi açmalıyam?",>50,>50,10,>50,9,10,>50,>50,31,20,25,44,13,44,>50,48,>50
+ABB-Q035,paraphrase,az,Rəsmi maaşım görünmür. Nağd kredit təklifi verəndə bank mənim hansı maliyyə məlumatlarıma baxa bilər?,1,1,1,1,1,1,1,>50,1,5,2,2,16,2,1,>50,7
+ABB-Q036,paraphrase,az,"Maaş arayışım yoxdur, amma mağazadan aldığım əşyanın pulunu sonra hissə-hissə ödəmək istəyirəm. “İndi al, sonra ödə” üçün müraciət edə bilərəm?",>50,8,7,8,7,7,7,7,50,21,11,12,13,9,22,10,14
+ABB-Q037,paraphrase,az,Travel Card-da topladığım bonusları dostuma hədiyyə edib onun kartına göndərə bilərəm?,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,9,2
+ABB-Q038,paraphrase,az,Travel Card-la aldığım məhsulu geri qaytardım. Həmin alışdan qazandığım bonuslar hesabımda qalacaq?,2,2,3,3,2,3,2,2,1,6,1,1,9,1,1,28,2
+ABB-Q039,paraphrase,az,"Travel Card-dan nağd pul çıxarmışam və başqa karta pul yollamışam, amma bonus gəlməyib. Bunun səbəbi nədir?",1,1,1,1,1,1,1,1,3,7,1,2,5,1,2,6,1
+ABB-Q040,paraphrase,az,"Ödəniş etdiyim mağaza həm Faydalı Klub-da, həm də aylıq keşbek paketimdə var. İki faizi birləşdirəcəklər?",1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+ABB-Q041,paraphrase,az,Mağazada ayrıca POS aparatı almaq istəmirəm. Mobil POS-la təkcə telefon vasitəsilə kart ödənişi götürə bilərəm?,1,1,1,1,1,1,1,1,4,5,2,12,2,16,16,4,>50
+ABB-Q042,paraphrase,az,Hər satış üçün yenidən kod yaratmaq istəmirəm; müştəri özü məbləği yazsın. ABB-nin hansı QR növü buna uyğundur?,1,1,1,1,1,1,1,1,1,4,2,1,2,1,1,1,1
+ABB-Q043,paraphrase,az,Şirkətimin Ani Ödəniş Sistemi ilə köçürmə etməsi üçün bankın səhər açılmasını gözləməliyəm?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,4
+ABB-Q044,paraphrase,az,Məhsullarımı internetdə satıram və alıcıların elə saytımda kartla pul ödəməsini istəyirəm. ABB-nin hansı xidməti bu iş üçündür?,1,1,>50,>50,>50,>50,>50,1,10,>50,>50,>50,>50,>50,22,29,>50
+ABB-Q045,paraphrase,az,"Nağd krediti filialda rəsmiləşdirəndə ödəniş gününü maaşıma uyğun daha gec tarixə salmaq istəsəm, bunu nə vaxt deməliyəm?",1,1,1,1,1,1,1,1,1,1,1,6,1,10,11,20,>50
+ABB-Q046,terminology,az,TamKart Max-da “Tam 12” funksiyası hansı əməliyyatlara şamil edilmir?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,2
+ABB-Q047,terminology,az,TamKart Max-ın “Taksitə çevir” funksiyasından hansı əməliyyatlar üçün istifadə etmək olmaz?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1
+ABB-Q048,terminology,az,TamKart Max ödəniş üsullarında göstərilən C2C nə deməkdir?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1
+ABB-Q049,terminology,az,ABB-nin ePOS xidməti hansı beynəlxalq kart sistemlərinin kartlarını qəbul edir?,1,1,1,1,1,1,1,1,2,1,14,1,1,1,1,1,1
+ABB-Q050,terminology,az,DigiTransfer ilə Amerikaya pul göndərərkən hesab məlumatlarından əlavə hansı bank kodu daxil edilməlidir?,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1
+ABB-Q051,terminology,az,Ani Ödəniş Sistemində FIN və VÖEN-dən başqa hansı sadələşdirilmiş identifikatorlardan istifadə olunur?,2,3,3,3,3,3,3,3,2,1,1,1,1,1,1,2,2
+ABB-Q052,terminology,az,ABB-nin akkreditiv təsvirində SBLC hansı akkreditiv növünə aiddir və ödəniş nə vaxt yaranır?,1,1,1,1,1,1,1,1,1,6,2,2,2,2,1,2,2
+ABB-Q053,terminology,az,Geri çağrılmayan akkreditiv satıcının razılığı olmadan dəyişdirilə və ya ləğv edilə bilərmi?,2,2,2,2,2,2,2,2,1,2,2,2,2,2,1,2,1
+ABB-Q054,terminology,az,Köçürülə bilən akkreditiv benefisiara hansı hüququ verir?,2,2,2,2,2,2,2,2,2,2,1,2,2,1,2,2,2
+ABB-Q055,terminology,az,İnkassoda “akseptə qarşı sənədlər” şərti idxalçı üçün nə deməkdir?,1,1,1,1,1,1,1,1,1,2,2,1,1,2,1,1,2
+ABB-Q056,terminology,az,ABB-də NFC dəstəkli Android cihazından təmassız ödəniş qəbul etmək üçün nəzərdə tutulan həllin adı nədir?,3,2,3,3,2,>50,2,2,6,32,19,8,11,5,3,5,1
+ABB-Q057,terminology,az,Fayda Max-ı aktivləşdirmək üçün tətbiqdə hansı bölməyə daxil olmaq lazımdır?,3,3,3,3,3,3,3,3,1,4,1,1,1,1,1,2,1
+ABB-Q058,terminology,az,Fayda Max-da “DigiDeposit gəlirinə keşbek” mükafatı hansı valyutadakı depozitlərə şamil olunur?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+ABB-Q059,terminology,az,Avans kredit xətti hansı əməkhaqqı və pensiya kartı sahibləri üçün nəzərdə tutulub?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+ABB-Q060,terminology,az,Sahibkar məhsulunda kreditin annuitet geri ödənişi ilə kredit xəttinin geri ödənişi necə fərqlənir?,1,1,1,1,1,1,1,1,1,1,1,2,1,3,2,2,10
+ABB-Q061,numeric,az,ABB-nin onlayn nağd krediti üzrə maksimum məbləğ və maksimum müddət nə qədərdir?,9,13,13,14,8,10,12,11,11,7,3,4,7,4,3,20,16
+ABB-Q062,numeric,az,TamKart Max üçün minimum və maksimum kredit məbləği nə qədərdir?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4,3
+ABB-Q063,numeric,az,TamKart Max-ın nominal illik faiz dərəcələri və FİFD aralığı hansılardır?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+ABB-Q064,numeric,az,TamKart Gold Kredit-in tariflərində nominal illik faiz dərəcəsi neçə faiz göstərilir?,1,1,1,1,1,1,1,1,3,1,1,1,1,1,1,1,1
+ABB-Q065,numeric,az,"Alpha Card üçün aylıq komissiyasız köçürmə və nağdlaşdırma limiti nə qədərdir, limit aşılarsa hansı komissiya tətbiq olunur?",1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1
+ABB-Q066,numeric,az,"Tam DigiCard-a Emanat, MilliÖn və GoldenPay vasitəsilə mədaxilin aylıq pulsuz limiti və limiti aşma komissiyası nə qədərdir?",1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1
+ABB-Q067,numeric,az,Alpha Card-ın plastik və rəqəmsal versiyalarının qiyməti nə qədərdir?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+ABB-Q068,numeric,az,Tam DigiCard balansına illik gəlir neçə faizədəkdir və balansın hansı hissəsinə tətbiq olunur?,1,1,1,1,1,1,1,1,7,1,2,1,1,1,1,2,1
+ABB-Q069,numeric,az,DigiHesab Max-da minimum faiz hesablanan məbləğ və hər hesab üzrə maksimum faiz hesablanan məbləğlər nə qədərdir?,1,1,1,1,1,1,1,1,2,1,2,1,1,2,2,1,1
+ABB-Q070,numeric,az,DigiDeposit-in AZN cədvəlinə görə 12 aylıq əmanətdə faiz aylıq və müddətin sonunda ödəniləndə illik dərəcələr neçədir?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,8
+ABB-Q071,numeric,az,DigiDeposit-in USD cədvəlinə görə 6 aylıq əmanətdə aylıq və müddətin sonunda faiz ödənişi üçün illik dərəcələr neçədir?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1
+ABB-Q072,numeric,az,Klassik əmanətin AZN cədvəlində 36 ay üçün aylıq və müddətin sonunda faiz ödənişi üzrə illik dərəcələr neçədir?,1,1,1,1,1,1,1,1,1,1,3,1,1,2,1,5,1
+ABB-Q073,numeric,az,Travel Card bonusları hesablandıqdan neçə gün sonra istifadə üçün aktivləşir?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,1
+ABB-Q074,numeric,az,Avans kreditinin komissiyası və minimum komissiya məbləği nə qədərdir?,2,2,2,2,1,2,2,2,3,5,1,4,4,2,3,4,16
+ABB-Q075,numeric,az,İnkasso üçün sənədlərin qəbuluna görə komissiya faizi və minimum haqq nə qədərdir?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,3,3
+ABB-Q076,multi_source,az,"Tam DigiCard və Alpha Card-ın aylıq komissiyasız köçürmə və nağdlaşdırma limitlərini, həmçinin limitdən sonrakı komissiyalarını müqayisə edin.",1,1,1,1,1,1,1,1,1,3,2,1,1,1,1,1,1
+ABB-Q077,multi_source,az,DigiHesab və DigiHesab Max-ın dəstəklədiyi valyutalar necə fərqlənir?,1,1,1,1,1,1,1,1,2,2,2,1,2,1,2,1,3
+ABB-Q078,multi_source,az,AZN ilə daha uzunmüddətli əmanət istəyirəm. DigiDeposit və Klassik əmanət üçün göstərilən müddət aralıqlarını müqayisə edin.,8,9,9,9,7,9,9,9,4,6,4,8,5,9,8,8,15
+ABB-Q079,multi_source,az,"AZN ilə açılmış DigiDeposit və Klassik əmanətdən pulu vaxtından əvvəl çıxarsam, faiz ödənişi baxımından hansı qayda tətbiq olunur?",1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,4
+ABB-Q080,multi_source,az,DigiHesab Max-a başqa bankın kartından pul əlavə etməklə Dama-dama-da avtomatik yığım üsulları arasında nə fərq var?,1,4,5,5,2,4,4,5,2,6,1,2,6,1,1,6,3
+ABB-Q081,multi_source,az,Avans krediti ilə onlayn nağd kreditin müraciətçilərə dair əməkhaqqı və ya pensiya şərtləri necə fərqlənir?,5,5,5,5,6,8,5,4,1,5,4,4,5,2,1,7,3
+ABB-Q082,multi_source,az,Əmanət üzrə nağd kredit və Əmanətçilər üçün kredit xətti depozitə nisbətdə məbləğ və komissiya baxımından necə fərqlənir?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1
+ABB-Q083,multi_source,az,TamKart Max və TamKart Gold Kredit-in nominal illik faiz dərəcələrini müqayisə edin.,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1
+ABB-Q084,multi_source,az,Travel Card Visa Signature və ABB–Sea Breeze Visa Platinum ilə lounge zallarından illik neçə dəfə istifadə etmək olar?,2,2,2,2,2,15,2,2,5,12,7,6,6,3,2,2,3
+ABB-Q085,multi_source,az,Ani kredit və Sahibkar krediti üçün maksimum kredit müddətlərini müqayisə edin; kredit xəttini nəzərə almayın.,2,2,2,2,2,2,2,2,7,2,2,5,3,6,8,4,18
+ABB-Q086,multi_source,az,Onlayn mağazam üçün ePOS ilə satış nöqtəsində Mobil POS arasında əsas istifadə fərqi nədir?,1,1,1,1,1,1,1,1,4,1,2,1,1,1,1,1,2
+ABB-Q087,multi_source,az,"ABB-nin QR kod ödənişi hansı sistemlə işləyir, Mobil POS isə hansı tətbiqdə və cihaz platformasında təqdim olunur?",1,2,2,2,2,1,2,2,2,15,1,4,4,4,2,2,6
+ABB-Q088,multi_source,az,Filialda adi cari hesab açmaqla tətbiqdən DigiHesab açmağın əsas addımları necə fərqlənir?,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2
+ABB-Q089,multi_source,az,Gəncədə əmanət seyfi üçün hansı ABB filialına müraciət edə bilərəm və icarə üçün nə təqdim etməliyəm?,1,1,2,2,2,2,2,2,1,12,3,3,7,2,1,11,1
+ABB-Q090,multi_source,az,ABİF üzrə Avadanlıq krediti ilə Ani kreditin maksimum məbləğ və müddətlərini müqayisə edin.,1,1,1,1,1,1,1,1,2,2,6,1,1,2,1,2,1
+ABB-Q091,multilingual,en,"When are monthly instalments for a TamKart Max purchase due, and in which month do repayments start?",14,11,>50,11,>50,15,>50,>50,4,10,41,19,32,>50,16,>50,>50
+ABB-Q092,multilingual,en,How many Travel Card bonus points do I need to cover a flight ticket purchase of 300 AZN?,2,2,2,2,>50,2,>50,2,3,5,32,17,8,>50,13,11,>50
+ABB-Q093,multilingual,en,What is the maximum number of DigiHesab accounts I can open in the same currency?,3,3,3,3,>50,3,>50,3,3,3,36,9,4,>50,10,8,>50
+ABB-Q094,multilingual,en,"Can I delete my ABB mobile profile directly in the app? If not, how can I have it blocked?",5,5,5,5,5,5,5,>50,9,8,10,15,19,20,19,>50,>50
+ABB-Q095,multilingual,ru,Как задаётся сумма при оплате динамическим QR-кодом ABB: покупатель вводит её самостоятельно?,5,5,5,5,>50,5,>50,>50,3,3,33,6,20,>50,6,>50,>50
+ABB-Q096,multilingual,ru,Как долго действуют бонусы Travel Card и что происходит с ними после окончания срока действия карты?,3,3,3,3,3,3,2,>50,5,4,12,13,25,24,20,>50,>50
+ABB-Q097,multilingual,ru,"До какого момента нужно завершить уровни Fayda Max, чтобы получить награды в следующем месяце?",8,8,9,9,7,8,8,8,2,4,21,8,4,10,8,8,25
+ABB-Q098,multilingual,en,"After a purchase with TamKart Max at a partner store, how can I extend the instalment term and what is the deadline?",15,12,18,12,15,15,>50,>50,10,8,18,15,28,35,19,>50,>50
+ABB-Q099,multilingual,en,How close to the maturity date can I still add money to my DigiDeposit?,5,5,5,5,4,5,>50,5,6,1,26,4,2,50,14,4,>50
+ABB-Q100,multilingual,en,What security measures does ABB describe for Internet Banking transactions?,16,>50,>50,>50,>50,>50,>50,>50,21,>50,>50,>50,>50,>50,38,>50,>50
