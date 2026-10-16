@@ -4,7 +4,7 @@ Corpus: `data/abb_pages.jsonl` — 4,223 documents.
 
 ## 1. CMS coverage
 
-Every text line (≥ 20 characters) of each page's own CMS components looked up in the output.
+Every text line (≥ 20 characters) of each page's own CMS components looked up in the output. This measures *presence* of the text, not semantic correctness (table relations, conditions staying with their lists) — those are covered by the structure checks below and by manual review. PDF contents are out of scope; documents are kept as links.
 
 | | Lines | Share |
 |---|---:|---:|
@@ -65,7 +65,7 @@ DigiDeposit, 1 month (AZN): `Müddət: 1 ay; Aylıq: –; Müddətin sonu: 6.5%`
 
 ## 5. FAQ placement
 
-1,598 FAQ items. Items on up to 3 pages stay on each page (product context); 0 widely repeated items are kept once and list the other pages in `also_on`.
+1,607 FAQ items. Items on up to 3 pages stay on each page (product context); 0 widely repeated items are kept once and list the other pages in `also_on`.
 
 AZAL Miles Black Edition card page: 17 FAQ items.
 

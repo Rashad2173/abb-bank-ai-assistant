@@ -19,11 +19,13 @@ def write_chunk_report(chunks: list[Chunk], config: ChunkingConfig, markdown_pat
     markdown_path.write_text(_markdown(chunks, config), encoding="utf-8")
     with csv_path.open("w", encoding="utf-8-sig", newline="") as fh:  # BOM: Excel opens UTF-8 correctly
         writer = csv.writer(fh)
-        writer.writerow(["chunk_id", "url", "lang", "category", "chunk_type", "token_count", "title",
-                         "heading_path", "text"])
+        writer.writerow(["chunk_id", "url", "lang", "category", "categories", "chunk_type", "token_count",
+                         "title", "heading_path", "published", "is_active", "valid_until", "related_urls", "text"])
         for c in chunks:
-            writer.writerow([c.chunk_id, c.url, c.lang, c.category, c.chunk_type, c.token_count, c.title,
-                             " > ".join(c.heading_path), c.text])
+            writer.writerow([c.chunk_id, c.url, c.lang, c.category, ", ".join(c.categories), c.chunk_type,
+                             c.token_count, c.title, " > ".join(c.heading_path), c.published or "",
+                             "" if c.is_active is None else c.is_active, c.valid_until or "",
+                             " ".join(c.related_urls), c.text])
 
 
 def _markdown(chunks: list[Chunk], config: ChunkingConfig) -> str:

@@ -171,6 +171,8 @@ def _find_frequent_blocks(drafts: list[_Draft], config: ScraperConfig) -> dict[R
     example: dict[RepeatKey, str] = {}
 
     for draft in drafts:
+        if category_of(draft.url) in config.boilerplate_exempt_categories:
+            continue
         keys = {}
         for block in draft.content.blocks:
             if _can_be_boilerplate(block):
@@ -246,14 +248,17 @@ def _assemble_pages(
 
     for draft in drafts:
         content = draft.content
-        blocks = [
-            block for block in content.blocks
-            if (key := (draft.lang, fingerprint(block.text))) not in frequent or keep_once.first_time(key)
-        ]
+        category = category_of(draft.url)
+        if category in config.boilerplate_exempt_categories:
+            blocks = list(content.blocks)
+        else:
+            blocks = [
+                block for block in content.blocks
+                if (key := (draft.lang, fingerprint(block.text))) not in frequent or keep_once.first_time(key)
+            ]
         if _is_home_page(draft.url):
             blocks += _contact_blocks(content.footer_blocks)
 
-        category = category_of(draft.url)
         page = _make_page(
             url=draft.url,
             lang=draft.lang,

@@ -2,6 +2,7 @@ import pytest
 
 from abb_retrieval.evalset import (
     CorpusMismatchError,
+    apply_additions,
     attach_chunks,
     freeze_evidence,
     parse_question_set,
@@ -156,6 +157,36 @@ def test_a_shared_table_header_is_not_enough_evidence():
               make_chunk("usd", "u", 0, ["sections[1].paragraphs[0]"])]
     attach_chunks([question], chunks, [page])
     assert question.evidence[0].chunk_ids == ["azn"]
+
+
+def test_a_sentence_in_two_tables_counts_only_in_its_own_section():
+    """Q079: "no interest on early withdrawal" is under the AZN *and* the USD table."""
+    rule = "- Əmanət məbləği vaxtından əvvəl çıxarıldığı halda heç bir faiz ödənilmir."
+    question = Question(id="Q", question="?", lang="az", category="multi_source", expected_answer="", evidence=[
+        EvidenceRef(url="u", page_index=0, positions=[], texts=[rule], section_paths=[["DigiDeposit", "AZN"]]),
+    ])
+    page = {"url": "u", "faq": [], "sections": [
+        {"heading_path": ["DigiDeposit", "AZN"], "paragraphs": [rule]},
+        {"heading_path": ["DigiDeposit", "USD"], "paragraphs": [rule]},
+    ]}
+    azn = make_chunk("azn", "u", 0, ["sections[0].paragraphs[0]"])
+    azn.text = f"DigiDeposit\n\n## AZN\n{rule}"
+    usd = make_chunk("usd", "u", 0, ["sections[1].paragraphs[0]"])
+    usd.text = f"DigiDeposit\n\n## USD\n{rule}"
+    attach_chunks([question], [azn, usd], [page])
+    assert question.evidence[0].chunk_ids == ["azn"]
+
+
+def test_reviewed_alternative_passages_count_as_evidence():
+    questions = frozen_questions()
+    apply_additions(questions, [{"question_id": "ABB-Q001", "evidence": 0, "url": ALPHA,
+                                 "contains": "Valideyn sifariş verir"}])
+    alternative = make_chunk("alpha-faq", ALPHA, 2467, ["faq[0]"])
+    alternative.text = "Alpha Card\n\nSual: Kim sifariş edir?\nCavab: Valideyn sifariş verir."
+    pages = corpus_v1()
+    pages[2467] = {**pages[2467], "faq": [{"question": "Kim sifariş edir?", "answer": "Valideyn sifariş verir."}]}
+    attach_chunks(questions, [make_chunk("alpha-0", ALPHA, 2467, ["sections[0].paragraphs[0]"]), alternative], pages)
+    assert questions[0].evidence[0].chunk_ids == ["alpha-0", "alpha-faq"]
 
 
 def test_merged_identical_chunks_still_cover_evidence_of_both_pages():

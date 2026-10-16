@@ -251,6 +251,7 @@ class _PageChunker:
             valid_until=self.validity.get("valid_until"),
             published=self.page.get("published"),
             related_urls=related_urls or [],
+            categories=[self.page["category"]],
         ))
 
 

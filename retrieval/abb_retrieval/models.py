@@ -16,6 +16,7 @@ class ChunkAlias(BaseModel):
     url: str
     page_index: int
     sources: list[str]
+    category: str = ""
 
 
 class Chunk(BaseModel):
@@ -41,9 +42,11 @@ class Chunk(BaseModel):
     published: date | None = None
     """News, press releases, CSR, tenders: the date shown on the page."""
     related_urls: list[str] = Field(default_factory=list)
-    """Other pages with the same content (shared FAQ items, merged identical chunks)."""
+    """Other pages with the same content (shared FAQ items, merged chunks)."""
+    categories: list[str] = Field(default_factory=list)
+    """All categories the chunk belongs to — more than one after merging (filter on this)."""
     aliases: list[ChunkAlias] = Field(default_factory=list)
-    """Identical chunks of other pages merged into this one."""
+    """Chunks of other pages merged into this one."""
 
 
 class EvidenceRef(BaseModel):
@@ -55,6 +58,11 @@ class EvidenceRef(BaseModel):
     """Same notation as :attr:`Chunk.sources` — valid for the corpus version the set was written for."""
     texts: list[str] = Field(default_factory=list)
     """The paragraph / FAQ texts at ``positions``. They identify the evidence in any later corpus version."""
+    section_paths: list[list[str]] = Field(default_factory=list)
+    """Heading path of each text's section (empty for FAQ) — tells the AZN table from the USD table
+    when both contain the same sentence."""
+    alternatives: list[str] = Field(default_factory=list)
+    """Other passages of the same page that answer equally well (``evaluation/evidence_additions.json``)."""
     quote: str = ""
     chunk_ids: list[str] = Field(default_factory=list)
     """Chunks containing this evidence — filled in once the corpus is chunked."""

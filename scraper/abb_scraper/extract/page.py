@@ -28,8 +28,10 @@ _GENERIC_LINK_TEXTS = frozenset(fingerprint(t) for t in (
     "Yüklə", "Yükləyin", "Ətraflı", "Bax", "Endir", "Endirin", "Download", "More", "Details",
     "Скачать", "Подробнее", "PDF",
 ))
-_MIN_QUESTION_WORDS = 2
-"""A one-word "question" ("Məlumat") is a broken CMS entry; short answers ("Bəli.") are fine."""
+_MIN_WORDS = 2
+"""A broken CMS entry has a one-word question *and* a one-word answer ("Məlumat" /
+"əməliyyatları."). A one-word title over a real explanation ("Məlumat" + 2 000
+characters) and a short answer to a real question ("Bəli.") are both content."""
 
 
 @dataclass
@@ -100,7 +102,8 @@ def _extract_faq(scope: Any, rows: dict[str, Any]) -> list[FaqItem]:
     faq = []
     for question_html, answer_html in extract_accordion_items(scope, rows):
         question, answer = html_fragment_to_text(question_html), html_fragment_to_text(answer_html)
-        if is_placeholder(question) or is_placeholder(answer) or len(question.split()) < _MIN_QUESTION_WORDS:
+        is_broken = len(question.split()) < _MIN_WORDS and len(answer.split()) < _MIN_WORDS
+        if is_placeholder(question) or is_placeholder(answer) or is_broken:
             continue
         faq.append(FaqItem(question=question, answer=answer))
     return faq

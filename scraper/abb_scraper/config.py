@@ -34,6 +34,9 @@ class ScraperConfig:
     more widely repeated items are kept once, on the most general page."""
     min_page_chars: int = 150
     """Pages with less extracted text than this are treated as empty."""
+    boilerplate_exempt_categories: tuple[str, ...] = ("procurement",)
+    """Pages that must stay complete on their own: every tender announcement states its
+    own fee, conditions and document list, even when the wording repeats across tenders."""
     boilerplate_min_pages: int = 25
     """A text block that occurs on at least this many pages of one language is
     boilerplate (banners, teasers) and is kept only once. An absolute count, not

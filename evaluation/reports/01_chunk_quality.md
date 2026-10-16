@@ -6,12 +6,12 @@ Settings: target 350 tokens, max 512, overlap 1 paragraph(s), tokenizer `BAAI/bg
 
 | Metric | Value |
 |--------|-------|
-| Chunks | 8044 |
+| Chunks | 9604 |
 | Source pages | 4223 |
-| By type | section: 6431, faq: 1613 |
-| By language | az: 4282, ru: 2220, en: 1542 |
-| Tokens p10 / p50 / p90 / p99 / max | 66 / 293 / 472 / 502 / 504 |
-| Total tokens | 2,206,865 |
+| By type | section: 7977, faq: 1627 |
+| By language | az: 5822, ru: 2229, en: 1553 |
+| Tokens p10 / p50 / p90 / p99 / max | 71 / 341 / 494 / 504 / 504 |
+| Total tokens | 3,034,941 |
 | Over the 512-token limit | 0 |
 | Pages split into more than 10 chunks | 93 |
 
@@ -19,12 +19,12 @@ Settings: target 350 tokens, max 512, overlap 1 paragraph(s), tokenizer `BAAI/bg
 
 | Category | Chunks | Median tokens |
 |----------|-------:|--------------:|
-| procurement | 1523 | 374 |
+| procurement | 3069 | 475 |
 | news | 1494 | 347 |
-| individual | 1446 | 108 |
+| individual | 1456 | 111 |
 | general | 1012 | 117 |
 | campaigns | 789 | 304 |
-| business | 695 | 201 |
+| business | 699 | 202 |
 | about | 489 | 437 |
 | service_network | 335 | 198 |
 | csr | 175 | 320 |
@@ -36,127 +36,17 @@ Settings: target 350 tokens, max 512, overlap 1 paragraph(s), tokenizer `BAAI/bg
 
 | Tokens | Chunks | |
 |--------|-------:|---|
-| 0–49 | 249 | █ |
-| 50–99 | 1356 | ███████ |
-| 100–199 | 1099 | █████ |
-| 200–299 | 1431 | ███████ |
-| 300–399 | 2008 | ██████████ |
-| 400–511 | 1901 | █████████ |
+| 0–49 | 243 | █ |
+| 50–99 | 1355 | ██████ |
+| 100–199 | 1098 | █████ |
+| 200–299 | 1367 | ██████ |
+| 300–399 | 1443 | ██████ |
+| 400–511 | 4098 | █████████████████ |
 | 512–… | 0 |  |
 
 ## Random samples
 
-### `89504f47e9-001` — section, en, individual, 272 tokens
-
-<https://abb-bank.az/en/ferdi/kartlar/kredit-kartlari>
-
-```text
-TamKart Credit Card
-
-## Credit card application terms
-To apply for a credit card, it is sufficient to fill out the online application form and provide the required information. After the application is reviewed, the approved credit card becomes ready for use within a short period of time. Since the credit card application process is simple and convenient, it can be completed without visiting a bank branch. This approach allows users to obtain their card quickly and efficiently, without wasting time.
-## Credit cards > TamKart > TamKart Max
-Get the maximum benefit out of your credit card with TamKart Max! 12-month interest-free payments with TAM 12, “Convert to installments” up to 24 months, and many more.
-Credit limit: Up to 30 000 ₼
-Grace period: Up to 60 months
-Interest-free payments: TAM 12
-Installment: Up to 24 months
-## Credit cards > TamKart > TamKart Classic
-You will earn more cashback from your payments with Faydali Cashback, partner stores, and Fayda Max. Make your purchases with TamKart and enjoy interest-free installments for up to 24 months.
-Credit limit: Up to 30,000 ₼
-Installment: Up to 24 months, no interest rate
-Grace period: Up to 60 days
-Price: Free
-```
-
-### `37992897cc-023` — faq, az, individual, 462 tokens
-
-<https://abb-bank.az/ferdi/investisiya>
-
-```text
-ABB mobile ilə qiymətli kağızlara investisiya!
-Tez-tez verilən suallar
-
-Sual: SELL LIMIT sifarişi nədir?
-Cavab: SELL LIMIT – bu sifarişini yerləşdirmək üçün iki parametri müəyyən etməlisiz: satmaq istədiyiniz qiymətli kağızın miqdarı və satışın minimal qiyməti (bu qiymət limit qiyməti olaraq qəbul edilir). Sifarişiniz sistemə yerləşdirildikdən sonra sifarişin icra alqoritmi satmaq istədiyiniz qiymətli kağızın bazar qiyməti ilə müəyyən etdiyiniz limit qiymətini müqayisə edir. Əgər bazarda olan alış sifarişlərinin qiyməti sizin limit qiymətinizə bərabər və ya bu qiymətdən çox olarsa, sifarişiniz “ən yaxşı qiymət prinsipi” ilə icra ediləcək. Satış sifarişlərinə nisbətdə “ən yaxşı qiymət prinsipi” satış sifarişlərinizin qiymət baxımından bazarda mövcud olan ən yaxşı alış qiyməti ilə uzlaşdırılması (müvafiq qiymətlə əqdin bağlanması) prinsipidir. Nəzərə almalısınız ki, SELL LIMIT sifarişi tam və qismən icra edilə və ya ümumiyyətlə icra edilməyə bilər. Sifarişinizin icrası bazarda uyğun qiymətli əks sifarişlərin, yəni alış sifarişlərin olması ilə yanaşı bu əks sifarişlər ilə alınan qiymətli kağızların həcmindən (miqdarından) də asılıdır. Əgər qiymət üzrə uyğun gələn əks sifarişlərin həcmi sizin satmaq istədiyiniz həcmdən azdırsa, o zaman satış sifarişiniz natamam icra olunacaq və müvafiq həcmdə və qiymətdə əks sifarişlər əmələ gələnədək gözləmə rejimində qalacaqdır. Misal 1: SELL LIMIT sifarişinin tam icrası
-İnvestisiya portfelinizdə 16 ədəd Apple Inc. (ticarət simvolu: AAPL) şirkətinin səhmi mövcuddur. Sizin bu səhmlərdən 10 ədədini ən azı $180-a satmaq niyyətiniz var. Bu halda, siz miqdar olaraq 10 ədəd, limit qiyməti olaraq $180 müəyyən edib sistemə SELL LIMIT sifarişi yerləşdirirsiniz. Həmin an bazarda olan alış sifarişləri aşağıdakılardır:
-· $179-a 1 ədəd AAPL səhmləri alınır;
-· $180-a 3 ədəd AAPL səhmləri alınır;
-· $181,50-a 8 ədəd AAPL səhmləri alınır.
-```
-
-### `e7fbdeff63-008` — faq, az, general, 56 tokens
-
-<https://abb-bank.az/azal-bilet-abb-mobile-ile-aviabiletinizi-onlayn-alin>
-
-```text
-AZAL Bilet - ABB mobile ilə aviabiletinizi onlayn alın
-Tez-tez verilən suallar
-
-Sual: AZAL biletinin qiymətini necə yoxlamaq olar?
-Cavab: İstiqamət və tarix seçərək mövcud uçuşların qiymətlərini müqayisə edə bilərsiniz.
-```
-
-### `e29ded27cf-000` — section, az, procurement, 358 tokens
-
-<https://abb-bank.az/haqqimizda/satinalmalar/musabiqelerin-elani/bank-terefinden-oracle-sistemleri-ucun-yeni-lisenziyalarin-satin-alinmasi-iyun-2023>
-
-```text
-Bank tərəfindən Oracle sistemləri üçün yeni lisenziyaların satın alınması
-Tarix: 07.06.2023
-
-7 İyun, 2023
-Tenderin adı: “ABB” ASC tərəfindən Oracle sistemləri üçün yeni lisenziyaların satın alınması
-Tenderin elan tarixi: 07.06.2023
-İştirak haqqı:
-BANKIN ADI: ABB
-VÖEN : 9900001881
-KOD: 805250
-SWIFT: IBAZAZ2X
-M/h: AZ03NABZ01350100000000002944
-H/h: AZ12IBAZ34501019440000100100 AZN
-H/h: AZ33IBAZ34511018400000100100 USD
-- tender təklifi (tender zərflərinin açıldığı tarixdən (22 iyun 2023-cü il) sonra azı 30 (otuz) bank günü (yəni ən azı 08 avqust 2023-cü il tarixinədək) qüvvədə olmalıdır;
-- tender təklifi dəyərinin 1 (bir) faizi həcmində bank təminatı (tender təklifinin qüvvədə olma müddətinin sonuncu günündən azı 30 bank günü çox olmalıdır (yəni ən azı 18 sentyabr 2023-cü il tarixinədək qüvvədə olmalıdır);
-İddiaçılar tenderdə iştirak etmək üçün yuxarıda göstərilən sənədləri (tender təklifi və bank təminatı istisna olmaqla) 14 iyun 2023-cü il saat 17:00-a qədər, tender təklifi və bank təminatını isə möhürlənmiş ikiqat zərflərdə 21 iyun 2023-cü il saat 17:00-a qədər Bakı şəhəri, Nəsimi rayonu, Nizami küçəsi, 67 nömrəli ünvana təqdim etməlidirlər.
-İddiaçıların təklifləri 22 iyun 2023-cü il saat 16:00-da Bakı şəhəri, Nəsimi rayonu, Nizami küçəsi, 67 nömrəli ünvanda açılacaqdır.
-Tender Komissiyası
-```
-
-### `754876f930-002` — section, az, news, 342 tokens
-
-<https://abb-bank.az/xeberler/abb-nin-yeni-sehmdarlari-da-2024-ci-ilin-neticeleri-uzre-dividendler-alacaqlar>
-
-```text
-ABB-nin yeni səhmdarları da 2024-cü ilin nəticələri üzrə dividendlər alacaqlar
-Tarix: 01.08.2024
-
-- Bəli, səhmlərə ABB mobile tətbiqi, ölkəmizdəki əksər bankların filialları, eləcə də Azərbaycanda fəaliyyət göstərən investisiya şirkətləri vasitəsilə abunə yazılmaq mümkündür. Səhm almaq niyyətində olan investorlara tövsiyəmiz bu olardı ki, qərarlarını sürətləndirib sifarişlərini vaxtında etsinlər. Çünki müddət azalır, hazırki proses sentyabrın 10-da tamamlanacaq.
-Digər tərəfdən, səhm sifariş etmiş investorlar 10 sentyabr tarixinə qədər ABB-də ödədikləri sifariş məbləğinə görə 7% illik gəlirliliklə faiz qazancı əldə edirlər. Bu faiz gəliri investorlara əvvəlcədən, yəni sifariş verilən gün ödənilir. Səhmlərə daha tez abunə yazılanlar bu imkandan da faydalanmış olurlar.
-Bundan başqa, avqustun 1-dən etibarən ABB səhmi sifariş verən investorlar üçün lotereya kampaniyasına da start verdik. İnvestorlar avqust və sentyabr aylarındakı səhm sifarişlərinə görə 5000 manatadək uduş şansı qazanacaqlar.
-- ABB səhmlərini təkrar bazarda satmaq olacaqmı?
-- Yerləşdirmə bitdikdən sonra hər bir səhmdar öz səhmlərini “ABB-İnvest” şirkəti və ya digər investisiya şirkətləri vasitəsilə sata bilər. Bununla yanaşı, sentyabrın sonunadək səhmləri ABB mobile vasitəsilə də satmaq mümkün olacaq. Yəni səhmdar malik olduğu səhmləri istədiyi zaman ən rahat şəkildə sata biləcək. ABB səhmlərinin alqı-satqısında yüksək likvidliyin təmin olunması üçün hazırda Bank aidiyyəti qurumlarla müvafiq tədbirlər həyata keçirir.
-```
-
-### `f39ca662a9-000` — section, az, news, 417 tokens
-
-<https://abb-bank.az/xeberler/abb-de-sansli-2026-lotereya-kampaniyasi-baslandi>
-
-```text
-ABB-də “Şanslı 2026” lotereya kampaniyası başlandı!
-Tarix: 15.11.2025
-
-15 Noyabr, 2025
-Müştərilərini daim xoş sürprizlərlə sevindirən ABB “Şanslı 2026” lotereya kampaniyasına start verib. Bu kampaniya müştərilərə avtomobil də daxil olmaqla qiymətli hədiyyələr qazandırır.
-Şərtlərə görə, 15.11.2025-ci tarixindən 15.01.2026-cı il tarixinə qədər ABB-nin kartları ilə aparılan hər 20 AZN ödəniş müştəriyə 1 şans qazandırır. ABB-nin yeni məhsullarından istifadə edən müştərilər isə əlavə şanslar da əldə edirlər.
-Belə ki, nağd kredit və depozit məhsullarından istifadə birdəfəlik 100 şans, kredit kartının sifarişi 100 şans, debet kartı sifarişi 20 şans gətirir. Bu imkan əməkhaqqı, təqaüd, biznes və sahibkar kartlarına aid deyil.
-Şans qazanmaq istəyən istifadəçilər ABB mobile tətbiqinin “Lotereya” bölməsinə keçid edib, “Aktiv et” düyməsini sıxıb iştiraklarını aktivləşdirməlidirlər. Eyni müştəri yalnız 1 dəfə qalib ola bilər.
-Birinci yerin qalibi “Li Auto L6 Pro” avtomobili qazanacaq. Digər yerlərin qaliblərinə isə, “MacBook Air 13 M4” kompüterləri, “İphone 16 Pro” telefonları, “Apple Watch Series 11” saatları, 1000 AZN-lik səyahət kartları, “AirPods 4” qulaqlıqları və “Faydalı Keşbek”lər veriləcək. Kampaniya zamanı oynanılacaq hədiyyə sayı ümumən 2026-dır.
-Qaliblər 03 fevral 2026-cı il tarixində ABB-nin rəsmi Facebook səhifəsində canlı yayımda elan olunacaqlar.
-ABB-nin müasir, faydalı və universal məhsul və xidmətləri barədə məlumatları Bankın filial və şöbələrindən, https://abb-bank.az/ rəsmi internet səhifəsindən və ya 937 nömrəli Məlumat Mərkəzindən, həmçinin sosial şəbəkələrdəki rəsmi korporativ səhifələrindən əldə etmək olar.
-```
-
-### `89c6a99595-009` — faq, ru, general, 71 tokens
+### `89c6a99595-005` — faq, ru, general, 65 tokens
 
 <https://abb-bank.az/ru/kreditle-komputer>
 
@@ -164,371 +54,500 @@ ABB-nin müasir, faydalı və universal məhsul və xidmətləri barədə məlum
 Компьютер в кредит
 Часто задаваемые вопросы
 
-Вопрос: Можно ли оформить компьютер в кредит только по удостоверению личности?
-Ответ: Да, оформить компьютер в кредит только по удостоверению личности возможно. После выбора товара в магазине-партнёре необходимо ознакомиться с условиями в приложении ABB Mobile и после подтверждения оплачивать покупку по частям.
+Вопрос: На сколько месяцев можно разделить оплату за компьютер в кредит?
+Ответ: Стоимость выбранного компьютера можно разделить на ежемесячные беспроцентные платежи сроком до 24 месяцев. Условия могут различаться в зависимости от магазина-партнёра и выбранного товара.
 ```
 
-### `5df4451210-088` — section, az, about, 433 tokens
+### `f821d01f68-001` — section, az, general, 245 tokens
 
-<https://abb-bank.az/haqqimizda/hesabatlar>
+<https://abb-bank.az/kreditle-paltaryuyan-masin>
 
 ```text
-Maliyyə və korporativ hesabatlar
-İnvestisiya portfeli
+Kreditlə Paltaryuyan Maşın
+Kreditlə paltaryuyan maşın almaq mümkündürmü?
 
-Son yenilənmə - 23.01.2026
-Depozitlər və Qiymətli Kağızlar portfeli (investisiya portfeli daxil) 2025, 12 ay üzrə (https://cdn.abb-bank.az/Depozitler_ve_Qiymetli_Kagizlar_98657973c4.pdf)
-Depozitlər və Qiymətli Kağızlar portfeli (investisiya portfeli daxil) 2024, 12 ay üzrə (https://cdn.abb-bank.az/1737551832_Depoz_Itl_r_v_Q_Iym_tl_I_Kagizlar_portfel_I_Invest_Is_Iya_portfel_I_dax_Il_31_683c18b457.pdf)
-Depozitlər və Qiymətli Kağızlar portfeli (investisiya portfeli daxil) 2023, 12 ay üzrə (https://cdn.abb-bank.az/1706248276_depozitler_ve_qiymetli_kagizlar_portfeli_investisiya_portfeli_daxil_31122023_92d72b279c.pdf)
-Depozitlər və Qiymətli Kağızlar portfeli (investisiya portfeli daxil) 2022, 12 ay üzrə (https://cdn.abb-bank.az/1674829870_depozitler_ve_qiymetli_kagizlar_portfeli_investisiya_portfeli_daxil_31122022_8f59191630.pdf)
-Depozitlər və Qiymətli Kağızlar portfeli (investisiya portfeli daxil) 2021, 12 ay üzrə (https://cdn.abb-bank.az/1651065419_depozitler_ve_qiymetli_kagizlar_portfeli_investisiya_portfeli_daxil_31122021_5ad217bf0d.pdf)
+Bəli, kreditlə paltaryuyan maşın almaq mümkündür. ABB-nin “İndi al, sonra ödə” xidməti vasitəsilə olduqca sadə, sürətli və rəqəmsal şəkildə həyata keçirilir. Artıq bank filiallarına getmədən, kreditə ehtiyac olmadan istədiyiniz məhsulu ala bilərsiniz. Üstəlik, rəsmi gəlir tələbi olmadan!
+Müştərilər ABB-nin yüzlərlə partnyor mağazalarından istədiyi brendə və tutuma malik paltaryuyan modelini seçir. Təsdiq və rəsmiləşdirmə prosesi birbaşa ABB mobile tətbiqi üzərindən icra olunur. Müraciət təsdiqləndikdən sonra məhsul dərhal sizə təqdim olunur, ödənişi isə sonradan tam faizsiz 24 ayadək hissələrə bölünür.
+Nağd kreditə və ya taksit kartına ehtiyac olmadan “İndi al, sonra ödə” xidməti ilə aşağıdakı şərtlərlə məhsul əldə edə bilərsiniz:
+Məhsulun qiyməti: 100 AZN-dən 5000 AZN-dək;
+Müddət: 24 ayadək bölərək rahat ödəniş müddəti;
+Şərtlər: Tamamilə faizsiz, zaminsiz və girovsuz.
 ```
 
-### `9d248b0890-000` — section, az, procurement, 385 tokens
+### `ec1d94504e-000` — section, ru, news, 285 tokens
 
-<https://abb-bank.az/haqqimizda/satinalmalar/musabiqelerin-elani/bank-terefinden-mobilelron-proqram-teminati-ucun-yeni-lisenziyalarin-ve-texniki-destek-xidmetlerinin-satin-alinmasi-kotirovka-190424>
+<https://abb-bank.az/ru/xeberler/abb-korporativ-musteriler-ucun-muhum-bir-xidmeti-teqdim-etdi200225>
 
 ```text
-Bank tərəfindən “Mobilelron” proqram təminatı üçün yeni lisenziyaların və texniki dəstək xidmətlərinin satın alınması
-Tarix: 19.04.2024
+Банк АВВ представил важную услугу для корпоративных клиентов
+Дата: 20.02.2025
 
-19 Aprel, 2024
-Kotirovka sorğusunun adı: "ABB" ASC tərəfindən “Mobilelron” proqram təminatı üçün yeni lisenziyaların və texniki dəstək xidmətlərinin satın alınması
-Kotirovka sorğusunun elan tarixi: 19.04.2024
-Kotirovka sorğusunda iştirak etmək istəyən iddiaçılar öz qiymət kotirovkalarını qapalı zərfdə imzalanmış və ya möhürlənmiş şəkildə Bakı şəhəri, Nəsimi rayonu, Nizami küçəsi 67 ünvanında yerləşən “ABB” ASC-nin Baş ofisinə 29 aprel 2024-cü il saat 17:00-a qədər təqdim etməlidirlər.
-Kotirovka sorğusu proseduru üzrə zərflərin açılışı 30 aprel 2024-cü il saat 15:00-da keçiriləcəkdir.
-- Kotirovka sorğusunda iştirak etmək istəyən iddiaçılar iştirak niyyətini bildirmək üçün Orkhan.Taghiyev@abb-bank.az və pod@abb-bank.az e-poçt ünvanına şirkətin adını qeyd etməklə “iştirakımı təsdiq edirəm” mətnini göndərməlidir.
-- Göndərilən müraciətdə e-poçtun “subject” hissəsində - "ABB" ASC tərəfindən “Mobilelron” proqram təminatı üçün yeni lisenziyaların və texniki dəstək xidmətlərinin satın alınması - qeyd edilməlidir.
-Kotirovka sorğusu ilə bağlı əlavə məlumat almaq üçün adı qeyd edilmiş “ABB” ASC-nin əməkdaşına (Orxan Tağıyevə: (012) 493-00-91, daxili 82-16/82-20, elektron poçt ünvanları: (Orkhan.Taghiyev@abb-bank.az və pod@abb-bank.az) müraciət edə bilərsiniz.
+Состоялась встреча группы пользователей SWIFT, организо?...
+20 февраля, 2025
+Состоялась встреча группы пользователей SWIFT, организованная по инициативе Центрального банка Азербайджана и Всемирного межбанковского финансово-телекоммуникационного сообщества (SWIFT). В мероприятии приняли участие представители банков, работающих в нашей стране и использующих услуги SWIFT.
+На встрече Банк АВВ представил услугу "G4C", разработанную в партнерстве с SWIFT. Теперь корпоративные клиенты могут с помощью интернет-банкинга отслеживать переводы, поступающие из-за рубежа в иностранных валютах, и контролировать статус операций.
+Это одно из инновационных решений, которые Банк АВВ внедрил в банковский сектор страны. До появления этой возможности от Банка АВВ, клиенты могли отслеживать только переводы, отправленные из Азербайджана за границу в иностранной валюте. Теперь благодаря запуску услуги G4C корпоративные клиенты могут контролировать статус переводов в страну и из страны с помощью Интернет-банкинга.
+Во время встречи обсудили предстоящий запуск продуктов “Pre-validation” и “Swiftref”, которые Банк ABB скоро представит своим клиентам в рамках сотрудничества со SWIFT.
+```
+
+### `dc104bd8cf-001` — section, ru, campaigns, 414 tokens
+
+<https://abb-bank.az/ru/kampaniyalar/abb-azal-miles-dan-black-friday-teklifi-6000-xosgeldin-mili-40-endirim>
+
+```text
+Специальное предложение ABB-AZAL Miles к “Black Friday”: 6000 приветственных миль и скидка 40%
+Статус кампании: завершена (21.11.2025 – 23.11.2025)
+С 21 по 23 ноября 2025 года AZAL и Банк ABB запускают совместную кампанию для всех, кто ценит комфортные и выгодные перелёты.
+
+21.11.2025 - 23.11.2025
+Неактивно
+В период с 21 по 23 ноября 2025 года оформите карту ABB-AZAL Miles Visa Platinum или Mastercard Black Edition и получите не стандартные 2000, а в три раза больше — 6000 приветственных миль. При этом мили зачисляются на ваш счёт в течение дня, без 14-дневного периода ожидания, что позволяет сразу использовать их для покупки авиабилета.
+С 21 по 24 ноября 2025 года держатели ко-брендовых карт ABB-AZAL Miles получают эксклюзивную скидку 40% на авиабилеты AZAL, при оплате милями. Чтобы воспользоваться преимуществом, достаточно в мобильном приложении AZAL или на сайте авиакомпании выбрать способ оплаты милями.
+Условия кампании по предоставлению 40% скидки на авиабилеты AZAL для держателей ко-брендовых карт
+- Период продажи билетов: 21–24 ноября 2025 года
+- Период возможных перелётов по этим билетам: с 24 ноября 2025 года по 30 апреля 2026 года
+- Исключения: 25 декабря 2025 – 7 января 2026 года и 19–29 марта 2026 года
+- Маршруты: только международные регулярные рейсы
+- Классы обслуживания: Эконом / Премиум-Эконом / Бизнес
+Планируйте путешествие уже сейчас. В этом году Black Friday — это и скидки, и мили, и новые возможности для полётов.
+Оформление карты: через ABB mobile или в любом филиале Банка ABB Покупка билетов: на сайте azal.az
+Оформите через ABB mobile
+```
+
+### `02db2abc43-011` — faq, ru, individual, 63 tokens
+
+<https://abb-bank.az/ru/ferdi/digitravel>
+
+```text
+Цифровые решения для ваших путешествий!
+Часто задаваемые вопросы
+
+Вопрос: Отправляется ли электронный билет?
+Ответ: Да. После оформления билета: электронный билет автоматически отправляется на указанный e-mail адрес, а также доступен для просмотра и скачивания в истории DigiTravel.
+```
+
+### `4c84bf655e-000` — section, az, news, 439 tokens
+
+<https://abb-bank.az/xeberler/abb-sehmdarlarina-200-000-000-manat-dividend-odeyecek080525>
+
+```text
+ABB səhmdarlarına 200 000 000 manat dividend ödəyəcək!
+Tarix: 08.05.2025
+
+7 may 2025-ci il tarixində ABB Səhmdarlarının Ümumi Yığıncağı keçirilib. Yığ?...
+8 May, 2025
+7 may 2025-ci il tarixində ABB Səhmdarlarının Ümumi Yığıncağı keçirilib. Yığıncaqda ABB-nin 2024-cü il üzrə kənar auditor tərəfindən təqdim olunmuş maliyyə hesabatı təsdiqlənib, bir sıra təşkilati məsələlərə baxılıb, eyni zamanda 2024-cü ilin maliyyə nəticələrinə əsasən, ABB-nin səhmdarlarına dividendin ödənilməsinə qərar verilib.
+Bankın İdarə Heyətinin sədri Abbas İbrahimov keçirdiyi mətbuat konfransında bununla bağlı qərarı elan edərək bildirib ki, ötən ilin mənfəətindən səhmdarlara 200 000 000 manat məbləğində dividend ödəniləcək.
+Onun sözlərinə görə, bu, son 7 ildə səhmdarlarına ardıcıl şəkildə yüksək dividendlər ödəyən ABB-nin ayırdığı rekord dividend məbləğidir. Beləliklə, ABB-nin hər bir səhminin illik gəlirlilik səviyyəsi nominal qiymətlə 15,6%-ə yüksəlib.
+Hazırda ABB-nin 30 mindən çox səhmdarı var. Bankın nizamnamə kapitalının strukturunda dövlətin iştirak payı 92.18%-dir. Bu bölgüyə uyğun olaraq dividendin 184 000 000 manatı dövlət büdcəsinə, 16 000 000 manatı isə digər səhmdarlara ödəniləcək.
+“Qürur duyuruq ki, 30 mindən çox vətəndaşımızla gəlirlərimizi bölüşəcəyik. Həmçinin bu ilin dividend ödənişini də nəzərə alsaq, son illər ərzində ABB-nin dövlət büdcəsinə və digər sosial yönümlü layihələrə ödədiyi vəsaitlərin ümumi məbləği 1,6 milyard manata çatacaq” – Abbas İbrahimov bildirib.
+İdarə Heyətinin sədri jurnalistlərə ABB-nin 2024-cü il, eləcə də cari ilin yanvar-aprel ayları üzrə fəaliyyəti, həyata keçirdiyi strateji inkişaf layihələri haqqında ətraflı məlumat verib.
+Mətbuat konfransında ABB-nin 2024-cü il üzrə Dayanıqlı İnkişaf Hesabatı da təqdim olunub. Media nümayəndələrini maraqlandıran çoxsaylı suallar cavablandırılıb.
+```
+
+### `8f6a019eee-000` — section, az, press_releases, 125 tokens
+
+<https://abb-bank.az/press-relizler/qlobal-financeyahoocom-portali-abb-davr-haqqinda-yazdi>
+
+```text
+Qlobal finance.yahoo.com portalı ABB Davr haqqında yazdı
+Tarix: 27.08.2026
+
+27 Avqust, 2026
+Avqustun 23-də Daşkənddə Azərbaycan Respublikasının Prezidenti İlham Əliyevin və Özbəkistan Respublikasının Prezidenti Şavkat Mirziyoyevin onlayn formatda iştirakı ilə “ABB Davr” Bank layihəsinin açılışı beynəlxalq medianın da marağına səbəb olub. Qlobal finance.yahoo.com portalı ABB-nin Özbəkistanın kommersiya bankı Davr Bankın əsas nəzarət səhm paketini əldə etməsi haqqında hazıb. Yazının linki ilə buradan tanış ola bilərsiniz.
+```
+
+### `4f1a171508-001` — section, ru, business, 68 tokens
+
+<https://abb-bank.az/ru/biznes/kicik-ve-orta-biznes/senedli-emeliyyatlar/inkasso>
+
+```text
+Безопасная торговля с инкассо!
+Тарифы > Инкассационные операции
+
+Сбор документов: 0.1% (min. 100 AZN/USD/EUR)
+Местные почтовые службы (за каждый комплект документов): 10 AZN
+Зарубежные почтовые службы (за каждый комплект документов): 70 USD
+```
+
+### `b21c42a110-000` — section, az, campaigns, 175 tokens
+
+<https://abb-bank.az/kampaniyalar/konsyerj-xidmeti>
+
+```text
+Konsyerj xidməti
+Kampaniya statusu: bitib (28.06.2020 – 28.06.2020)
+
+28.06.2020 - 28.06.2020
+Aktiv deyil
+Chatbot-Concierge xidməti ABB-nin VISA Platinum, VISA İnfinite, Mastercard World Elite kart sahiblərinin günboyu dünyanın istənilən nöqtəsindən onlayn rejimdə faydalana biləcəkləri çoxsaylı xidmətlərdir.
+Mövcud xidmətlər
+- Aviabiletlərin bronlaşdırılması
+- Otellərin bronlaşdırılması
+- Restoranlarda masa sifarişi
+- Kirayə avtomobil sifarişi
+- Tədbirlərə biletlərin əldə edilməsi
+- Səfərlərin planlaşdırılması
+- Digər tələblər
+Necə istifadə etmək olar?
+Aşağıdakı kanallar vasitəsilə xidmətə qoşulub onun üstünlüklərindən faydalana bilərsiniz:
+- VISA Concierge - Telegram
+- VISA Concierge - Viber
+- MasterCard Concierge - Telegram
+- MasterCard Concierge - Facebook
+- MasterCard Concierge - Whatsapp
+```
+
+### `20ba83d2b2-000` — section, az, procurement, 497 tokens
+
+<https://abb-bank.az/haqqimizda/satinalmalar/musabiqelerin-elani/bank-terefinden-pos-terminallar-ucun-adapter-komplektinin-satin-alinmasi-23092026>
+
+```text
+Bank tərəfindən POS-terminallar üçün adapter komplektinin satın alınması
+Tarix: 23.09.2026
+
+23 Sentyabr, 2026
+“ABB” Açıq Səhmdar Cəmiyyəti
+KOTİROVKA SORĞUSU ELAN EDİR
+Kotirovka sorğusunun adı: “ABB” ASC tərəfindən POS-terminallar üçün adapter komplektinin satın alınması
+Kotirovka sorğusunun elan tarixi 23.09.2026
+Kotirovka sorğusu proseduru üzrə iddiaçıların təkliflərini təqdim etmələri üçün son tarix 02 oktyabr 2026-cı il saat 15:00-a qədərdir.
+İddiaçıların təklifləri 02 oktyabr 2026-cı il saat 15:00-dan saat 16:00-dək, elan edilmiş müsabiqələrin ardıcıllığına uyğun olaraq elektron platforma vasitəsilə açılacaqdır.
+İddiaçılar sözügedən sahə üzrə ixtisas uyğunluğuna malik olmalıdırlar.
+Kotirovka sorğusunda iştirak etmək istəyən iddiaçılar aşağıda qeyd edilənləri diqqət yetirməlidirlər:
+- Kotirovka sorğusunda iştirak etmək istəyən iddiaçılar iştirak niyyətini bildirmək üçün: Vusal.Agayev@abb-bank.az və pod@abb-bank.az e-poçt ünvanına şirkətin adını qeyd etməklə “iştirakımı təsdiq edirəm” mətnini göndərməlidir.
+- Göndərilən müraciətdə e-poçtun “subject” hissəsində - “POS-terminallar üçün adapter komplektinin satın alınması” - qeyd edilməlidir.;
+- İddiaçının dövlət reyestrindən çıxarış sənədi qeyd olunan e-poçt ünvanlarına bərkildilərək təqdim edilməlidir.
+İddiaçıların təqdim etdiyi qiymət kotirovkaları, nəqliyyat, sığorta, vergi, gömrük rüsumları və digər xərclər də daxil edilməklə, manatla göstərilməlidir.
+Kotirovka təklifinin qüvvədə olma müddəti zərflərin açıldığı gündən sonra azı 30 (otuz) bank günü (17 noyabr 2026-cı il) təşkil etməlidir.
+Kotirovka sorğusu ilə bağlı əlavə məlumat almaq üçün adı qeyd edilmiş “ABB” ASC-nin əməkdaşına (Vüsal Ağayev: (012) 493-00-91, daxili 82-24/82-12, elektron poçt ünvanları: (Vusal.Agayev@abb-bank.az və pod@abb-bank.az) müraciət edə bilərsiniz.
 Satınalma Komissiyası
-- terrorçuluğun maliyyələşdirilməsi;
-Performans dəyərləndirilməsi prosesi
-- Ödəniş şərtləri
+“ABB” ASC tərəfindən təchizatçıların fəaliyyətinə dair tələblər
+Etibarsız təchizatçı siyahısının meyarları
 ```
 
-### `c1c24ba28c-000` — section, en, general, 100 tokens
+### `b088c25b54-000` — section, az, general, 174 tokens
 
-<https://abb-bank.az/en/yol-hereketi-cerimelerimi-nece-odeye-bilerem>
+<https://abb-bank.az/rub-to-azn-canli-mezennesine-nece-baxa-bilerem>
 
 ```text
-Pay Fines Online | ABB ✅
-Your questions > Detallar
+Valyuta məzənnələri
 
-Rashad Aliyev asks
-How can I pay my traffic fines?
-You can easily and securely pay traffic violation fines using the ABB mobile application. To do so, simply go to the Payments section, enter your fine details, and confirm the payment. This allows you to pay your fines conveniently at any time and from anywhere.
-For more detailed information, please visit the ABB mobile Payments page.
+Son yenilənmə: 14.10.2026
+Bütün valyuta məzənnələri
+Valyuta
+Alış
+Satış
+USD
+1.6970
+1.7020
+EUR
+1.8674
+1.9226
+100 RUB
+1.9000
+2.0500
+## Sizdən gələnlər > Detallar
+Fərid Eyvazov soruşur
+RUB to AZN canlı məzənnəsinə necə baxa bilərəm?
+Rublun manata məzənnəsini öyrənmək üçün ABB-nin Valyuta məzənnələri səhifəsinə daxil olaraq cari alış və satış məzənnələri ilə tanış ola bilərsiniz. Burada Rusiya rublunun Azərbaycan manatına qarşı məzənnəsi təqdim olunur. Rublun manata məzənnəsi müxtəlif iqtisadi və maliyyə amillərindən, eləcə də valyuta bazarındakı dəyişikliklərdən asılı olaraq gün ərzində dəyişə bilər. Bu səbəbdən rublu manata çevirərkən əldə edəcəyiniz məbləği hesablamaq üçün əməliyyatdan əvvəl aktual məzənnəni yoxlamaq faydalıdır.
 ```
 
-### `7f15ea468d-000` — section, az, procurement, 361 tokens
+### `1da0ae5ddf-002` — faq, az, general, 73 tokens
 
-<https://abb-bank.az/haqqimizda/satinalmalar/musabiqelerin-elani/atm-sebekesi-ucun-gprs-modemlerin-satin-alinmasi>
+<https://abb-bank.az/onlayn-kredit>
 
 ```text
-ATM şəbəkəsi üçün GPRS modemlərin satın alınması
-Tarix: 26.10.2020
+Onlayn Kredit
+Tez-tez verilən suallar
 
-26 Oktyabr, 2020
-Tenderin adı: “ABB” Açıq Səhmdar Cəmiyyətinin mövcud ATM şəbəkəsi üçün GPRS modemlərin satın alınması.
-Tenderin elan tarixi: 26.10.2020
-İştirak haqqı:
-BANKIN ADI: ABB
-VÖEN : 9900001881
-KOD: 805250
-SWIFT: IBAZAZ2X
-M/h: AZ03NABZ01350100000000002944
-H/h: AZ12IBAZ34501019440000100100 AZN
-H/h: AZ33IBAZ34511018400000100100 USD
-- tender təklifi (tender zərflərinin açıldığı tarixdən (17 noyabr 2020-ci il) sonra azı 30 (otuz) bank günü (yəni ən azı 29 dekabr 2020-ci il tarixinədək) qüvvədə olmalıdır;
-- tender təklifi dəyərinin 1 (bir) faizi həcmində bank təminatı (tender təklifinin qüvvədə olma müddətinin sonuncu günündən azı 30 bank günü çox olmalıdır (yəni ən azı 15 fevral 2021-ci il tarixinədək qüvvədə olmalıdır);
-İddiaçılar tenderdə iştirak etmək üçün yuxarıda göstərilən sənədləri (tender təklifi və bank təminatı istisna olmaqla) 10 noyabr 2020-cı il saat 17:00-a qədər, tender təklifi və bank təminatını isə möhürlənmiş ikiqat zərflərdə 16 noyabr 2020-cı il saat 17.00-a qədər Bakı şəhəri, Nəsimi rayonu, Nizami küçəsi, 67 nömrəli ünvana təqdim etməlidirlər.
-İddiaçıların təklifləri 17 noyabr 2020-cı il saat 16.00-da Bakı şəhəri, Nəsimi rayonu, Nizami küçəsi, 67 nömrəli ünvanda açılacaqdır.
-Tender komissiyası
+Sual: Onlayn kredit nədir?
+Cavab: Onlayn kredit bankın rəqəmsal kanalları vasitəsilə müraciət edilə bilən nağd kredit növüdür. Müştərilər sayta və ya mobil tətbiqə daxil olaraq kredit üçün müraciət edə və prosesi daha sürətli şəkildə tamamlaya bilərlər.
 ```
 
-### `ac5be36d3e-000` — section, az, procurement, 482 tokens
+### `003745dcb0-000` — section, az, campaigns, 87 tokens
 
-<https://abb-bank.az/haqqimizda/satinalmalar/musabiqelerin-elani/bank-terefinden-oracle-exadata-engineering-system-avadanliginin-satin-alinmasi>
+<https://abb-bank.az/kampaniyalar/tamkart-sahiblerine-ozel-yeni-il-kampaniyasi>
 
 ```text
-Bank tərəfindən “Oracle Exadata Engineering System” avadanlığının satın alınması
-Tarix: 24.10.2025
+TamKart-lılara özəl Yeni il kampaniyası!
+Kampaniya statusu: bitib (15.12.2023 – 04.01.2024)
 
-24 Oktyabr, 2025
-lot - 1 Lot üzrə 500 (beş yüz) manat
-Tenderin adı: “ABB” ASC tərəfindən “Oracle Exadata Engineering System” avadanlığının satın alınması
-Tenderin elan tarixi: 24.10.2025
-İştirak haqqı:
-Lot – 1 üzrə 500 (beş yüz) manat
-BANKIN ADI: ABB
-VÖEN: 9900001881
-KOD: 805250
-SWIFT: IBAZAZ2X
-M/h: AZ03NABZ01350100000000002944
-H/h: AZ12IBAZ34501019440000100100 AZN
-H/h: AZ33IBAZ34511018400000100100 USD
-· tenderdə iştirak haqqının ödənilməsi barədə bank sənədi;
-· tender təklifi (tender zərflərinin açıldığı tarixdən (18 noyabr 2025-ci il) sonra azı 30 (otuz) bank günü (yəni ən azı 08 yanvar 2026-cı il tarixinədək) qüvvədə olmalıdır;
-· Tender təklifinin 1%-i dəyərində bank təminatı (tender təklifinin qüvvədə olma müddətinin sonuncu günündən azı 30 bank günü çox olmalıdır (yəni ən azı 19 fevral 2026-cı il tarixinədək qüvvədə olmalıdır);
-· iddiaçının Azərbaycan Respublikasında vergilərə və digər icbari ödənişlərə dair yerinə yetirilməsi vaxtı keçmiş öhdəliklərinin olmaması haqqında müvafiq vergi orqanından arayış; rəsmi formada təqdim edilməlidir (imzalı, möhürlü və ya notarial qaydada təsdiq edilmiş)
-· iddiaçının son bir ildəki fəaliyyəti haqqında vergi orqanları tərəfindən təsdiq olunmuş maliyyə hesabatının surəti; rəsmi formada təqdim edilməlidir (imzalı, möhürlü və ya notarial qaydada təsdiq edilmiş)
-· iddiaçının son bir ildəki maliyyə vəziyyəti haqqında bank arayışı;
-· iddiaçının tam adı, hüquqi statusu, nizamnaməsi, qeydiyyatdan keçdiyi ölkə (notarial qaydada təsdiq edilmiş) və bank rekvizitləri;
-· iddiaçının öz mülahizəsinə uyğun digər sənədlər;
-· iddiaçı qeyri-rezident olduğu halda qeyri-rezident hesab edilən iddiaçının vergi rezidentliyini müəyyən etmək məqsədi ilə həmin şəxslər vergi rezidentliyini təsdiq edən sənədi (sertifikatı) təqdim etməlidir.
+15.12.2023 - 04.01.2024
+Aktiv deyil
+İldən-ilə fürsətlərlə! 📅 15.12.2023 - 04.01.2024 (qeyd olunan tarixlər daxil) tarixlərində TamKart-la edilən hər növbəti əməliyyat sizə daha çox keşbek qazandıracaq!
 ```
 
-### `1b19228e29-001` — section, en, procurement, 364 tokens
+### `3594a36863-008` — faq, az, individual, 51 tokens
 
-<https://abb-bank.az/en/haqqimizda/satinalmalar/musabiqelerin-elani/ehtimal-olunan-deleduzluq-fraud-hallarinin-ve-insidentlerin-mueyyen-olunmus-indikatorlar-uzerinden-askarlanmasi-ucun-proqram-teminatinin-satin-alinmasi2104>
+<https://abb-bank.az/ferdi/kreditler/indi-al-sonra-ode>
 
 ```text
-Procurement of software for detection of possible fraud and incidents on the basis of certain indicators
-Date: 21.04.2021
+İndi al, sonra ödə
+Tez-tez verilən suallar
 
-Required documents for participation in the tender:
-- A copy of the financial report of the bidder on its activity for the last year, approved by the tax authorities;
-- Bank statement on the financial condition of the bidder for the last year (if the operations period is shorter, for the whole activity period);
-- Full name, legal status, charter, country of registration and bank details of the bidder;
-- Other documents at the discretion of the bidder;
-- If the bidder is a non-resident, these persons must submit a document (certificate) confirming the tax residency in order to determine the tax residency of the bidder who is considered a non-resident.
-Documents must be prepared in 2 copies (original and copy), in the Azerbaijani language (tender proposals in a foreign language must be translated into Azerbaijani).
-To participate in the tender, bidders must submit the above documents (excluding the tender proposal and bank guarantee) until May 05, 2021, at 17:00, and the tender proposal and bank guarantee in sealed double envelopes until May 16, 2021, at 17:00, to the following address: Baku city, Nasimi district, Nizami street, 67.
-Submitted envelopes after the deadline will be returned unopened.
-Bidders' proposals will be opened on May 17, 2021, at 15:50 at the address: 67, Nizami Street, Nasimi district, Baku.
-Authorized representatives of the bidders may attend. The participating representatives must submit a document (power of attorney) confirming their authority.
-Tender committee
+Sual: Partnyor siyahısını necə əldə etmək olar?
+Cavab: Partnyor siyahısı ilə ABB mobile tətbiqində "İndi al, sonra ödə" kabinetində tanış ola bilərsiniz.
 ```
 
-### `02505efa9c-000` — section, ru, news, 384 tokens
+### `d0d03e1d9d-002` — section, ru, individual, 451 tokens
 
-<https://abb-bank.az/ru/xeberler/abb-en-yaxsi-isegoturen-beynelxalq-sertifikatina-layiq-goruldu>
-
-```text
-Банк ABB удостоен международного сертификата «Лучший работодатель»!
-Дата: 13.06.2024
-
-13 июня, 2024
-Банк ABB стремится стать лучшим работодателем в банковском секторе нашей страны и последовательно движется к этой цели. В результате своих усилий Банк получил сертификат международной организации "Top Employers Institute" («Институт лучших работодателей»).
-Аудиторы организации проводили сертификационный процесс в течение трех месяцев, оценивая Банк ABB по 255 международным стандартам. Эти стандарты проверялись на соответствие в Банке ABB. Анализ включал такие аспекты, как рабочая среда, привлечение талантов, обучение, разнообразие, равенство и инклюзивность, благополучие, развитие и другие.
-Банк ABB выполнил 88% критериев и получил сертификат «Лучший работодатель». Минимальное требование для получения этого сертификата составляет 60%. Согласно мировому опыту, в среднем компании, получившие этот сертификат, соответствуют 85% критериев. Банк ABB превзошел этот показатель, что подчеркивает его превосходство в применении международных практик управления персоналом и создании достойных условий труда для сотрудников.
-"Top Employers Institute" до сих пор сертифицировал более 2300 организаций в 121 стране и регионе. Процессы сертификации, проводимые институтом, оказывают положительное влияние на жизнь более 12 миллионов сотрудников по всему миру. Среди компаний, получивших сертификат «Лучший работодатель», такие мировые бренды, как BP, Coca-Cola, HSBC, Unicredit, BMW, Puma, Pepsico, Toyota, Walmart, Philip Morris International, Ferrari, Mercedes, Marriott International, Bosch, HUAWEI, Vodafone, EY.
-Подробнее о "Top Employers Institute" можно узнать здесь.
-```
-
-### `56b0110462-013` — faq, en, general, 66 tokens
-
-<https://abb-bank.az/en/krediti-olanlara-kredit>
+<https://abb-bank.az/ru/ferdi/valyuta-mezenneleri>
 
 ```text
-Loans for Existing Borrowers
-Frequently asked questions
+Валюта
+Курсы валют
 
-Question: What Are the Loan Terms for Customers with Existing Credit?
-Answer: The loan amount, term, interest rate, and monthly payment may be determined based on the terms of the selected loan product and the outcome of the application assessment.
+Валюта: GBP; Наличный: 2.1664; Интернет Банкинг: 2.1913; Розничные цифровые транзакции: 2.2341; Безналичный: 2.1890; ЦБА: 2.2567; Пластиковые карты: 2.2341
+Валюта: 100 RUB; Наличный: 1.9000; Интернет Банкинг: 1.7300; Розничные цифровые транзакции: 1.7300; Безналичный: 1.7300; ЦБА: 2.0299; Пластиковые карты: -
+Валюта: CHF; Наличный: 1.9416; Интернет Банкинг: 1.9416; Розничные цифровые транзакции: 1.9416; Безналичный: 1.9416; ЦБА: 2.0438; Пластиковые карты: -
+Валюта: JPY; Наличный: 0.0100; Интернет Банкинг: 0.0103; Розничные цифровые транзакции: 0.0103; Безналичный: 0.0103; ЦБА: 0.0107; Пластиковые карты: -
+Валюта: CAD; Наличный: 1.1135; Интернет Банкинг: 1.1374; Розничные цифровые транзакции: 1.1374; Безналичный: 1.1374; ЦБА: 1.1973; Пластиковые карты: -
+Валюта: AUD; Наличный: 1.1070; Интернет Банкинг: 1.1308; Розничные цифровые транзакции: 1.1308; Безналичный: 1.1308; ЦБА: 1.1903; Пластиковые карты: -
+Валюта: TRY; Наличный: 0.0310; Интернет Банкинг: 0.0323; Розничные цифровые транзакции: 0.0322; Безналичный: 0.0322; ЦБА: 0.0344; Пластиковые карты: -
+Валюта: AED; Наличный: 0.4165; Интернет Банкинг: 0.4397; Розничные цифровые транзакции: 0.4397; Безналичный: 0.4397; ЦБА: 0.4628; Пластиковые карты: -
 ```
 
 
 ## One sample per category
 
-### `d6e47f9e75-005` — section, en, about, 328 tokens
+### `e46c9ea02d-077` — section, en, about, 472 tokens
 
-<https://abb-bank.az/en/haqqimizda/senedler>
+<https://abb-bank.az/en/haqqimizda/hesabatlar>
 
 ```text
-Documents and resources
-AML/CFT
+Financial and corporate reports
+Liquidity risk
 
-AML Questionnaire (https://cdn.abb-bank.az/1639461324_aml_questionnaire_eng_53ec628c06.pdf)
-Policy of “ABB” OJSC with regard to actions against anti-money laundering and combating the financing of terrorism (https://cdn.abb-bank.az/1744373112_aml_policy_e3e0a95932.pdf)
-“Know the Client Policy” of the “ABB” OJSC in its activity in the field of fight against legalization of monetary funds or other property obtained through the crime and financing of terrorism (https://cdn.abb-bank.az/1680678979_kyc_2023_866d09ddc8.pdf)
-Certification Regarding Correspondent Accounts for Foreign Banks (https://cdn.abb-bank.az/IBA_Patriot_Act_July_2025_stamped_2e273d18aa.pdf)
-Wolfsberg Questionnaire (https://cdn.abb-bank.az/IBA_Wolfsberg_CBDDQ_v1_4_20_04_2026_2ba83c56f1.pdf)
-FinTech Questionnaire (https://cdn.abb-bank.az/Fin_Tech_Questionnaire_09_09_2025_2_c07392940b.docx)
+Liquidity risk, Second quarter of 2024 (https://cdn.abb-bank.az/1720791374_likvidlik_riski_30062024_43a5a56920.pdf)
+Liquidity risk, First quarter of 2024 (https://cdn.abb-bank.az/1713269606_Likvidlik_riski_a25377e717.pdf)
+Liquidity risk, 12 months of 2023 (https://cdn.abb-bank.az/1711632868_likvidlik_riski_31122023_29619e5a78.pdf)
+Liquidity risk, Third quarter of 2023 (https://cdn.abb-bank.az/1697020246_Likvidlik_riski_30_09_2023_a504d8fff8.pdf)
+Liquidity risk, Second quarter of 2023 (https://cdn.abb-bank.az/1690270326_Likvidlik_riski_30_06_2023_197eaea035.pdf)
+Liquidity risk, First quarter of 2023 (https://cdn.abb-bank.az/1682508936_Likvidlik_riski_31_03_2023_cb41867b09.pdf)
+Liquidity risk, 12 months of 2022 (https://cdn.abb-bank.az/1674648658_Likvidlik_riski_31_12_2022_33e7c4ba2a.pdf)
+Liquidity risk, Third quarter of 2022 (https://cdn.abb-bank.az/1666784951_Likvidlik_riski_30_09_2022_e50d777320.pdf)
+Liquidity risk, Second quarter of 2022 (https://cdn.abb-bank.az/1658821759_likvidlik_riski_8d74539feb.pdf)
+Liquidity risk - 2022, Q1 (https://cdn.abb-bank.az/1650888827_Likvidlik_riski_31_03_2022_136c60cdbf.pdf)
 ```
 
-### `4f9638e7db-002` — faq, ru, business, 120 tokens
+### `949c18d1f0-003` — faq, ru, business, 57 tokens
 
-<https://abb-bank.az/ru/biznes/korporativ/kocurmeler-1>
+<https://abb-bank.az/ru/biznes/kicik-ve-orta-biznes/biznes-kreditleri/mikro-kredit>
 
 ```text
-Быстрые денежные переводы
+Микрокредит
 Часто задаваемые вопросы
 
-Вопрос: Для других целей:
-Ответ: - Плата за участие в международных организациях, конференциях, выставках;
-- Плата за подписку на периодические издания зарубежных стран; плата за размещение объявлений;
-- Переводы для оплаты за образование, лечение и для материальной помощи, оказываемой гражданам республики с такими целями;
-- Переводы для оплаты за использование авторских прав и франчайзинга;
-- Возмещение командировочных расходов туристов лицами, осуществляющими туристическую деятельность.
+Вопрос: Что такое микрокредит?
+Ответ: Микрокредит - это вид финансовой поддержки, предоставляемый владельцам малого и среднего бизнеса. С помощью этого кредита предприниматели получают возможность расширять свою бизнес-деятельность и получать финансовую поддержку.
 ```
 
-### `bdb9165a2b-000` — section, az, campaigns, 173 tokens
+### `dce748bab8-000` — section, az, campaigns, 47 tokens
 
-<https://abb-bank.az/kampaniyalar/abb-azal-miles-kartlarindan-bayram-teklifleri>
+<https://abb-bank.az/kampaniyalar/abb-azal-miles-kart-sahiblerine-xususi-kampaniya>
 
 ```text
-ABB-AZAL Miles kartlarından bayram təklifləri
-Kampaniya statusu: bitib (17.03.2025 – 19.03.2025)
+ABB-AZAL Miles kart sahiblərinə xüsusi kampaniya
+Kampaniya statusu: bitib (11.03.2026 – 31.05.2026)
 
-17.03.2025 - 19.03.2025
-Aktiv deyil
-17-19 mart 2025-ci il tarixlərində ABB-AZAL Miles kartı sifariş edən müştərilər eksklüziv üstünlüklərdən faydalanacaqlar!
-Bu müddət ərzində:
-ABB-AZAL Miles Visa Platinum və ya Mastercard World Black Edition kartlarını əldə edən müştərilər 4500 mil “Xoşgəldin mili” qazanacaqlar. Bu, İstanbul uçuş biletinin 50%-nə bərabərdir və heç bir əlavə dövriyyə şərti tələb olunmur!
-ABB-AZAL Miles Visa Infinite və ya Mastercard World Elite kartlarını əldə etmək istəyən müştərilər isə 50% endirim qazanaraq bu premium kartları 1000 AZN əvəzinə, 500 AZN-ə əldə edə biləcəklər.
+ABB-AZAL Miles kobrend kart sahibləri üçün xüsusi təklifimiz var.
 ```
 
-### `cb1aaf9201-001` — section, az, csr, 138 tokens
+### `5c1226ea2b-000` — section, ru, csr, 339 tokens
 
-<https://abb-bank.az/korporativ-sosial-mesuliyyet/4-cu-reqemsal-jurnalistikaya-dogru-proqramina-start-verilir-ksm>
+<https://abb-bank.az/ru/korporativ-sosial-mesuliyyet/abb-tamgenc-basketbol-liqasinin-esas-terefdasi-oldu-ksm>
 
 ```text
-4-cü “Rəqəmsal Jurnalistikaya doğru” proqramına start verilir
-Tarix: 04.10.2022
+ABB стал основным партнером баскетбольной лиги «TamGənc»!
+Дата: 09.02.2023
 
-Layihə ilə bağlı ətraflı məlumat əldə etmək üçün:
-https://www.digital.gov.az/digitalazerbaijan/webinars/6/reqemsal-jurnalistikaya-dogru-proqrami-4
-Əlavə suallar üçün digicom@asan.gov.az
-İndiyədək sayca 3 “Rəqəmsal Jurnalistikaya doğru” proqramı keçirilib. Layihə çərçivəsində 100-dən çox media nümayəndəsinə təlimlər verilib, sertifikatlar təqdim edilib.
-Proqramın media tərəfdaşı “ASAN Radio”dur.
-Rəqəmsal sahədə bizimlə inkişaf edin!
+9 февраля, 2023
+Банк ABB в рамках Корпоративной Социальной Ответственности, продолжая осуществлять проекты, по развитию спорта в нашей стране, начал сотрудничество с федерацией баскетбола Азербайджана. Студенческая лига по баскетболу, стартовавшая в декабре прошлого года, в контексте данного партнёрства определена как Баскетбольная Лига «TamGənc» и ABB является основным партнером этого спортивного мероприятия.
+Название Баскетбольной Лиги «TamGənc» связано с картой «TamGənc», которую ABB предусматривает для молодежи в возрасте от 18 до 25 лет. Карта «TamGənc» была представлена на рынке в прошлом году, условия которой дают множество преимуществ для молодых пользователей.
+Возвращаясь к Баскетбольной Лиге «TamGənc» следует отметить что в этой лиге соревнуются команды из 7 университетов нашей страны. Это команды Академии Физической Культуры и спорта, Азербайджанского Технического университета, Азербайджанский государственный экономический университета, Бакинского государственного университета, Азербайджанского университета нефти и промышленности, Бакинского инженерного университета и университета «Хазар». Соревнования проходят в спортивном зале Азербайджанского Технического университета, где также 19 мая состоится финальный матч Баскетбольной Лиги «TamGənc» .
+Основная цель банка АВВ в оказании партнерской поддержки этого спортивного мероприятия, заключается в популяризации баскетбола как вида спорта, являющимся полезным для физического здоровья молодёжи и подрастающего поколения.
 ```
 
-### `038bb7c59a-001` — faq, az, general, 59 tokens
+### `e7fbdeff63-011` — faq, az, general, 55 tokens
 
-<https://abb-bank.az/aciq-bankciliq-kesbek-kampaniyasi>
+<https://abb-bank.az/azal-bilet-abb-mobile-ile-aviabiletinizi-onlayn-alin>
 
 ```text
-ABB - Müasir, Faydalı, Universal
+AZAL Bilet - ABB mobile ilə aviabiletinizi onlayn alın
 Tez-tez verilən suallar
 
-Sual: Açıq Bankçılıq nədir?
-Cavab: Açıq Bankçılıq - ABB mobile tətbiqindən istifadə edərək digər banklara məxsus kartlarınızı bir yerdə idarə etməyə imkan verən müasir bankçılıq funksiyasıdır.
+Sual: Alınmış AZAL biletinə haradan baxmaq olar?
+Cavab: Alışdan sonra bilet və uçuş məlumatlarını tətbiqdən yoxlaya bilərsiniz.
 ```
 
-### `47eb7de06e-003` — section, az, home, 66 tokens
+### `217fd905f3-003` — section, ru, home, 71 tokens
 
-<https://abb-bank.az/>
+<https://abb-bank.az/ru>
 
 ```text
 Tam DigiCard
-Gələcəyinizi ABB ilə qurun! > ABB — contact information / əlaqə
+Создавайте будущее вместе с Банком ABB! > ABB — contact information / əlaqə
 
-Tel:+994 12 493 00 91
-E-poçt:info@abb-bank.az
-Faks:+994 12 493 00 91
-Ünvan:67, Nizami küç., AZ1005 Bakı, Azərbaycan
+Телефон:+994 12 493 00 91
+Электронная почта:info@abb-bank.az
+Факс:+994 12 493 00 91
+Адрес:Ул. Низами, 67, AZ1005 Баку, Азербайджан
 ```
 
-### `f2dbcc1d06-000` — section, az, individual, 348 tokens
+### `a92de21ccf-010` — faq, ru, individual, 216 tokens
 
-<https://abb-bank.az/ferdi/kartlar/kredit-kartlari>
+<https://abb-bank.az/ru/ferdi/kartlar/kredit-kartlari/tamkart-max>
 
 ```text
-TamKart Kredit Kartı
+TamKart Max
+Часто задаваемые вопросы
 
-Məişət əşyaları, səyahət, elektronika və daha bir çox alış-verişlərinizdə TamKart yanınızdadır. TAM alın, 24 ayadək hissə-hissə ödəyin. FİFD: min.18.40% - maks.41.60%
-## Kredit kartı nədir?
-Kredit kartı sizə əvvəlcədən müəyyən edilmiş limit çərçivəsində alış-veriş etmək və ödənişləri sonradan həyata keçirmək imkanı yaradır. Bu vasitə həm gündəlik xərclər, həm də planlaşdırılmış alışlar üçün rahat həll sayılır. Kredit kartı ilə ödəniş edərkən nağd pula ehtiyac qalmır və bütün əməliyyatları izləmək daha asan olur. Müxtəlif bonus və kampaniyalar da kredit kartı istifadəsini daha sərfəli edir. Sərfəli kredit kartları gündəlik xərclərinizi rahat idarə etmək və alış-verişlərdə əlavə üstünlüklər qazanmaq üçün ideal maliyyə alətidir. Bu kartlar vasitəsilə nağdsız ödənişlər edə, kampaniyalardan yararlana və büdcənizi daha planlı şəkildə idarə edə bilərsiniz.
-## Kredit kartları harda istifadə etmək olar?
-Kredit kartları fərqli ehtiyaclara uyğun olaraq müxtəlif limit, güzəşt müddəti və əlavə imkanlarla təqdim olunur. İstifadəçilər öz xərcləmə vərdişlərinə uyğun kredit kartları seçərək ödənişlərini daha səmərəli şəkildə idarə edə bilərlər. Bu kartlar onlayn ödənişlərdə, səyahətlərdə və gündəlik alışlarda geniş istifadə olunur. Kredit kartları büdcə planlamasını asanlaşdıraraq maliyyə çevikliyini artırır. Sərfəli kredit kartları həm onlayn, həm də fiziki mağazalarda rahat istifadə imkanı təqdim edir və müxtəlif güzəştli şərtlərlə seçilir. Doğru kart seçimi ilə ödənişlərinizi daha çevik və rahat şəkildə həyata keçirmək mümkündür.
+Вопрос: Что такое «Tam 12» (возможность беспроцентной оплаты сроком до 13 месяцев)?
+Ответ: Tam 12 - это функционал, позволяющий погасить без начисления процентов сумму, использованную из определённой части кредитного лимита, в течение срока до 13 месяцев.
+Максимальная сумма, доступная для использования в рамках Tam 12, составляет 20% от кредитного лимита, но не более 2 000 AZN. Функционал применяется к соответствующим операциям, совершённым в течение первых 30 дней с даты подписания договора.
+Беспроцентный период по Tam 12 действует до конца соответствующего месяца следующего года после месяца совершения операции.
+Tam 12 не распространяется на следующие операции:
+- операции по снятию наличных через банкоматы и POS-терминалы;
+- операции по переводам;
+- операции, совершённые с использованием MCC-кодов 6012, 6050 и 6051.
+Tam 12 может применяться к нескольким соответствующим операциям.
 ```
 
-### `c2babdf680-001` — section, ru, investor_relations, 494 tokens
+### `c2babdf680-003` — section, ru, investor_relations, 343 tokens
 
 <https://abb-bank.az/ru/investorlarla-elaqe>
 
 ```text
 Инвестируйте в своё будущее с ABB!
-200 mln. AZN
 
-Выплаченные дивиденды
-Коэффициенты по финансовым показателям: Дивиденд на акцию (DPS); 2020: 0,03; 2021: 0,03; 2022: 0,03; 2023: 0,04; 2024: 0,04; 2025: 0,04
-Коэффициенты по финансовым показателям: Доходность активов (ROA); 2020: 1,9%; 2021: 1,3%; 2022: 2,2%; 2023: 2,7%; 2024: 2,6%; 2025: 2,80%
-Коэффициенты по финансовым показателям: Доходность акций (Earnings Yield)*; 2020: 14,4%; 2021: 11,2%; 2022: 23,6%; 2023: 31,1%; 2024: 29,0%; 2025: 31,60%
-Коэффициенты по финансовым показателям: Чистая прибыль на акцию (EPS); 2020: 0,04; 2021: 0,03; 2022: 0,06; 2023: 0,08; 2024: 0,08; 2025: 0,09
-Коэффициенты по финансовым показателям: Дивидендная доходность (Dividend Yield)*; 2020: 10,2%; 2021: 10,1%; 2022: 12,8%; 2023: 15,1%; 2024: 15,6%; 2025: 15,60%
-Коэффициенты по финансовым показателям: Доходность собственного капитала (ROE); 2020: 11%; 2021: 8%; 2022: 16%; 2023: 20%; 2024: 17%; 2025: 17%
-Коэффициенты по финансовым показателям: Соотношение цены акции к прибыли (P/E ratio)*; 2020: 6,94; 2021: 8,89; 2022: 4,24; 2023: 3,22; 2024: 3,44; 2025: 3,17
-Коэффициенты по финансовым показателям: Дивиденд на акцию (DPS); 2020: 0,03
-Коэффициенты по финансовым показателям: Доходность активов (ROA); 2020: 1,9%
-Коэффициенты по финансовым показателям: Доходность акций (Earnings Yield)*; 2020: 14,4%
+## Коэффициенты по финансовым показателям
+0,03
+1,9%
+14,4%
+0,04
+10,2%
+11%
+6,94
+0,03
+1,3%
+11,2%
+0,03
+10,1%
+8%
+8,89
+0,03
+2,2%
+23,6%
+0,06
+12,8%
+16%
+4,24
+0,04
+2,7%
+31,1%
+0,08
+15,1%
+20%
+3,22
+0,04
+2,6%
+29,0%
+0,08
+15,6%
+17%
+3,44
+0,04
+2,80%
+31,60%
+0,09
+15,60%
+17%
+3,17
+## Рейтинги
+Рейтинги - это ключевые показатели, подтверждающие финансовую устойчивость и надёжность нашей компании
+## Рейтинги > Рейтинги Fitch
+Долгосрочный рейтинг дефолта эмитента | BB+
+Краткосрочный рейтинг дефолта эмитента | B
+Рейтинг устойчивости | bb+
+Рейтинг государственной поддержки | ns
+Прогноз | Стабильный
+Последнее обновление: 07.08.2026
+Дата рейтинга: 07.08.2026
+## Рейтинги > Moody's Investors Service
+Долгосрочные банковские депозиты | Ba1
+Краткосрочные банковские депозиты | NP
+Базовая оценка кредитоспособности | ba2
+Базовая оценка кредитоспособности (скорректированная) | ba2
+Долгосрочные оценка риска контрагента | Baa3
+Краткосрочные оценки риска контрагента | P-3
+Прогноз | Стабильный
+Последнее обновление: 09.07.2025
+Дата рейтинга: 09.07.2025
 ```
 
-### `a48148c8e7-006` — section, ru, news, 492 tokens
+### `eac6549120-000` — section, ru, news, 468 tokens
 
-<https://abb-bank.az/ru/xeberler/abb-yeni-strateji-dovre-daxil-olub-musahibimiz-bankin-idare-heyeti-sedri-abbas-ibrahimovdur>
+<https://abb-bank.az/ru/xeberler/abb-binasinda-libraff>
 
 ```text
-«ABB вступает в новый стратегический этап»
-Дата: 15.11.2023
+Libraff в Банке ABB!
+Дата: 16.09.2025
 
-- Как крупнейший банк страны, мы внимательно следим за всеми тенденциями современного банковского сектора, стремимся быть среди первых в применении решений, соответствующих нашим потребностям и бизнес-стратегии. Мы оцениваем инициативы открытого банкинга (open banking) в контексте новых возможностей, поддерживаемые новым законом о платежных услугах и платежных системах и другими новыми нормами в нашей стране. Эти инициативы запустят новый период изменений в секторе, что приведет к созданию новых ценностей для наших клиентов. Представьте, что после внедрения подхода открытого банкинга отдельные банки с согласия клиента будут открывать его данные конкурирующим банкам, а также новым инновационным игрокам в финансовой экосистеме - финтехам и стартапам. Это создаст более динамичную и конкурентную среду для клиентов. В результате клиент сможет выбрать финансового поставщика, который предлагает наиболее подходящие ему продукты и услуги наилучшего качества. Опыт показывает, что современные банки и инновационные финтехи, готовые к этим процессам, будут победителями. Мы в ABB уже некоторое время работаем над технологической и цифровой инфраструктурой, подготавливаем API - набор протоколов и инструментов для взаимодействия между различными информационными системами, которые являются основой для перехода к открытому банкингу. Наша технологическая инфраструктура полностью готова для взаимодействия с информационными системами внешних организаций или компаний. Мы уже применили некоторые из этих интеграций. В прошлом периоде, будучи одним из двух операторских банков услуги «Возврат НДС», мы обеспечили доступность этой услуги для клиентов нескольких других коммерческих банков. Как я уже упоминал, в начале года мы завершили интеграцию в реальном времени с брокерской компанией в США для предоставления клиентам ABB mobile прямого и моментального доступа к американским биржам, именно опираясь на наше технологическое преимущество. Недавно благодаря взаимной интеграции с системами страховой компаний мы предоставили клиентам полный цифровой процесс покупки страховых продуктов . Клиенты также могут отслеживать все свои активные продукты в данной страховой компании через ABB mobile. В настоящее время мы также обсуждаем процессы интеграции с несколькими финтех-игроками.
+Состоялось открытие здания, в котором располагаются инвестиционная компания «ABB Invest» - дочерняя компания Банка ABB, а также филиал Банка «Джафар Джаббарлы».
+16 сентября, 2025
+Состоялось открытие здания, в котором располагаются инвестиционная компания «ABB Invest» — дочерняя компания Банка ABB, а также филиал Банка «Джафар Джаббарлы». Здание расположено по адресу: город Баку, улица Джафара Джаббарлы, 40C.
+Одной из самых интересных новинок в здании, оформленном в соответствии с новым корпоративным стилем Банка ABB, стало наличие книжного магазина. Банк создал условия для открытия новой торговой точки сети магазинов «Libraff» прямо внутри филиала «Джафар Джаббарлы». Таким образом, клиенты Банка ABB смогут не только пользоваться продуктами и услугами Банка, но и знакомиться с новыми изданиями и приобретать книги. Это проект корпоративной социальной ответственности. В церемонии открытия приняли участие руководство Банка ABB и «Libraff», а также несколько известных писателей нашей страны.
+В филиале Банка, носящем имя нашего незабвенного писателя Джафара Джаббарлы, также расположился книжный магазин, что вытекает из ценностей гражданской ответственности Банка. Банк ABB формирует у клиентов новые впечатления, внедряя инновационные технологии в центр их жизни. В то же время он стремится сохранять и развивать такие традиционные привычки, как чтение книг. Подобные интересные проекты способствуют распространению и популяризации полезных тенденций в нашем обществе.
+В филиале «Джафар Джаббарлы» созданы все условия для удовлетворения финансовых потребностей как бизнеса, так и индивидуальных клиентов. Здесь можно воспользоваться различными видами кредитов, кассово-расчетными операциями, депозитами, денежными переводами, заказом платежных карт, операциями с наличной валютой и многими другими услугами. Кроме того, клиенты и инвесторы могут воспользоваться инвестиционными возможностями, предлагаемыми компанией «ABB Invest».
 ```
 
-### `527c38891d-000` — section, az, press_releases, 449 tokens
+### `0465e9f563-000` — section, az, press_releases, 70 tokens
 
-<https://abb-bank.az/press-relizler/abb-asc-nin-sehmdarlarinin-umumi-yigincaginda-onlayn-qaydada-istirak-edin>
+<https://abb-bank.az/press-relizler/press-abb-tecrubesi-assosiated-press-de>
 
 ```text
-"ABB" ASC-nin Səhmdarlarının Ümumi Yığıncağında onlayn qaydada iştirak edin
-Tarix: 19.03.2026
+ABB təcrübəsi Associated Press-də
+Tarix: 04.06.2026
 
-19 Mart, 2026
-Hörmətli səhmdar!
-“Banklar haqqında” Azərbaycan Respublikası Qanununun 24.5-ci maddəsini rəhbər tutaraq, “Azərbaycan Beynəlxalq Bankı” Açıq Səhmdar Cəmiyyətinin (bundan sonra - “ABB” ASC) İdarə Heyəti Sizin nəzərinizə çatdırır ki, 07.05.2026-cı il tarixində Bankın səhmdarlarının növbəti ümumi yığıncağı (bundan sonra – Ümumi Yığıncaq) keçiriləcəkdir.
-Bununla yanaşı bildiririk ki, “ABB” ASC-nin Nizamnaməsinin 8.10-cu maddəsinə əsasən səsvermənin qiyabi şəkildə, Azərbaycan Respublikasının Milli Depozit Mərkəzi tərəfindən İnvestor Portalında (invp.e-mdm.gov.az) yaradılmış şəxsi kabinet vasitəsilə həyata keçirilməsi nəzərdə tutulmuşdur. Ümumi yığıncağın gündəliyinə aşağıdakı məsələlər daxil edilir:
-1. “ABB” ASC-nin kənar auditor tərəfindən yoxlanılmış 2025-ci ilin maliyyə hesabatları və idarəetmə hesabatının təsdiq edilməsi; 2. 2025-ci ilin maliyyə nəticələrinə əsasən “ABB” ASC-nin səhmdarlarına dividendin ödənilməsi; 3. “ABB” ASC-nin aktivlərin idarə edilməsi üzrə törəmə şirkətinin yaradılması; 4. Xarici bankda iştirak payının (nəzarət səhm paketinin) alınması; 5. “ABB” ASC-nin Müşahidə Şurasının tərkibinə dəyişiklik edilməsi
-Ümumi yığıncağın gündəliyinə çıxarılan məsələlər üzrə müvafiq materiallar və səsvermə bülleteni 15.04.2026-cı il tarixindən hər bir səhmdar üçün Azərbaycan Respublikasının Milli Depozit Mərkəzi tərəfindən İnvestor Portalında yaradılmış şəxsi kabinetində yerləşdiriləcəkdir (invp.e-mdm.gov.az).
-Gündəlikdə olan məsələlərə dair münasibətinizi şəxsi kabinet vasitəsilə 15.04.2026-cı il tarixindən 06.05.2026-cı il tarixinədək elektron qaydada bildirməklə səsvermədə qiyabi iştirak edə bilərsiniz.
-Yuxarıda qeyd olunan şəkildə elektron qaydada verilmiş səslərin sayılması ümumi yığıncağın keçirildiyi gün həyata keçiriləcəkdir.
-“Azərbaycan Beynəlxalq Bankı” ASC-nin İdarə Heyəti
+4 İyun, 2026
+ABB-nin danışan bankçılıq təcrübəsi beynəlxalq mediada da maraq doğurub. Associated Press-in Bankın süni intellekt əsaslı fərdi maliyyə menecerləri AI-nur və AI-khan haqqında yaydığı məqalə ilə buradan tanış ola bilərsiniz.
 ```
 
-### `722eae8e42-000` — section, az, procurement, 354 tokens
+### `4e38b5962d-001` — section, az, procurement, 473 tokens
 
-<https://abb-bank.az/haqqimizda/satinalmalar/musabiqelerin-elani/pesekar-yukdasima-xidmetlerinin-satin-alinmasi-12>
+<https://abb-bank.az/haqqimizda/satinalmalar/musabiqelerin-elani/bank-terefinden-yeni-acilan-mxs-lerin-ve-inzibati-binalarin-yangin-xebervericilerinin-satin-alinmasi-kotirovka-300424>
 
 ```text
-Peşəkar yükdaşıma xidmətlərinin satın alınması
-Tarix: 22.12.2022
+Bank tərəfindən yeni açılan MXS-lərin və İnzibati binaların yanğın xəbərvericilərinin satın alınması
+Tarix: 30.04.2024
 
-22 Dekabr, 2022
-Tenderin adı: “ABB” ASC tərəfindən peşəkar yükdaşıma xidmətlərinin satın alınması
-Tenderin elan tarixi: 22.12.2022
-İştirak haqqı:
-BANKIN ADI: ABB
-VÖEN : 9900001881
-KOD: 805250
-SWIFT: IBAZAZ2X
-M/h: AZ03NABZ01350100000000002944
-H/h: AZ12IBAZ34501019440000100100 AZN
-H/h: AZ33IBAZ34511018400000100100 USD
-- tender təklifi (tender zərflərinin açıldığı tarixdən (17 yanvar 2023-cü il) sonra azı 30 (otuz) bank günü (yəni ən azı 01 mart 2023-cü il tarixinədək) qüvvədə olmalıdır;
-- 900.00 (doqquz yüz) manat dəyərində bank təminatı (tender təklifinin qüvvədə olma müddətinin sonuncu günündən azı 30 bank günü çox olmalıdır (yəni ən azı 19 aprel 2023-cü il tarixinədək qüvvədə olmalıdır);
-İddiaçılar tenderdə iştirak etmək üçün yuxarıda göstərilən sənədləri (tender təklifi və bank təminatı istisna olmaqla) 10 yanvar 2023-cü il saat 17:00-a qədər, tender təklifi və bank təminatını isə möhürlənmiş ikiqat zərflərdə 16 yanvar 2023-cü il saat 17:00-a qədər Bakı şəhəri, Nəsimi rayonu, Nizami küçəsi, 67 nömrəli ünvana təqdim etməlidirlər.
-İddiaçıların təklifləri 17 yanvar 2023-cü il saat 16:45-də Bakı şəhəri, Nəsimi rayonu, Nizami küçəsi, 67 nömrəli ünvanda açılacaqdır.
-Tender Komissiyası
+Kotirovka təklifinin qüvvədə olma müddəti zərflərin açıldığı gündən sonra azı 30 (otuz) bank günü təşkil etməlidir.
+Kotirovka sorğusu ilə bağlı əlavə məlumat almaq üçün adı qeyd edilmiş “ABB” ASC-nin əməkdaşına (Nərgiz Şahsuvarova: (012) 493-00-91, daxili 82-17/82-15, elektron poçt ünvanları: (Nargiz.Shahsuvarova@abb-bank.az və pod@abb-bank.az) müraciət edə bilərsiniz.
+Satınalma Komissiyası
+“ABB” ASC tərəfindən podratçıların fəaliyyətinə dair tələblər
+Qara və Boz siyahı meyarları
+1.1. ABB ilə əməkdaşlıq dövründə podratçının fəaliyyətində qanunvericiliyin pozulması, müqavilə öhdəliklərinin yerinə yetirilməməsi/lazımınca yerinə yetirilməməsi və ya ABB ilə əməkdaşlığa mənfi təsir edəcək bu kimi digər hallar aşkar olunduqda, pozuntuların ağırlığından, mahiyyətindən və digər meyarlardan asılı olaraq podratçının (malgöndərənin) adı ABB tərəfindən “Etibarsız podratçılar (malgöndərənlər) siyahısı”na - “qara siyahı” (“black list”) və ya “boz siyahı”-ya (“grey list”) salına bilər.
+1.2. “Qara siyahı” (“black list”)
+Əgər podratçının (malgöndərənin) fəaliyyətində aşağıda göstərilən meyarlar öz əksini taparsa, həmin podratçı (malgöndərən) müddətsiz əsaslarla “qara siyahı”ya daxil edilir və onunla ABB arasında əməkdaşlıq qadağan olunur:
+- cinayət yolu ilə əldə edilmiş pul vəsaitlərinin və ya digər əmlakın leqallaşdırılması;
+- terrorçuluğun maliyyələşdirilməsi;
+- transmilli mütəşəkkil cinayətkarlıq;
+- silahlı separatizmin, ekstremizmin və muzdluluğun dəstəkləməsi;
+- narkotik vasitələrin, psixotrop maddələrin və ya onların prekursorlarının qanunsuz dövriyyəsində iştirak ehtimalı;
+- podratçının (malgöndərənin) maliyyə əməliyyatlarının aparılması zamanı eyniləşdirmə məlumatlarının açıqlanması tələb olunmayan dövlətlərin (ərazilərin) siyahısında yer alması;
 ```
 
-### `1bbb47e073-000` — section, az, service_network, 497 tokens
+### `a792a25ccb-000` — section, az, service_network, 136 tokens
 
-<https://abb-bank.az/atm#agdas>
+<https://abb-bank.az/terminallar#masalli>
 
 ```text
-ABB bankomatları (ATM) — Ağdaş
+ABB ödəniş terminalları — Masallı
 
-Ağdaş üzrə 9 nöqtə; onlardan 2-i nağd pul mədaxili (cash-in) qəbul edir.
-Agdash rayonu, Leki qesebesi, Sabir k. 1 (Nur market) — xəritə: https://www.google.com/maps?q=40.5593118849288,47.428207445752946
-Ağdaş r., Məşəd kəndi (1inci market) — xəritə: https://www.google.com/maps?q=40.63019365175335,47.46457721515742
-Ağdaş rayon,Yuxarı Ləki kəndi (Halal Super market) — xəritə: https://www.google.com/maps?q=40.548661,47.42294
-Ağdaş rayonu, Ağdaş-Qəbələ yolunun üzərində (Ağdaş ticarət mərkəzi) — 24/7 — xəritə: https://www.google.com/maps?q=40.648466045400845,47.497024988075616
-Ağdaş rayonu, Xosrov kəndi (Store market) — xəritə: https://www.google.com/maps?q=40.63277,47.572907
-Ağdaş ş., M.İsayev küç. "Ağdaş" market (Beş mərtəbəli binanın birinci mərtəbəsi) — xəritə: https://www.google.com/maps?q=40.648036,47.471287
-Ağdaş, H.Əliyev prospekti, 96 (ABB-nin Ağdaş filialı 24/7 sahə) — nağd pul mədaxili (cash-in), həftə sonu işləyir — xəritə: https://www.google.com/maps?q=40.64464509611075,47.47541481995137
-Ağdaş, H.Əliyev prospekti, 96 (ABB-nin Ağdaş filialı 24/7 sahə) — nağd pul mədaxili (cash-in), həftə sonu işləyir — xəritə: https://www.google.com/maps?q=40.64464509611075,47.47541481995137
-H.Əliyev pr., 73A — xəritə: https://www.google.com/maps?q=40.640642,47.470164
+Masallı üzrə 2 nöqtə; onlardan 2-i nağd pul mədaxili (cash-in) qəbul edir.
+Masallı şəh, Heydər Əliyev prospekti 34 — nağd pul mədaxili (cash-in) — xəritə: https://www.google.com/maps?q=39.035048,48.669059
+Masallı, Zərifə Əliyeva, 54, AZ4400. — nağd pul mədaxili (cash-in) — xəritə: https://www.google.com/maps?q=39.02646,48.68291
 ```
 
 
@@ -554,6 +573,18 @@ Ownership in subsidiaries and associate companies
 Supporting growth and innovation through strong partnerships and investments
 ```
 
+### `da3e77d271-006` — faq, az, business, 25 tokens
+
+<https://abb-bank.az/biznes/kicik-ve-orta-biznes/kocurmeler>
+
+```text
+Asan və sürətli pul köçürmələri
+Tez-tez verilən suallar
+
+Sual: Məlumat
+Cavab: əməliyyatları.
+```
+
 ### `f6b89438f4-003` — section, en, individual, 25 tokens
 
 <https://abb-bank.az/en/ferdi/sigorta>
@@ -574,16 +605,6 @@ Credit Life Insurance
 Доля участия в дочерних и зависимых компаниях
 
 Рост и поддержка инноваций через прочные партнерства и инвестиции
-```
-
-### `a7025f445b-000` — section, en, about, 26 tokens
-
-<https://abb-bank.az/en/haqqimizda/siyasetlerimiz>
-
-```text
-Our policies
-
-Key principles and governance rules applied in Bank ABB’s operations - Last updated: 13.10.2026
 ```
 
 

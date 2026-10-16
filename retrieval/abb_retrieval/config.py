@@ -18,6 +18,10 @@ class ChunkingConfig:
     """Paragraphs repeated at the start of the next window when a section is split."""
     min_body_words: int = 4
     """Section chunks with less text than this ("Все", "Sual-cavab") carry no information."""
+    shared_section_categories: tuple[str, ...] = ("procurement",)
+    shared_section_min_pages: int = 10
+    """A chunk body found word for word on this many tender pages is a common section
+    (supplier requirements …) and is stored once — see :mod:`merging`."""
     tokenizer: str = "BAAI/bge-m3"
     """Token counts use this tokenizer (all candidate models allow >= 512 tokens)."""
 
@@ -46,6 +50,10 @@ class Paths:
     @property
     def questions(self) -> Path:
         return self.evaluation_dir / "questions.jsonl"
+
+    @property
+    def evidence_additions(self) -> Path:
+        return self.evaluation_dir / "evidence_additions.json"
 
     @property
     def reports_dir(self) -> Path:

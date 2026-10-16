@@ -119,14 +119,36 @@ def test_news_chunks_show_the_publication_date():
     assert str(c.published) == "2022-06-09"
 
 
-def test_identical_chunks_of_different_pages_are_merged():
-    from abb_retrieval.corpus import merge_identical_chunks
+def test_identical_chunks_of_different_pages_are_merged_with_their_categories():
+    from abb_retrieval.merging import merge_identical_chunks
     first = chunk(page(sections=[(["A"], ["Eyni mətn burada yazılıb."])]))[0]
-    second = first.model_copy(update={"url": "https://abb-bank.az/ferdi", "chunk_id": "other", "page_index": 9})
+    second = first.model_copy(update={"url": "https://abb-bank.az/ferdi", "chunk_id": "other",
+                                      "page_index": 9, "category": "home", "categories": ["home"]})
     merged = merge_identical_chunks([first, second])
     assert [c.chunk_id for c in merged] == [first.chunk_id]
     assert merged[0].related_urls == ["https://abb-bank.az/ferdi"]
-    assert merged[0].aliases[0].page_index == 9
+    assert merged[0].categories == ["individual", "home"]
+    assert (merged[0].aliases[0].page_index, merged[0].aliases[0].category) == (9, "home")
+
+
+def test_sections_shared_by_many_tenders_become_one_common_chunk():
+    from abb_retrieval.merging import merge_shared_sections
+    config = ChunkingConfig(shared_section_min_pages=3)
+
+    def tender(i: int, body: str):
+        p = page(sections=[(["Tələblər"], [body])], title=f"Tender {i}")
+        p.update(url=f"https://abb-bank.az/haqqimizda/satinalmalar/t{i}", category="procurement")
+        return chunk_page(p, i, words, config)[0]
+
+    common = "Qara siyahı meyarları bütün təchizatçılara şamil olunur."
+    chunks = [tender(i, common) for i in range(3)] + [tender(9, "Lot 1 üzrə 100 manat iştirak haqqı.")]
+    merged = merge_shared_sections(chunks, config)
+
+    assert len(merged) == 2
+    shared = merged[0]
+    assert shared.text.startswith("Satınalmalar (bütün tenderlər üçün ümumi)\nTələblər\n\n")
+    assert len(shared.related_urls) == 2 and len({a.url for a in shared.aliases}) == 3
+    assert merged[1].text.startswith("Tender 9")  # a tender's own facts stay with the tender
 
 
 def test_sections_without_information_are_not_chunked():

@@ -118,17 +118,38 @@ def freeze_evidence(questions: list[Question], pages: list[dict], corpus_path: P
             if page["url"] != ref.url:
                 raise CorpusMismatchError(f"{question.id}: line {ref.page_index + 1} is {page['url']}, not {ref.url}")
             ref.texts = [position_text(page, position) for position in ref.positions]
+            ref.section_paths = [_section_path(page, position) for position in ref.positions]
 
 
 def position_text(page: dict, position: str) -> str:
     """The paragraph or FAQ answer at ``sections[i].paragraphs[j]`` / ``faq[k]``."""
-    match = _POSITION_RE.fullmatch(position)
-    if match is None:
-        raise ValueError(f"Unknown position notation: {position}")
-    section, paragraph, faq = match.groups()
+    section, paragraph, faq = _parse_position(position)
     if faq is not None:
         return page["faq"][int(faq)]["answer"]
     return page["sections"][int(section)]["paragraphs"][int(paragraph)]
+
+
+def _section_path(page: dict, position: str) -> list[str]:
+    section, _, faq = _parse_position(position)
+    return [] if faq is not None else list(page["sections"][int(section)]["heading_path"])
+
+
+def _parse_position(position: str) -> tuple[str | None, str | None, str | None]:
+    match = _POSITION_RE.fullmatch(position)
+    if match is None:
+        raise ValueError(f"Unknown position notation: {position}")
+    return match.groups()
+
+
+def apply_additions(questions: list[Question], additions: list[dict]) -> None:
+    """Register reviewed alternative passages (``evaluation/evidence_additions.json``)."""
+    by_id = {q.id: q for q in questions}
+    for addition in additions:
+        ref = by_id[addition["question_id"]].evidence[addition["evidence"]]
+        if ref.url != addition["url"]:
+            raise ValueError(f"{addition['question_id']}: evidence {addition['evidence']} is {ref.url}")
+        if addition["contains"] not in ref.alternatives:
+            ref.alternatives.append(addition["contains"])
 
 
 # --------------------------------------------------------------------------- #
@@ -141,40 +162,68 @@ def attach_chunks(questions: list[Question], chunks: list[Chunk], pages: list[di
     A chunk contains an evidence text when one of its source positions holds
     that text on the same page (matched by URL, not by line number). Table rows
     also match when only their format changed (see :func:`table_cells`).
+    Reviewed alternative passages (``ref.alternatives``) count as well.
     """
     index: dict[tuple[str, object], list[str]] = defaultdict(list)
+    chunks_of_url: dict[str, list[Chunk]] = defaultdict(list)
     for chunk in chunks:
-        # A merged chunk also stands for the identical chunks of other pages.
+        # A merged chunk also stands for the chunks of other pages merged into it.
         for url, page_index, sources in [(chunk.url, chunk.page_index, chunk.sources),
                                          *((a.url, a.page_index, a.sources) for a in chunk.aliases)]:
+            chunks_of_url[url].append(chunk)
             for source in sources:
                 for key in _match_keys(position_text(pages[page_index], source)):
                     index[(url, key)].append(chunk.chunk_id)
+    by_id = {chunk.chunk_id: chunk for chunk in chunks}
 
     problems = []
     for question in questions:
         for ref in question.evidence:
             if not ref.texts:
                 raise ValueError(f"{question.id}: evidence is not frozen yet (run the freeze step first)")
-            ref.chunk_ids = _chunks_with_evidence(ref.url, ref.texts, index)
+            ids = _chunks_with_evidence(ref, index, by_id) + _chunks_with_alternatives(ref, chunks_of_url)
+            ref.chunk_ids = list(dict.fromkeys(ids))
             if not ref.chunk_ids:
                 problems.append(f"{question.id}: no chunk of {ref.url} contains the evidence {ref.texts[0][:60]!r}")
     return problems
 
 
-def _chunks_with_evidence(url: str, texts: list[str], index: dict[tuple[str, object], list[str]]) -> list[str]:
+def _chunks_with_evidence(ref: EvidenceRef, index: dict[tuple[str, object], list[str]],
+                          by_id: dict[str, Chunk]) -> list[str]:
     """Chunks containing the evidence.
 
-    A table header row ("Əmanət müddəti | Aylıq | Müddətin sonu") is shared by
-    the AZN and the USD table; it only counts when the evidence has nothing
-    more specific. Otherwise the chunk must contain the data row itself.
+    * A table header row ("Əmanət müddəti | Aylıq | Müddətin sonu") is shared by
+      the AZN and the USD table; it only counts when the evidence has nothing
+      more specific. Otherwise the chunk must contain the data row itself.
+    * A sentence found in several chunks of the page ("no interest on early
+      withdrawal" under both the AZN and the USD table) counts only in the
+      chunk of the evidence's own section.
     """
-    def matches(text: str) -> list[str]:
-        return [cid for key in _match_keys(text) for cid in index.get((url, key), [])]
+    paths = ref.section_paths or [[] for _ in ref.texts]
+    pairs = list(zip(ref.texts, paths))
+    specific = [(text, path) for text, path in pairs if not _is_table_header(text)] or pairs
 
-    specific = [text for text in texts if not _is_table_header(text)]
-    ids = [cid for text in (specific or texts) for cid in matches(text)]
-    return list(dict.fromkeys(ids))
+    ids = []
+    for text, path in specific:
+        found = list(dict.fromkeys(cid for key in _match_keys(text) for cid in index.get((ref.url, key), [])))
+        if len(found) > 1 and path:
+            found = [cid for cid in found if _is_in_section(by_id[cid], path[-1])] or found
+        ids += found
+    return ids
+
+
+def _is_in_section(chunk: Chunk, heading: str) -> bool:
+    """Is ``heading`` part of the chunk's context (header lines or a "## sub-heading")?"""
+    header, _, body = chunk.text.partition("\n\n")
+    context = header.split("\n") + [line for line in body.split("\n") if line.startswith("## ")]
+    key = fingerprint(heading)
+    return any(key in fingerprint(line) for line in context)
+
+
+def _chunks_with_alternatives(ref: EvidenceRef, chunks_of_url: dict[str, list[Chunk]]) -> list[str]:
+    snippets = [fingerprint(snippet) for snippet in ref.alternatives]
+    return [chunk.chunk_id for chunk in chunks_of_url.get(ref.url, [])
+            if any(snippet in fingerprint(chunk.text) for snippet in snippets)]
 
 
 def _is_table_header(text: str) -> bool:
