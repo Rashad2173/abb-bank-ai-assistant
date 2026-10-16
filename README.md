@@ -13,8 +13,9 @@ retrieved from a **Milvus** vector database and the model answers only from them
 | Part | State |
 |------|-------|
 | Web scraping (all textual content of abb-bank.az, AZ/EN/RU) | ✅ done — [scraper/](scraper/) |
-| Chunking + embedding model benchmark on Azerbaijani data | ⏳ next |
-| Vector database (Milvus), backend microservices, OpenAI integration | ⏳ planned |
+| Chunking + embedding model benchmark on Azerbaijani data | ✅ done — [retrieval/](retrieval/) |
+| Vector database (Milvus) | ⏳ next |
+| Backend microservices, OpenAI integration, guardrail | ⏳ planned |
 | Web UI (data upload, chat, analytics dashboard) | ⏳ planned |
 | Docker | ⏳ planned |
 
@@ -29,16 +30,40 @@ and ATM network. The scraper therefore combines three sources:
 * the page's **CMS data from the React Server Components payload**,
 * the site's own **Server Actions / REST API** for branches, ATMs and terminals.
 
-Result: 7 397 URLs crawled with 0 failures, **4 420 clean documents**
-(8.7 M characters, 1 550 FAQ items), **100 % coverage** of the CMS text.
-Details and design decisions: [scraper/README.md](scraper/README.md).
+Result: 7 397 URLs crawled with 0 failures, **4 223 clean documents**
+(12.9 M characters, 1 607 FAQ items), **99.9 %** of the CMS text lines present in
+the output. Details and design decisions: [scraper/README.md](scraper/README.md).
+
+## Retrieval highlights
+
+The documents are split into **9 604 chunks** (rule-based, ≤ 512 tokens, every
+chunk starts with its page title and section path). Three embedding models were
+compared on **two independent sets of 100 questions** each, with the passages that
+answer every question marked in advance:
+
+| Method | All evidence in top 5 (set A + set B) | Recall@10 (A / B) |
+|--------|-----------------:|--------------:|
+| **bge-m3 dense + sparse + bge-reranker-v2-m3** (chosen) | **173 / 200** | 94 % / 92 % |
+| text-embedding-3-large + reranker | 171 / 200 | 93 % / 90 % |
+| multilingual-e5-large-instruct + reranker | 173 / 200 | 92 % / 92 % |
+| bge-m3 dense, no reranker | 154 / 200 | 89 % / 88 % |
+| text-embedding-3-large, no reranker | 142 / 200 | 92 % / 82 % |
+| BM25 keyword search | 111 / 200 | 70 % / 72 % |
+
+With the reranker the models are within noise of each other; without it bge-m3
+is the most consistent across both sets (text-embedding-3-large drops from 81 %
+to 68 % Recall@5 on set B). bge-m3 is open source, produces dense and sparse
+vectors for Milvus hybrid search in one pass and needs no paid API.
+Details: [retrieval/README.md](retrieval/README.md).
 
 ## Repository layout
 
 ```
 ├── scraper/              # abb-bank.az scraper (Python package `abb_scraper`)
+├── retrieval/            # chunking, evaluation sets, embedding benchmark (`abb_retrieval`)
+├── evaluation/           # question sets A and B + generated quality / benchmark reports
 ├── tests/                # pytest test suite
-├── data/                 # scraper output — not committed, generated locally
+├── data/                 # scraper output, chunks, embeddings — not committed, generated locally
 ├── REQUIREMENTS.md       # case study requirements tracker
 └── requirements-dev.txt  # development / test dependencies
 ```
@@ -56,6 +81,14 @@ pip install -r requirements-dev.txt
 cd scraper
 python -m abb_scraper run
 
+# Chunk the documents and run the embedding benchmark (GPU recommended)
+cd ../retrieval
+python -m abb_retrieval chunk                # → data/chunks.jsonl
+python -m abb_retrieval evalset              # map set A's evidence to chunk ids
+python -m abb_retrieval benchmark            # → evaluation/reports/02_embedding_benchmark.md
+python -m abb_retrieval evalset --set b
+python -m abb_retrieval benchmark --set b    # → evaluation/reports/03_embedding_benchmark_set_b.md
+
 # Run the tests (from the repository root)
 cd ..
 pytest
@@ -67,5 +100,7 @@ pytest
 |----------|--------|
 | Milvus as vector database | Case requirement; supports hybrid (dense + BM25) search |
 | Embedding model chosen by benchmark on Azerbaijani data | Most of the content is Azerbaijani — accuracy matters more than cost |
+| bge-m3 (dense + sparse) + bge-reranker-v2-m3 | Best and most consistent on two independent question sets; open source, no API cost |
+| Second, independent question set | One set can favour one model; the ranking had to hold on questions written separately |
 | Crawl and extraction as separate phases | Extraction rules can be improved and re-run in minutes without re-downloading the site |
 | Repeated content kept once, on the most general page | Prevents duplicate chunks from crowding search results |

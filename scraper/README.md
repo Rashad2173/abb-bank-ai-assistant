@@ -123,12 +123,12 @@ and the list of repeated blocks that were kept only once.
 | URLs discovered | 7 397 (sitemap 7 187 + 209 found via links + home) |
 | Fetched | 7 232 × HTTP 200, 165 × 404 (dead sitemap entries), 0 failures |
 | Unique pages | 7 178 (98 redirects) |
-| Written documents | **4 225** — 4 006 web pages + 219 service-network documents |
+| Written documents | **4 223** — 4 004 web pages + 219 service-network documents |
 | Dropped | ~3 000 untranslated copies, duplicates and empty pages |
-| FAQ / documents | 1 611 FAQ items; 744 linked documents (PDF) kept as links in the text |
+| FAQ / documents | 1 607 FAQ items; 744 linked documents (PDF) kept as links in the text |
 | Campaigns | 517 pages with validity: 506 ended, 11 active |
 | Service network | 79 branches, 8 sub-branches, 2 offices abroad, 941 ATMs in 72 cities, 277 terminals |
-| **CMS coverage** | **99.9 %** of 15 645 CMS text lines are in the output; the rest are titles of calculators and FAQ groups |
+| **CMS coverage** | **99.9 %** of 15 646 CMS text lines are in the output; the rest are titles of calculators and FAQ groups |
 | Run time | crawl ≈ 30 min (4 pages/s, polite), extract ≈ 2 min (parallel) |
 
 `python -m abb_scraper check` re-measures all of this and writes

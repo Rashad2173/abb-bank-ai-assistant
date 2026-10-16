@@ -9,7 +9,7 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 | # | Requirement | Status | Where |
 |---|-------------|--------|-------|
 | 1.1 | Script that parses the official ABB website (abb-bank.az) | ✅ | `scraper/` |
-| 1.2 | Extracts **all** textual content | ✅ | `scraper/` — 100 % CMS coverage, see `scraper/README.md` |
+| 1.2 | Extracts **all** textual content | ✅ | `scraper/` — 99.9 % of CMS text lines present, see `evaluation/reports/00_data_quality.md` |
 
 ## 2. Web Application
 | # | Requirement | Status | Where |
@@ -17,7 +17,7 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 | 2.1 | **Data Upload** — user uploads the extracted data | ⬜ | |
 | 2.2 | Uploaded data is stored in the browser's **local storage** | ⬜ | |
 | 2.3 | Backend service that interacts with an **OpenAI LLM** | ⬜ | |
-| 2.4 | Extracted data formatted into a **vector database** (Milvus) compatible with OpenAI's requirements | ⬜ | |
+| 2.4 | Extracted data formatted into a **vector database** (Milvus) compatible with OpenAI's requirements | 🟨 | `retrieval/` — chunks + embedding model chosen; Milvus next |
 | 2.5 | After successful processing, show a **chat interface** | ⬜ | |
 | 2.6 | Answers stay **within the context of ABB information** | ⬜ | |
 | 2.7 | **Microservice architecture** for question handling and response generation, communicating in **JSON** | ⬜ | |
@@ -45,6 +45,8 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 |----------|--------|
 | Vector DB: **Milvus** | Required for this case |
 | Embedding model chosen by **benchmark on Azerbaijani data** (bge-m3, text-embedding-3-large, multilingual-e5 candidates) | Site content is mostly Azerbaijani; accuracy over cost |
+| **bge-m3 dense + sparse + bge-reranker-v2-m3** | 173/200 questions with all evidence in the top 5 over two independent question sets; most consistent without the reranker too (`retrieval/README.md`) |
+| Reranker needs a GPU (or a hosted reranker) in production | ~1 s per question on a GPU, ~47 s on CPU |
 | Scraped chunks must be **human-reviewable** | Chunks will be checked manually |
 
 ## Notes for answer generation
