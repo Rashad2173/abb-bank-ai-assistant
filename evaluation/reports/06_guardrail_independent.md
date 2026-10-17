@@ -1,6 +1,6 @@
 # Guardrail evaluation
 
-80 questions (`evaluation/guardrail_set_independent.json`) sent to the running chat service.
+80 questions (`evaluation/guardrail/guardrail_set_independent.json`) sent to the running chat service.
 
 | | Result |
 |---|---:|

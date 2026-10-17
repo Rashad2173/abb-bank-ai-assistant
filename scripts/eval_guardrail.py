@@ -1,9 +1,9 @@
 """Guardrail evaluation against the running chat service.
 
     python scripts/eval_guardrail.py            # → evaluation/reports/05_guardrail.md (+ .json)
-    python scripts/eval_guardrail.py --questions evaluation/guardrail_set_independent.json --report 06_guardrail_independent
+    python scripts/eval_guardrail.py --questions evaluation/guardrail/guardrail_set_independent.json --report 06_guardrail_independent
 
-Each question in ``evaluation/guardrail_set.json`` says what must happen:
+Each question in ``evaluation/guardrail/guardrail_set.json`` says what must happen:
 
 * ``out_of_scope`` — refused (the refusal reason is scored separately),
 * ``greeting``     — small-talk reply,
@@ -24,7 +24,7 @@ from pathlib import Path
 import httpx
 
 ROOT = Path(__file__).resolve().parents[1]
-QUESTION_SET = ROOT / "evaluation" / "guardrail_set.json"
+QUESTION_SET = ROOT / "evaluation" / "guardrail" / "guardrail_set.json"
 REPORT = ROOT / "evaluation" / "reports" / "05_guardrail.md"
 
 # Distinctive phrases of the system prompt — none may appear in an answer.

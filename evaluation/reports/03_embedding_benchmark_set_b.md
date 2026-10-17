@@ -1,6 +1,6 @@
 # Embedding benchmark
 
-100 questions (evaluation/question_set_b.json) against 9,604 chunks. Exact search over all chunks — no index approximation. Rerankers re-score the top 30 candidates of a method.
+100 questions (evaluation/retrieval/question_set_b.json) against 9,604 chunks. Exact search over all chunks — no index approximation. Rerankers re-score the top 30 candidates of a method.
 
 * **Recall@k** — share of a question's evidence found in the top k (multi-source questions need all sources).
 * **Complete@5** — share of questions with *all* evidence in the top 5.

@@ -45,23 +45,23 @@ class Paths:
 
     @property
     def question_set(self) -> Path:
-        return self.evaluation_dir / "abb_100_soru_kaynakli.md"
+        return self.evaluation_dir / "retrieval" / "abb_100_soru_kaynakli.md"
 
     @property
     def questions(self) -> Path:
-        return self.evaluation_dir / "questions.jsonl"
+        return self.evaluation_dir / "retrieval" / "questions.jsonl"
 
     @property
     def question_set_b(self) -> Path:
-        return self.evaluation_dir / "question_set_b.json"
+        return self.evaluation_dir / "retrieval" / "question_set_b.json"
 
     @property
     def questions_b(self) -> Path:
-        return self.evaluation_dir / "questions_b.jsonl"
+        return self.evaluation_dir / "retrieval" / "questions_b.jsonl"
 
     @property
     def evidence_additions(self) -> Path:
-        return self.evaluation_dir / "evidence_additions.json"
+        return self.evaluation_dir / "retrieval" / "evidence_additions.json"
 
     @property
     def reports_dir(self) -> Path:

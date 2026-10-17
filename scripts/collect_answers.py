@@ -1,6 +1,6 @@
 """Ask the running chat service every question of an answer set and store the answers for grading.
 
-    python scripts/collect_answers.py            # evaluation/answer_set.json → evaluation/reports/07_answers_raw.json
+    python scripts/collect_answers.py            # evaluation/answers/answer_set.json → evaluation/reports/07_answers_raw.json
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ def ask(chat_url: str, item: dict) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--chat-url", default="http://localhost:8001")
-    parser.add_argument("--questions", type=Path, default=ROOT / "evaluation" / "answer_set.json")
+    parser.add_argument("--questions", type=Path, default=ROOT / "evaluation" / "answers" / "answer_set.json")
     parser.add_argument("--out", type=Path, default=ROOT / "evaluation" / "reports" / "07_answers_raw.json")
     parser.add_argument("--workers", type=int, default=4)
     args = parser.parse_args()

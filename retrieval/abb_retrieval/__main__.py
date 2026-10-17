@@ -4,7 +4,7 @@ Usage (from the ``retrieval/`` directory)::
 
     python -m abb_retrieval freeze --corpus data/abb_pages.v1-042c420d.jsonl
                                         # once: question set + the corpus version it was written for
-                                        # → evaluation/questions.jsonl
+                                        # → evaluation/retrieval/questions.jsonl
     python -m abb_retrieval chunk       # data/chunks.jsonl + chunk quality report
     python -m abb_retrieval evalset     # map the questions' evidence to the current chunk ids
     python -m abb_retrieval benchmark   # embedding benchmark report
@@ -12,7 +12,7 @@ Usage (from the ``retrieval/`` directory)::
     python -m abb_retrieval milvus-check  # both question sets through Milvus vs. the exact search
 
 ``--set b`` runs ``evalset`` / ``benchmark`` on the independent question set B
-(evaluation/question_set_b.json → evaluation/questions_b.jsonl).
+(evaluation/retrieval/question_set_b.json → evaluation/retrieval/questions_b.jsonl).
 """
 
 from __future__ import annotations
@@ -103,9 +103,9 @@ def run_benchmark_command(paths: Paths, models: list[str], rerank: bool, questio
     from .benchmark_report import write_benchmark_report
 
     if question_set == "b":
-        questions_path, name, source = paths.questions_b, "03_embedding_benchmark_set_b", "evaluation/question_set_b.json"
+        questions_path, name, source = paths.questions_b, "03_embedding_benchmark_set_b", "evaluation/retrieval/question_set_b.json"
     else:
-        questions_path, name, source = paths.questions, "02_embedding_benchmark", "evaluation/abb_100_soru_kaynakli.md"
+        questions_path, name, source = paths.questions, "02_embedding_benchmark", "evaluation/retrieval/abb_100_soru_kaynakli.md"
     chunks, questions = load_chunks(paths.chunks), load_questions(questions_path)
     result = run_benchmark(chunks, questions, models, paths.embeddings_dir, rerank=rerank)
     report = write_benchmark_report(result, questions, chunks, paths.reports_dir, name=name, source=source)

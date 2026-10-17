@@ -1,6 +1,6 @@
 # Answer quality
 
-56 new questions (`evaluation/answer_set.json`) from pages that neither retrieval set uses — 44 Azerbaijani, 6 English, 6 Russian, incl. multi-source, ended-campaign and not-on-the-site questions. Answers from the running chat service (bge-m3 dense + sparse → reranker → 10 chunks → gpt-6-luna), each read next to its source text.
+56 new questions (`evaluation/answers/answer_set.json`) from pages that neither retrieval set uses — 44 Azerbaijani, 6 English, 6 Russian, incl. multi-source, ended-campaign and not-on-the-site questions. Answers from the running chat service (bge-m3 dense + sparse → reranker → 10 chunks → gpt-6-luna), each read next to its source text.
 
 | | Result |
 |---|---:|

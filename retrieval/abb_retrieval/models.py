@@ -63,7 +63,7 @@ class EvidenceRef(BaseModel):
     """Heading path of each text's section (empty for FAQ) — tells the AZN table from the USD table
     when both contain the same sentence."""
     alternatives: list[str] = Field(default_factory=list)
-    """Other passages of the same page that answer equally well (``evaluation/evidence_additions.json``)."""
+    """Other passages of the same page that answer equally well (``evaluation/retrieval/evidence_additions.json``)."""
     quote: str = ""
     chunk_ids: list[str] = Field(default_factory=list)
     """Chunks containing this evidence — filled in once the corpus is chunked."""

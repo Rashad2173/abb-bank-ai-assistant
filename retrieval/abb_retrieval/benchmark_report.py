@@ -25,7 +25,7 @@ OPENAI_PRICE_PER_MILLION = 0.13  # USD, text-embedding-3-large
 
 def write_benchmark_report(
     result: BenchmarkResult, questions: list[Question], chunks: list[Chunk], directory: Path,
-    name: str = "02_embedding_benchmark", source: str = "evaluation/abb_100_soru_kaynakli.md",
+    name: str = "02_embedding_benchmark", source: str = "evaluation/retrieval/abb_100_soru_kaynakli.md",
 ) -> Path:
     """Write ``<name>.md``, ``<name>.json`` and ``<name>_per_question.csv``; ``source`` names the question set."""
     directory.mkdir(parents=True, exist_ok=True)

@@ -1,6 +1,6 @@
 """The evaluation question sets: parse them, freeze their evidence, map it to chunks.
 
-The set (``evaluation/abb_100_soru_kaynakli.md``) is a human-readable Markdown
+The set (``evaluation/retrieval/abb_100_soru_kaynakli.md``) is a human-readable Markdown
 document written against one exact corpus version (its SHA-256 is stated in
 the document). Every question points at positions in that corpus
 (page line + ``sections[2].paragraphs[0]`` / ``faq[3]``).
@@ -9,11 +9,11 @@ Positions break as soon as the corpus is regenerated (a section more or less
 shifts the indices), so the set is used in two steps:
 
 1. **freeze** (once, against the documented corpus version): the text at every
-   position is stored with the question in ``evaluation/questions.jsonl``.
+   position is stored with the question in ``evaluation/retrieval/questions.jsonl``.
 2. **attach** (after every re-chunking): evidence is found by *page URL +
    text*, which survives changes of the corpus structure.
 
-Set B (``evaluation/question_set_b.json``) is an independent second set, written
+Set B (``evaluation/retrieval/question_set_b.json``) is an independent second set, written
 directly against the chunks: each source is a page URL plus verbatim snippets,
 so it needs no freeze step (see :func:`parse_snippet_set`).
 """
@@ -164,7 +164,7 @@ def _parse_position(position: str) -> tuple[str | None, str | None, str | None]:
 
 
 def apply_additions(questions: list[Question], additions: list[dict]) -> None:
-    """Register reviewed alternative passages (``evaluation/evidence_additions.json``)."""
+    """Register reviewed alternative passages (``evaluation/retrieval/evidence_additions.json``)."""
     by_id = {q.id: q for q in questions}
     for addition in additions:
         ref = by_id[addition["question_id"]].evidence[addition["evidence"]]

@@ -41,7 +41,7 @@ advance, so retrieval can be scored automatically.
 
 | | Set A | Set B |
 |---|---|---|
-| File | `evaluation/abb_100_soru_kaynakli.md` | `evaluation/question_set_b.json` |
+| File | `evaluation/retrieval/abb_100_soru_kaynakli.md` | `evaluation/retrieval/question_set_b.json` |
 | Questions | 100 (115 evidence passages) | 100 (110 evidence passages) |
 | Written | first, against corpus version `042c420d` | separately, only from pages set A does not use |
 | Evidence given as | position in the corpus (`sections[2].paragraphs[0]`), frozen to text once | page URL + verbatim snippet |
@@ -50,7 +50,7 @@ advance, so retrieval can be scored automatically.
 Evidence is matched to chunks by **page URL + text**, so both sets survive
 re-chunking. Table rows match across formats; a table header row alone is not
 evidence; a sentence that appears under two tables only counts in its own section.
-Reviewed equivalent passages are listed in `evaluation/evidence_additions.json`.
+Reviewed equivalent passages are listed in `evaluation/retrieval/evidence_additions.json`.
 
 **Metrics.** *Recall@k* — share of a question's evidence in the top k results.
 *Complete@5* — questions with **all** their evidence in the top 5 (what the LLM
