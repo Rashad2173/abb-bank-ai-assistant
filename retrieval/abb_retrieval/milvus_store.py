@@ -14,6 +14,7 @@ benchmark did with exact search.
 
 from __future__ import annotations
 
+import hashlib
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 
@@ -51,6 +52,9 @@ METHODS = {
 }
 
 _OUTPUT_FIELDS = ["chunk_id"]
+CHUNK_FIELDS = ["chunk_id", "url", "title", "lang", "category", "chunk_type", "is_active", "valid_until",
+                "published", "related_urls", "text"]
+"""What the chat service shows the LLM and the user."""
 
 
 @dataclass
@@ -64,8 +68,16 @@ class Query:
 
 class MilvusStore:
     def __init__(self, uri: str = "http://localhost:19530", collection: str = COLLECTION) -> None:
-        self.client = MilvusClient(uri)
+        self.uri = uri
         self.collection = collection
+        self._client: MilvusClient | None = None
+
+    @property
+    def client(self) -> MilvusClient:
+        """Connected on first use, so a service can start before Milvus is up."""
+        if self._client is None:
+            self._client = MilvusClient(self.uri)
+        return self._client
 
     # ------------------------------------------------------------------ #
     # Loading
@@ -78,17 +90,52 @@ class MilvusStore:
         self.client.create_collection(self.collection, schema=self._schema(), index_params=self._indexes())
 
     def insert(self, chunks: Sequence[Chunk], embeddings: Embeddings, batch_size: int = 500) -> None:
+        self._write(self.client.insert, chunks, embeddings, batch_size)
+        self.client.load_collection(self.collection)
+
+    def upsert(self, chunks: Sequence[Chunk], embeddings: Embeddings, batch_size: int = 500) -> None:
+        """Insert new chunks, replace changed ones (same chunk id)."""
+        self._write(self.client.upsert, chunks, embeddings, batch_size)
+
+    def delete(self, chunk_ids: Sequence[str]) -> None:
+        if chunk_ids:
+            self.client.delete(self.collection, ids=list(chunk_ids))
+            self.client.flush(self.collection)
+
+    def _write(self, write, chunks: Sequence[Chunk], embeddings: Embeddings, batch_size: int) -> None:
         if embeddings.sparse is None:
             raise ValueError("bge-m3 embeddings with sparse vectors are required")
         for start in range(0, len(chunks), batch_size):
             rows = [_row(chunk, embeddings.dense[i], embeddings.sparse[i])
                     for i, chunk in enumerate(chunks[start:start + batch_size], start)]
-            self.client.insert(self.collection, rows)
+            write(self.collection, rows)
         self.client.flush(self.collection)
-        self.client.load_collection(self.collection)
 
     def count(self) -> int:
         return int(self.client.get_collection_stats(self.collection)["row_count"])
+
+    def exists(self) -> bool:
+        return self.client.has_collection(self.collection)
+
+    def content_hashes(self) -> dict[str, str]:
+        """``chunk_id → content hash`` of everything stored — what ingestion compares against."""
+        iterator = self.client.query_iterator(self.collection, batch_size=2000, filter="",
+                                              output_fields=["chunk_id", "content_hash"])
+        hashes: dict[str, str] = {}
+        try:
+            while batch := iterator.next():
+                hashes |= {row["chunk_id"]: row["content_hash"] for row in batch}
+        finally:
+            iterator.close()
+        return hashes
+
+    def fetch(self, chunk_ids: Sequence[str]) -> list[dict]:
+        """The stored chunks (:data:`CHUNK_FIELDS`) in the order of ``chunk_ids``."""
+        if not chunk_ids:
+            return []
+        rows = {row["chunk_id"]: row for row in self.client.get(self.collection, ids=list(chunk_ids),
+                                                                 output_fields=CHUNK_FIELDS)}
+        return [rows[cid] for cid in chunk_ids if cid in rows]
 
     # ------------------------------------------------------------------ #
     # Search
@@ -133,6 +180,7 @@ class MilvusStore:
         schema.add_field("related_urls", DataType.ARRAY, element_type=DataType.VARCHAR, max_length=_URL_BYTES,
                          max_capacity=_MAX_RELATED)
         schema.add_field("text", DataType.VARCHAR, max_length=_TEXT_BYTES)
+        schema.add_field("content_hash", DataType.VARCHAR, max_length=16)
         schema.add_field("lexical_text", DataType.VARCHAR, max_length=_TEXT_BYTES,
                          enable_analyzer=True, analyzer_params=LEXICAL_ANALYZER)
         schema.add_field("dense", DataType.FLOAT_VECTOR, dim=DENSE_DIMENSION)
@@ -166,10 +214,18 @@ def _row(chunk: Chunk, dense: np.ndarray, sparse: SparseVector) -> dict:
         "published": chunk.published.isoformat() if chunk.published else None,
         "related_urls": chunk.related_urls,
         "text": chunk.text,
+        "content_hash": content_hash(chunk),
         "lexical_text": lexical_form(chunk.text),
         "dense": dense.tolist(),
         "sparse": sparse,
     }
+
+
+def content_hash(chunk: Chunk) -> str:
+    """Changes whenever anything stored for the chunk changes (text or metadata)."""
+    payload = chunk.model_dump_json(include={"url", "title", "lang", "category", "categories", "chunk_type",
+                                             "is_active", "valid_until", "published", "related_urls", "text"})
+    return hashlib.sha256(payload.encode()).hexdigest()[:16]
 
 
 def _data(queries: Sequence[Query], field: str) -> list:

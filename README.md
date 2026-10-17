@@ -15,7 +15,7 @@ retrieved from a **Milvus** vector database and the model answers only from them
 | Web scraping (all textual content of abb-bank.az, AZ/EN/RU) | ✅ done — [scraper/](scraper/) |
 | Chunking + embedding model benchmark on Azerbaijani data | ✅ done — [retrieval/](retrieval/) |
 | Vector database (Milvus) — loaded and validated against the benchmark | ✅ done — [docker-compose.yml](docker-compose.yml) |
-| Backend microservices, OpenAI integration, guardrail | ⏳ planned |
+| Backend microservices (chat, analytics, ingestion, inference), OpenAI integration, guardrail | ✅ done — [services/](services/) |
 | Web UI (data upload, chat, analytics dashboard) | ⏳ planned |
 | Docker | ⏳ planned |
 
@@ -60,13 +60,30 @@ Recall@10 94 % / 92 %); the HNSW index returns 99.7 % of the exact top 10 and a
 hybrid search takes 4–10 ms. Report: [04_milvus_check.md](evaluation/reports/04_milvus_check.md).
 Details: [retrieval/README.md](retrieval/README.md).
 
+## Services
+
+Four FastAPI services talking JSON over HTTP (details: [services/README.md](services/README.md)):
+
+| Service | Port | Does |
+|---------|------|------|
+| **chat** | 8001 | question → (standalone rewrite) → Milvus hybrid search → reranking → OpenAI → guardrail checks → answer with cited sources |
+| **analytics** | 8002 | stores every question, answer and timestamp in PostgreSQL; statistics for the dashboard |
+| **ingestion** | 8003 | uploaded website data → chunks → Milvus; only new or changed chunks are embedded |
+| **inference** | 8004 | bge-m3 embeddings and bge-reranker-v2-m3 scores — the only service that needs a GPU |
+
+Every service has `GET /health` (process up) and `GET /ready` (dependencies reachable),
+carries an `X-Request-ID` through all calls and logs, and returns errors as JSON.
+If the reranker is slow or down, the chat service answers from Milvus' order instead of failing.
+
 ## Repository layout
 
 ```
 ├── scraper/              # abb-bank.az scraper (Python package `abb_scraper`)
 ├── retrieval/            # chunking, evaluation sets, embedding benchmark (`abb_retrieval`)
 ├── evaluation/           # question sets A and B + generated quality / benchmark reports
-├── docker-compose.yml    # Milvus (+ etcd, MinIO) and the Attu admin UI
+├── services/             # chat, analytics, ingestion, inference (FastAPI) + shared service_common
+├── scripts/smoke_test.py # end-to-end check of the running services
+├── docker-compose.yml    # Milvus (+ etcd, MinIO), Attu admin UI, PostgreSQL
 ├── tests/                # pytest test suite
 ├── data/                 # scraper output, chunks, embeddings — not committed, generated locally
 ├── REQUIREMENTS.md       # case study requirements tracker

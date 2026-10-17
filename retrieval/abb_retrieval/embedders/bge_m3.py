@@ -10,11 +10,12 @@ class BgeM3Embedder(Embedder):
     dimension = 1024
     model_id = "BAAI/bge-m3"
 
-    def __init__(self, batch_size: int = 16, use_fp16: bool = True) -> None:
+    def __init__(self, batch_size: int = 16, use_fp16: bool = True, devices: str | None = None) -> None:
+        """``devices``: "cuda", "cpu" … — ``None`` lets FlagEmbedding pick (all GPUs if any)."""
         from FlagEmbedding import BGEM3FlagModel
 
         self.batch_size = batch_size
-        self.model = BGEM3FlagModel(self.model_id, use_fp16=use_fp16)
+        self.model = BGEM3FlagModel(self.model_id, use_fp16=use_fp16, devices=devices)
 
     def embed_documents(self, texts: list[str]) -> Embeddings:
         return self._encode(texts)

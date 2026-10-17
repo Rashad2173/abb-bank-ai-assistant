@@ -18,7 +18,7 @@ class OpenAIEmbedder(Embedder):
         from dotenv import load_dotenv
         from openai import OpenAI
 
-        load_dotenv()
+        load_dotenv(override=True)  # the project's .env wins over a key inherited from the system environment
         if not os.getenv("OPENAI_API_KEY"):
             raise RuntimeError("OPENAI_API_KEY is not set (put it into the .env file)")
         self.client = OpenAI(max_retries=5)

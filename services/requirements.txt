@@ -1,0 +1,8 @@
+# Runtime dependencies of the services (Python >= 3.12), on top of retrieval/requirements.txt
+fastapi==0.143.3
+uvicorn[standard]==0.54.0
+pydantic-settings==2.16.0      # settings from environment / .env
+httpx==0.28.1                  # calls between services
+openai==3.31.0                 # chat service
+SQLAlchemy==2.1.5              # analytics service
+psycopg[binary]==3.3.6         # PostgreSQL driver
