@@ -8,6 +8,8 @@ Usage (from the ``retrieval/`` directory)::
     python -m abb_retrieval chunk       # data/chunks.jsonl + chunk quality report
     python -m abb_retrieval evalset     # map the questions' evidence to the current chunk ids
     python -m abb_retrieval benchmark   # embedding benchmark report
+    python -m abb_retrieval index       # load the chunks into Milvus (docker compose up -d first)
+    python -m abb_retrieval milvus-check  # both question sets through Milvus vs. the exact search
 
 ``--set b`` runs ``evalset`` / ``benchmark`` on the independent question set B
 (evaluation/question_set_b.json → evaluation/questions_b.jsonl).
@@ -18,6 +20,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 from pathlib import Path
 
 from .chunk_report import write_chunk_report
@@ -32,12 +35,13 @@ log = logging.getLogger("abb_retrieval")
 
 def main() -> None:
     parser = argparse.ArgumentParser(prog="abb_retrieval")
-    parser.add_argument("command", choices=("freeze", "chunk", "evalset", "benchmark"))
+    parser.add_argument("command", choices=("freeze", "chunk", "evalset", "benchmark", "index", "milvus-check"))
     parser.add_argument("--models", nargs="+", choices=MODEL_NAMES, default=list(MODEL_NAMES),
                         help="embedding models to benchmark (default: all)")
     parser.add_argument("--no-rerank", action="store_true", help="skip the reranker step of the benchmark")
     parser.add_argument("--set", choices=("a", "b"), default="a", dest="question_set",
                         help="evalset/benchmark: question set A (default) or the independent set B")
+    parser.add_argument("--milvus-uri", default=os.environ.get("MILVUS_URI", "http://localhost:19530"))
     parser.add_argument("--corpus", type=Path,
                         help="freeze: the corpus version the question set was written for (default: data/abb_pages.jsonl)")
     args = parser.parse_args()
@@ -52,6 +56,10 @@ def main() -> None:
         run_evalset_b(paths) if args.question_set == "b" else run_evalset(paths)
     elif args.command == "benchmark":
         run_benchmark_command(paths, args.models, rerank=not args.no_rerank, question_set=args.question_set)
+    elif args.command == "index":
+        run_index(paths, args.milvus_uri)
+    elif args.command == "milvus-check":
+        run_milvus_check(paths, args.milvus_uri)
 
 
 def run_chunking(paths: Paths, config: ChunkingConfig) -> None:
@@ -102,6 +110,32 @@ def run_benchmark_command(paths: Paths, models: list[str], rerank: bool, questio
     result = run_benchmark(chunks, questions, models, paths.embeddings_dir, rerank=rerank)
     report = write_benchmark_report(result, questions, chunks, paths.reports_dir, name=name, source=source)
     log.info("Benchmark report: %s", report)
+
+
+def run_index(paths: Paths, milvus_uri: str) -> None:
+    from .embedding_cache import EmbeddingCache
+    from .milvus_store import MilvusStore
+
+    chunks = load_chunks(paths.chunks)
+    cache = EmbeddingCache("bge-m3", paths.embeddings_dir)
+    embeddings, _ = cache.documents([c.text for c in chunks])
+    cache.release()
+    store = MilvusStore(milvus_uri)
+    store.recreate()
+    store.insert(chunks, embeddings)
+    log.info("Loaded %d chunks into Milvus collection %r", store.count(), store.collection)
+
+
+def run_milvus_check(paths: Paths, milvus_uri: str) -> None:
+    from .milvus_check import check, write_report
+    from .milvus_store import MilvusStore
+
+    chunks = load_chunks(paths.chunks)
+    question_sets = {"Set A": load_questions(paths.questions), "Set B": load_questions(paths.questions_b)}
+    results = check(MilvusStore(milvus_uri), chunks, question_sets, paths.embeddings_dir)
+    report = paths.reports_dir / "04_milvus_check.md"
+    write_report(results, len(chunks), report)
+    log.info("Milvus check report: %s", report)
 
 
 if __name__ == "__main__":

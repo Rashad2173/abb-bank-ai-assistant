@@ -17,7 +17,7 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 | 2.1 | **Data Upload** — user uploads the extracted data | ⬜ | |
 | 2.2 | Uploaded data is stored in the browser's **local storage** | ⬜ | |
 | 2.3 | Backend service that interacts with an **OpenAI LLM** | ⬜ | |
-| 2.4 | Extracted data formatted into a **vector database** (Milvus) compatible with OpenAI's requirements | 🟨 | `retrieval/` — chunks + embedding model chosen; Milvus next |
+| 2.4 | Extracted data formatted into a **vector database** (Milvus) compatible with OpenAI's requirements | ✅ | `retrieval/abb_retrieval/milvus_store.py`, `docker-compose.yml` — validated in `evaluation/reports/04_milvus_check.md` |
 | 2.5 | After successful processing, show a **chat interface** | ⬜ | |
 | 2.6 | Answers stay **within the context of ABB information** | ⬜ | |
 | 2.7 | **Microservice architecture** for question handling and response generation, communicating in **JSON** | ⬜ | |

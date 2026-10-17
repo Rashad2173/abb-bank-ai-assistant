@@ -9,6 +9,8 @@ right chunks most reliably.
 python -m abb_retrieval chunk               # data/chunks.jsonl + evaluation/reports/01_chunk_quality.md
 python -m abb_retrieval evalset [--set b]   # map a question set's evidence to the current chunk ids
 python -m abb_retrieval benchmark [--set b] # embedding benchmark report (GPU recommended)
+python -m abb_retrieval index               # load the chunks into Milvus (docker compose up -d first)
+python -m abb_retrieval milvus-check        # both question sets through Milvus vs. the exact search
 python -m abb_retrieval freeze --corpus data/abb_pages.v1-042c420d.jsonl   # once, set A only
 ```
 
@@ -96,6 +98,40 @@ open source and free to run, and the best fallback if the reranker is unavailabl
 **Cost of the reranker.** ~1 s per question on a GPU (RTX 4060 Laptop) but ~47 s
 on CPU — production needs a GPU host or a hosted reranker.
 
+## Milvus
+
+Collection `abb_chunks` (Milvus 3.0.2, see `docker-compose.yml`): the chunk text
+and metadata (URL, title, language, categories, campaign status, dates) plus three
+searchable representations.
+
+| Field | Index | Used for |
+|-------|-------|----------|
+| `dense` — bge-m3, 1 024 dims | HNSW (M 16, efConstruction 200), inner product; search ef 200 | meaning |
+| `sparse` — bge-m3 lexical weights | sparse inverted index, inner product | important words, learned |
+| `bm25` — generated inside Milvus from `lexical_text` | sparse inverted index, BM25 (k1 1.5, b 0.75) | exact keywords |
+| `lang`, `category`, `chunk_type` | inverted | filters |
+
+**Azerbaijani letters in keyword search.** Milvus' `lowercase` filter turns "İ"
+into "i̇" (i + combining dot), so "KREDİT" would not match "kredit", and its
+`asciifolding` turns "ə" into "a", while people typing without an Azerbaijani
+keyboard write "e" ("odenis" for "ödəniş"). `lexical_text` therefore maps
+İ/ı → i and ə → e before indexing (the same is done to queries); the analyzer
+folds the remaining letters (ş, ç, ğ, ö, ü).
+
+**Check** ([04_milvus_check.md](../evaluation/reports/04_milvus_check.md)) — both
+question sets through Milvus:
+
+| | Set A | Set B |
+|---|---:|---:|
+| HNSW index recall (share of the exact dense top 10 found) | 99.7 % | 99.7 % |
+| dense + sparse + reranker: Complete@5 | 84 / 100 (exact: 84) | 89 / 100 (exact: 89) |
+| dense + sparse + reranker: Recall@10 | 94 % (exact: 94 %) | 92 % (exact: 92 %) |
+| dense + BM25 (Milvus) + reranker: Complete@5 / Recall@10 | 84 / 92 % | 90 / 94 % |
+| Hybrid search latency per question | 4–10 ms | |
+
+Retrieval through Milvus reproduces the benchmark. Milvus' BM25 and bge-m3's
+sparse vectors perform the same after reranking; dense + sparse stays the default.
+
 ## Layout
 
 ```
@@ -107,7 +143,10 @@ abb_retrieval/
 ├── embedders/           # bge-m3, multilingual-e5, text-embedding-3-large behind one interface
 ├── search.py            # BM25, dense and sparse scoring, Reciprocal Rank Fusion
 ├── metrics.py           # Recall@k, Complete@k, MRR
-├── benchmark.py         # runs all methods with an embedding cache
+├── embedding_cache.py   # embeddings cached on disk, shared by all steps
+├── benchmark.py         # runs all methods (exact search)
+├── milvus_store.py      # Milvus schema, loading, hybrid search
+├── milvus_check.py      # question sets through Milvus vs. the exact search
 ├── benchmark_report.py  # Markdown / JSON / per-question CSV reports
 └── chunk_report.py      # chunk statistics + reviewable CSV
 ```

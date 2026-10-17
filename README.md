@@ -14,7 +14,7 @@ retrieved from a **Milvus** vector database and the model answers only from them
 |------|-------|
 | Web scraping (all textual content of abb-bank.az, AZ/EN/RU) | ✅ done — [scraper/](scraper/) |
 | Chunking + embedding model benchmark on Azerbaijani data | ✅ done — [retrieval/](retrieval/) |
-| Vector database (Milvus) | ⏳ next |
+| Vector database (Milvus) — loaded and validated against the benchmark | ✅ done — [docker-compose.yml](docker-compose.yml) |
 | Backend microservices, OpenAI integration, guardrail | ⏳ planned |
 | Web UI (data upload, chat, analytics dashboard) | ⏳ planned |
 | Docker | ⏳ planned |
@@ -54,6 +54,10 @@ With the reranker the models are within noise of each other; without it bge-m3
 is the most consistent across both sets (text-embedding-3-large drops from 81 %
 to 68 % Recall@5 on set B). bge-m3 is open source, produces dense and sparse
 vectors for Milvus hybrid search in one pass and needs no paid API.
+
+**In Milvus** the chosen pipeline gives exactly the benchmark's results (173 / 200,
+Recall@10 94 % / 92 %); the HNSW index returns 99.7 % of the exact top 10 and a
+hybrid search takes 4–10 ms. Report: [04_milvus_check.md](evaluation/reports/04_milvus_check.md).
 Details: [retrieval/README.md](retrieval/README.md).
 
 ## Repository layout
@@ -62,6 +66,7 @@ Details: [retrieval/README.md](retrieval/README.md).
 ├── scraper/              # abb-bank.az scraper (Python package `abb_scraper`)
 ├── retrieval/            # chunking, evaluation sets, embedding benchmark (`abb_retrieval`)
 ├── evaluation/           # question sets A and B + generated quality / benchmark reports
+├── docker-compose.yml    # Milvus (+ etcd, MinIO) and the Attu admin UI
 ├── tests/                # pytest test suite
 ├── data/                 # scraper output, chunks, embeddings — not committed, generated locally
 ├── REQUIREMENTS.md       # case study requirements tracker
@@ -88,6 +93,13 @@ python -m abb_retrieval evalset              # map set A's evidence to chunk ids
 python -m abb_retrieval benchmark            # → evaluation/reports/02_embedding_benchmark.md
 python -m abb_retrieval evalset --set b
 python -m abb_retrieval benchmark --set b    # → evaluation/reports/03_embedding_benchmark_set_b.md
+
+# Load the chunks into Milvus and check retrieval through it
+cd ..
+docker compose up -d                         # Milvus on :19530, Attu admin UI on http://localhost:8000
+cd retrieval
+python -m abb_retrieval index                # 9 604 chunks → collection abb_chunks
+python -m abb_retrieval milvus-check         # → evaluation/reports/04_milvus_check.md
 
 # Run the tests (from the repository root)
 cd ..

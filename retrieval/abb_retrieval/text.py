@@ -17,3 +17,19 @@ _I_VARIANTS = str.maketrans({"İ": "i", "I": "i", "ı": "i"})
 def fingerprint(text: str) -> str:
     """Key for comparing texts regardless of case and spacing."""
     return _WHITESPACE_RE.sub(" ", text).strip().translate(_I_VARIANTS).casefold()
+
+
+# Azerbaijani letters people type without an Azerbaijani keyboard: "ə" as "e",
+# "ı"/"İ" as "i". The other letters (ş, ç, ğ, ö, ü) are folded by the keyword
+# index's own analyzer (asciifolding).
+_LEXICAL_LETTERS = str.maketrans({"İ": "i", "I": "i", "ı": "i", "Ə": "e", "ə": "e"})
+
+
+def lexical_form(text: str) -> str:
+    """Text as the keyword (BM25) index sees it — applied to chunks and queries alike.
+
+    Milvus' lowercase filter turns "İ" into "i̇" (i + combining dot) and its
+    asciifolding turns "ə" into "a", so "KREDİT" would not match "kredit" and
+    "odenis" would not match "ödəniş" without this step.
+    """
+    return text.translate(_LEXICAL_LETTERS)
