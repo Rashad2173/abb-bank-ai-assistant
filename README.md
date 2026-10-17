@@ -80,7 +80,7 @@ If the reranker is slow or down, the chat service answers from Milvus' order ins
 ```
 ├── scraper/              # abb-bank.az scraper (Python package `abb_scraper`)
 ├── retrieval/            # chunking, evaluation sets, embedding benchmark (`abb_retrieval`)
-├── evaluation/           # question sets A and B + generated quality / benchmark reports
+├── evaluation/           # test sets (retrieval / guardrail / answers) + reports 00–07 — see evaluation/README.md
 ├── services/             # chat, analytics, ingestion, inference (FastAPI) + shared service_common
 ├── scripts/smoke_test.py # end-to-end check of the running services
 ├── docker-compose.yml    # Milvus (+ etcd, MinIO), Attu admin UI, PostgreSQL
