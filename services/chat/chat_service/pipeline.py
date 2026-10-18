@@ -13,6 +13,8 @@ from service_common import dependency, request_id
 from .config import Settings
 from .generator import Generator
 from .guardrail import check_answer
+from .prompts import with_quote
+from .query import QueryPlanner
 from .retrieval import Retriever
 from .schemas import ChatRequest, ChatResponse, Source, Timings
 
@@ -31,21 +33,23 @@ class ChatPipeline:
         self.retriever = retriever
         self.generator = generator
         self.settings = settings
+        self.planner = QueryPlanner(generator, settings.query_expansion, settings.procurement_filter)
 
     async def run(self, request: ChatRequest) -> Outcome:
         started = time.perf_counter()
         history = request.history[-self.settings.history_turns:]
+        message = with_quote(request.question, request.quote)
 
         step = time.perf_counter()
         with dependency("OpenAI", OpenAIError):
-            standalone = await self.generator.rewrite(request.question, history)
+            plan = await self.planner.plan(message, history, quoted=bool(request.quote))
         rewrite_ms = _ms_since(step)
 
-        retrieval = await self.retriever.retrieve(standalone)
+        retrieval = await self.retriever.retrieve(plan)
 
         step = time.perf_counter()
         with dependency("OpenAI", OpenAIError):
-            generation = await self.generator.answer(request.question, retrieval.chunks, history)
+            generation = await self.generator.answer(message, retrieval.chunks, history)
         generation_ms = _ms_since(step)
 
         checked = check_answer(generation, retrieval.chunks)
@@ -58,7 +62,8 @@ class ChatPipeline:
             refusal_reason=generation.refusal_reason,
             language=generation.language,
             sources=sources,
-            standalone_question=standalone,
+            standalone_question=plan.standalone,
+            search_queries=plan.queries,
             reranked=retrieval.reranked,
             model=self.settings.openai_chat_model,
             timings=timings,
@@ -70,7 +75,7 @@ class ChatPipeline:
             "request_id": response.request_id,
             "session_id": request.session_id,
             "question": request.question,
-            "standalone_question": standalone,
+            "standalone_question": plan.standalone,
             "answer": response.answer,
             "status": response.status,
             "refusal_reason": response.refusal_reason,

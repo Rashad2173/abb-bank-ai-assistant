@@ -11,6 +11,7 @@ from chat_service.guardrail import check_answer
 from chat_service.main import build_app
 from chat_service.pipeline import ChatPipeline
 from chat_service.prompts import format_sources
+from chat_service.query import is_about_procurement, is_proper_azerbaijani
 from chat_service.retrieval import Retriever
 from chat_service.schemas import ChatRequest, Turn
 from service_common.inference_client import EmbeddingResult
@@ -28,13 +29,15 @@ CHUNKS = {
 class FakeStore:
     collection = "abb_chunks"
 
-    def __init__(self, order=("b", "a", "c")):
+    def __init__(self, order=("b", "a", "c"), per_query=None):
         self.order = list(order)
+        self.per_query = per_query or {}
+        """Query text → its own ranking (default: ``order`` for every query)."""
         self.searches = []
 
-    def search(self, queries, method, limit):
-        self.searches.append((method, limit))
-        return [self.order[:limit]]
+    def search(self, queries, method, limit, filter=""):
+        self.searches.append((method, limit, filter, [q.text for q in queries]))
+        return [self.per_query.get(q.text, self.order)[:limit] for q in queries]
 
     def fetch(self, ids):
         return [CHUNKS[i] for i in ids]
@@ -49,7 +52,7 @@ class FakeInference:
         self.rerank_error = rerank_error
 
     async def embed(self, texts, kind="query"):
-        return EmbeddingResult(dense=[[0.6, 0.8]], sparse=[{1: 0.5}])
+        return EmbeddingResult(dense=[[0.6, 0.8]] * len(texts), sparse=[{1: 0.5}] * len(texts))
 
     async def rerank(self, query, documents, timeout=None):
         if self.rerank_error:
@@ -67,9 +70,12 @@ class FakeGenerator:
     def __init__(self, status="answered", answer="12 bankomat var [S1] [S2].", source_ids=("S1", "S2")):
         self.status, self.answer_text, self.source_ids = status, answer, list(source_ids)
         self.seen_chunks = None
+        self.planned = []
 
-    async def rewrite(self, question, history):
-        return f"{question} (standalone)" if history else question
+    async def plan_search(self, question, history):
+        self.planned.append(question)
+        standalone = f"{question} (standalone)" if history else question
+        return standalone, f"{standalone} [az]"
 
     async def answer(self, question, chunks, history):
         self.seen_chunks = list(chunks)
@@ -119,7 +125,7 @@ async def test_without_reranker_milvus_returns_only_the_context_size():
     settings = Settings(_env_file=None, openai_api_key="x", reranker="none", context_chunks=2)
     chat, generator = pipeline(settings=settings, store=store)
     await chat.run(ChatRequest(question="?"))
-    assert store.searches == [("dense+sparse", 2)]
+    assert [(method, limit) for method, limit, *_ in store.searches] == [("dense+sparse", 2)]
     assert len(generator.seen_chunks) == 2
 
 
@@ -127,6 +133,42 @@ async def test_history_is_rewritten_into_a_standalone_question():
     chat, _ = pipeline()
     outcome = await chat.run(ChatRequest(question="dollarla?", history=[Turn(role="user", content="Depozit faizi?")]))
     assert outcome.response.standalone_question == "dollarla? (standalone)"
+    assert outcome.response.search_queries == ["dollarla? (standalone)", "dollarla? (standalone) [az]"]
+
+
+async def test_proper_azerbaijani_needs_no_planning_call_and_skips_tenders():
+    store = FakeStore()
+    chat, generator = pipeline(store=store)
+    outcome = await chat.run(ChatRequest(question="Zaqatalada neçə bankomat var?"))
+    assert generator.planned == []
+    assert outcome.response.search_queries == ["Zaqatalada neçə bankomat var?"]
+    assert store.searches[0][2] == 'category != "procurement"'
+
+
+async def test_other_languages_are_also_searched_in_azerbaijani_and_fused():
+    question = "Сколько банкоматов ABB в Загатале?"
+    store = FakeStore(per_query={question: ["c", "b"], f"{question} [az]": ["a", "b"]})
+    chat, generator = pipeline(store=store, inference=FakeInference(rerank_error=RuntimeError("off")))
+    await chat.run(ChatRequest(question=question))
+    assert generator.planned == [question]
+    assert store.searches[0][3] == [question, f"{question} [az]"]
+    # "b" is in both lists → first after fusion; then the two first places
+    assert [c["chunk_id"] for c in generator.seen_chunks] == ["b", "c", "a"]
+
+
+async def test_procurement_questions_search_tender_notices():
+    store = FakeStore()
+    chat, _ = pipeline(store=store)
+    await chat.run(ChatRequest(question="PaloAlto tenderində iştirak üçün hansı sənədlər lazımdır?"))
+    assert store.searches[0][2] == ""
+
+
+def test_language_and_procurement_detection():
+    assert is_proper_azerbaijani("Kredit üçün hansı sənədlər lazımdır?")
+    assert not is_proper_azerbaijani("kredit ucun hansi senedler lazimdir")
+    assert not is_proper_azerbaijani("Какие документы нужны?")
+    assert is_about_procurement("Satınalmalar haqqında") and is_about_procurement("тендер на закупку")
+    assert not is_about_procurement("Kart məlumatlarımı soruşurlar")
 
 
 async def test_the_interaction_holds_question_answer_and_timings():
@@ -232,3 +274,16 @@ def test_ready_lists_its_dependencies(api):
     assert set(checks) == {"milvus", "inference", "openai"}
     assert checks["milvus"]["detail"] == "3 chunks in 'abb_chunks'"
     assert checks["openai"]["detail"] == "model gpt-6-luna available"
+
+
+async def test_a_quoted_passage_reaches_planning_and_answering():
+    chat, generator = pipeline()
+    await chat.run(ChatRequest(question="Hansılardır?", quote="Zaqatalada 12 bankomat var, 3-ü cash-in qəbul edir."))
+    assert len(generator.planned) == 1  # rewritten although the text contains "ə"
+    assert "Zaqatalada 12 bankomat var" in generator.planned[0] and generator.planned[0].endswith("Hansılardır?")
+
+
+def test_with_quote_leaves_plain_questions_alone():
+    from chat_service.prompts import with_quote
+    assert with_quote("Q?", None) == "Q?" and with_quote("Q?", "  ") == "Q?"
+    assert with_quote("Q?", "passage").startswith("The user is replying to this part of an earlier answer:")

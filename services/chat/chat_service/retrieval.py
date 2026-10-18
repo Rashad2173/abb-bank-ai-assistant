@@ -15,10 +15,12 @@ import numpy as np
 from starlette.concurrency import run_in_threadpool
 
 from abb_retrieval.milvus_store import MilvusStore, Query
+from abb_retrieval.search import reciprocal_rank_fusion
 from service_common import dependency
 from service_common.inference_client import InferenceClient
 
 from .config import Settings
+from .query import PROCUREMENT_FILTER, SearchPlan
 
 log = logging.getLogger(__name__)
 
@@ -38,13 +40,13 @@ class Retriever:
         self.inference = inference
         self.settings = settings
 
-    async def retrieve(self, question: str) -> Retrieval:
+    async def retrieve(self, plan: SearchPlan) -> Retrieval:
         started = time.perf_counter()
-        candidates = await self._candidates(question)
+        candidates = await self._candidates(plan)
         retrieval_ms = _ms_since(started)
 
         started = time.perf_counter()
-        scores = await self._rerank_scores(question, candidates)
+        scores = await self._rerank_scores(plan.standalone, candidates)
         rerank_ms = _ms_since(started)
 
         if scores is None:
@@ -56,13 +58,18 @@ class Retriever:
         return Retrieval(chunks=chunks[:self.settings.context_chunks], reranked=scores is not None,
                          retrieval_ms=retrieval_ms, rerank_ms=rerank_ms)
 
-    async def _candidates(self, question: str) -> list[dict]:
+    async def _candidates(self, plan: SearchPlan) -> list[dict]:
+        """Every query searched in Milvus; several result lists are fused with Reciprocal Rank Fusion."""
         with dependency("inference service"):
-            embedding = await self.inference.embed([question], kind="query")
-        query = Query(text=question, dense=np.asarray(embedding.dense[0], dtype=np.float32), sparse=embedding.sparse[0])
+            embedding = await self.inference.embed(plan.queries, kind="query")
+        queries = [Query(text=text, dense=np.asarray(embedding.dense[i], dtype=np.float32), sparse=embedding.sparse[i])
+                   for i, text in enumerate(plan.queries)]
         limit = self.settings.retrieval_candidates if self.settings.reranker == "http" else self.settings.context_chunks
+        search_filter = "" if plan.include_procurement else PROCUREMENT_FILTER
         with dependency("Milvus"):
-            ids = (await run_in_threadpool(self.store.search, [query], self.settings.retrieval_method, limit))[0]
+            rankings = await run_in_threadpool(self.store.search, queries, self.settings.retrieval_method, limit,
+                                               search_filter)
+            ids = rankings[0] if len(rankings) == 1 else reciprocal_rank_fusion(*([r] for r in rankings), top_k=limit)[0]
             return await run_in_threadpool(self.store.fetch, ids)
 
     async def _rerank_scores(self, question: str, candidates: list[dict]) -> list[float] | None:

@@ -26,6 +26,8 @@ class ChatRequest(BaseModel):
     history: list[Turn] = Field(default_factory=list, max_length=20)
     """Earlier turns of the conversation, oldest first — lets "and in dollars?" be understood."""
     session_id: str | None = Field(default=None, max_length=64)
+    quote: str | None = Field(default=None, max_length=2000)
+    """A passage of an earlier answer the user is replying to ("which ones?" about a quoted list)."""
 
     @field_validator("question")
     @classmethod
@@ -62,7 +64,9 @@ class ChatResponse(BaseModel):
     sources: list[Source]
     """The sources the answer cites, in citation order."""
     standalone_question: str
-    """The question that was searched (rewritten when there was history)."""
+    """The question, understandable without the conversation (rewritten when there was history)."""
+    search_queries: list[str]
+    """What was searched: the question, plus its Azerbaijani version for other languages."""
     reranked: bool
     """False when the reranker was off or unavailable (Milvus' order was used)."""
     model: str

@@ -9,7 +9,7 @@ from datetime import UTC, date, datetime, timedelta
 
 from openai import AsyncOpenAI
 
-from .prompts import OUTPUT_SCHEMA, REWRITE_PROMPT, format_sources, system_prompt
+from .prompts import OUTPUT_SCHEMA, SEARCH_PROMPT, SEARCH_SCHEMA, format_sources, system_prompt
 from .schemas import Turn
 
 BAKU_OFFSET = timedelta(hours=4)  # Azerbaijan: UTC+4 all year
@@ -33,18 +33,19 @@ class Generator:
         self.model = model
         self.reasoning_effort = reasoning_effort
 
-    async def rewrite(self, question: str, history: Sequence[Turn]) -> str:
-        """A standalone version of ``question`` for retrieval ("and in dollars?" → full question)."""
-        if not history:
-            return question
+    async def plan_search(self, question: str, history: Sequence[Turn]) -> tuple[str, str]:
+        """``(standalone question, the same in Azerbaijani)`` — see :mod:`query`."""
         response = await self.client.responses.create(
             model=self.model,
-            instructions=REWRITE_PROMPT,
+            instructions=SEARCH_PROMPT,
             input=[*_messages(history), {"role": "user", "content": question}],
+            text={"format": {"type": "json_schema", "name": "search", "schema": SEARCH_SCHEMA, "strict": True}},
             reasoning={"effort": "low"},
             max_output_tokens=1000,
         )
-        return response.output_text.strip() or question
+        data = json.loads(response.output_text)
+        standalone = data["standalone_question"].strip() or question
+        return standalone, data["azerbaijani_question"].strip() or standalone
 
     async def answer(self, question: str, chunks: Sequence[dict], history: Sequence[Turn]) -> Generation:
         response = await self.client.responses.create(

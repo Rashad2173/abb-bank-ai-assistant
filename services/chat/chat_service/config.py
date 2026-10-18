@@ -28,6 +28,10 @@ class Settings(ServiceSettings):
     """Reranked chunks below this relevance (0–1) are not given to the LLM; 0 keeps all."""
     reranker: Literal["http", "none"] = "http"
     """``http``: the inference service's reranker; ``none``: Milvus' order."""
+    query_expansion: bool = True
+    """Also search non-Azerbaijani questions in Azerbaijani (see :mod:`query`)."""
+    procurement_filter: bool = True
+    """Leave tender notices out unless the question is about procurement."""
 
     # Limits and timeouts (seconds)
     history_turns: int = 6
