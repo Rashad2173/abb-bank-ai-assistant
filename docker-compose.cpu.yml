@@ -1,0 +1,15 @@
+# Machine without an NVIDIA GPU:
+#   docker compose -f docker-compose.yml -f docker-compose.cpu.yml up -d --build
+#
+# The embedding model runs on the CPU (fine for questions). The reranker is
+# switched off — on a CPU it needs ~45 s per question — so the chat answers from
+# Milvus' hybrid order (lower accuracy, see evaluation/reports/02).
+services:
+  inference:
+    deploy: !reset {}
+    environment:
+      INFERENCE_DEVICE: cpu
+      INFERENCE_LOAD_RERANKER: "false"
+  chat:
+    environment:
+      RERANKER: none

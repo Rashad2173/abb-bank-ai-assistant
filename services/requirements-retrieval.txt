@@ -1,0 +1,8 @@
+# What the API services need from retrieval/abb_retrieval (Milvus store, chunker, search helpers).
+# The full retrieval/requirements.txt adds PyTorch and the embedding models for the benchmark;
+# in the containers only the inference service has those.
+numpy==2.5.4
+scipy==1.18.1
+pydantic==2.14.1
+pymilvus==3.0.2
+python-dotenv==1.2.4

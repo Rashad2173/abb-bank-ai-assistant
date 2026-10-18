@@ -1,6 +1,12 @@
-# ABB Bank AI Assistant — local stack.
+# ABB Bank AI Assistant — the whole application.
 #
-#   docker compose up -d        # Milvus (+ etcd, MinIO), Attu admin UI, PostgreSQL
+#   docker compose up -d --build          # → http://localhost:8080   (Attu, the Milvus UI: :8000)
+#   docker compose -f docker-compose.yml -f docker-compose.cpu.yml up -d --build   # machine without a GPU
+#
+# Put OPENAI_API_KEY into .env first (see .env.example). On the first start the
+# inference service downloads its two models (~4.5 GB) into the `models` volume.
+# The search index starts empty: open the UI and learn the site from its link
+# (or upload abb_pages.jsonl) — the chat opens once the data is processed.
 #
 # Milvus services follow the official standalone compose file of Milvus v3.0.2;
 # data lives in named volumes instead of bind-mounted folders.
@@ -119,7 +125,92 @@ services:
       timeout: 5s
       retries: 5
 
+  # ------------------------------------------------------------------ #
+  # Application services (services/Dockerfile, one target each)
+  # ------------------------------------------------------------------ #
+  inference:
+    build: { context: ., dockerfile: services/Dockerfile, target: inference }
+    restart: unless-stopped
+    environment:
+      INFERENCE_DEVICE: auto
+    volumes:
+      - models:/models
+    ports:
+      - "8004:8004"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  chat:
+    build: { context: ., dockerfile: services/Dockerfile, target: chat }
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      MILVUS_URI: http://milvus:19530
+      INFERENCE_URL: http://inference:8004
+      ANALYTICS_URL: http://analytics:8002
+    ports:
+      - "8001:8001"
+    depends_on:
+      milvus: { condition: service_healthy }
+      analytics: { condition: service_healthy }
+
+  analytics:
+    build: { context: ., dockerfile: services/Dockerfile, target: analytics }
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg://abb:abb@postgres:5432/abb_analytics
+    ports:
+      - "8002:8002"
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  ingestion:
+    build: { context: ., dockerfile: services/Dockerfile, target: ingestion }
+    restart: unless-stopped
+    environment:
+      MILVUS_URI: http://milvus:19530
+      INFERENCE_URL: http://inference:8004
+    volumes:
+      - models:/models
+    ports:
+      - "8003:8003"
+    depends_on:
+      milvus: { condition: service_healthy }
+
+  scraper:
+    build: { context: ., dockerfile: services/Dockerfile, target: scraper }
+    restart: unless-stopped
+    environment:
+      INGESTION_URL: http://ingestion:8003
+    volumes:
+      # Page cache + output. SCRAPER_DATA=./data reuses a local cache (no 30-minute first crawl).
+      - ${SCRAPER_DATA:-scraper-data}:/data
+    ports:
+      - "8005:8005"
+    depends_on:
+      ingestion: { condition: service_healthy }
+
+  frontend:
+    build: { context: frontend }
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - chat
+      - analytics
+      - ingestion
+      - scraper
+
 volumes:
+  models:
+  scraper-data:
   postgres-data:
   milvus-data:
   etcd-data:

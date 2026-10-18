@@ -14,24 +14,24 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 ## 2. Web Application
 | # | Requirement | Status | Where |
 |---|-------------|--------|-------|
-| 2.1 | **Data Upload** — user uploads the extracted data | ⬜ | |
-| 2.2 | Uploaded data is stored in the browser's **local storage** | ⬜ | |
-| 2.3 | Backend service that interacts with an **OpenAI LLM** | ⬜ | |
+| 2.1 | **Data Upload** — user uploads the extracted data | ✅ | UI → Data: `abb_pages.jsonl` (also PDF/TXT documents, or the site learned from its link) → `services/ingestion` |
+| 2.2 | Uploaded data is stored in the browser's **local storage** | ✅ | `frontend/src/storage.ts` — gzip + 15-bit packing: 21 MB → 1.5 M characters (fits the ~5 MB quota) |
+| 2.3 | Backend service that interacts with an **OpenAI LLM** | ✅ | `services/chat` — gpt-6-luna, structured JSON answers |
 | 2.4 | Extracted data formatted into a **vector database** (Milvus) compatible with OpenAI's requirements | ✅ | `retrieval/abb_retrieval/milvus_store.py`, `docker-compose.yml` — validated in `evaluation/reports/04_milvus_check.md` |
-| 2.5 | After successful processing, show a **chat interface** | ⬜ | |
-| 2.6 | Answers stay **within the context of ABB information** | ⬜ | |
-| 2.7 | **Microservice architecture** for question handling and response generation, communicating in **JSON** | ⬜ | |
-| 2.8 | Store **questions, answers and timestamps** in a database | ⬜ | |
+| 2.5 | After successful processing, show a **chat interface** | ✅ | The chat unlocks when the index holds processed data; first visits start on the data step |
+| 2.6 | Answers stay **within the context of ABB information** | ✅ | Guardrail: 80 / 80 on an independent adversarial set (`evaluation/reports/06_guardrail_independent.md`) |
+| 2.7 | **Microservice architecture** for question handling and response generation, communicating in **JSON** | ✅ | chat, inference, analytics, ingestion, scraper (`services/`) — JSON over HTTP, Swagger at `/docs` |
+| 2.8 | Store **questions, answers and timestamps** in a database | ✅ | `services/analytics` — PostgreSQL table `interactions` |
 
 ## 3. Data Visualization
 | # | Requirement | Status | Where |
 |---|-------------|--------|-------|
-| 3.1 | Charting library visualizes stored questions/answers (insights into user interactions) | ⬜ | |
+| 3.1 | Charting library visualizes stored questions/answers (insights into user interactions) | ✅ | UI → Dashboard (Recharts): per day / hour, outcomes, languages, refusal reasons, latency, top sources |
 
 ## 4. Containerization
 | # | Requirement | Status | Where |
 |---|-------------|--------|-------|
-| 4.1 | Application and dependencies packaged as Docker image(s) | ⬜ | |
+| 4.1 | Application and dependencies packaged as Docker image(s) | ✅ | `services/Dockerfile` (one target per service), `frontend/Dockerfile`, `docker-compose.yml` — `docker compose up -d --build` |
 
 ## Evaluation criteria (apply to everything)
 - **Functionality** — meets the requirements above and works as intended

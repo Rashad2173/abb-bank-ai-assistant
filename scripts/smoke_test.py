@@ -22,6 +22,7 @@ SERVICES = {
     "analytics": "http://localhost:8002",
     "ingestion": "http://localhost:8003",
     "inference": "http://localhost:8004",
+    "scraper": "http://localhost:8005",
 }
 
 QUESTIONS = [
