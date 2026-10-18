@@ -21,8 +21,14 @@ class Page(BaseModel):
     faq: list[dict] = Field(default_factory=list)
 
 
+IngestMode = Literal["replace", "append"]
+"""* ``replace`` — the upload becomes the whole knowledge base (chunks not in it are deleted),
+* ``append``  — new and changed chunks are added, nothing is deleted (same URL = updated)."""
+
+
 class IngestRequest(BaseModel):
     pages: list[Page] = Field(min_length=1)
+    mode: IngestMode = "replace"
 
 
 JobStatus = Literal["queued", "chunking", "comparing", "embedding", "writing", "done", "failed"]
@@ -31,6 +37,7 @@ JobStatus = Literal["queued", "chunking", "comparing", "embedding", "writing", "
 class Job(BaseModel):
     job_id: str
     status: JobStatus
+    mode: IngestMode = "replace"
     pages: int
     chunks: int = 0
     unchanged: int = 0

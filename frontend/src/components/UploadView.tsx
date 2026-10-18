@@ -6,7 +6,7 @@ import { api, ApiError } from "../api";
 import { errorText, useI18n } from "../i18n";
 import { parseData, ParseError, type ParsedData } from "../parse";
 import { clearData, loadData, loadMeta, saveData, type StoredMeta } from "../storage";
-import type { CorpusInfo, IngestJob, JobStatus } from "../types";
+import type { CorpusInfo, IngestJob, IngestMode, JobStatus } from "../types";
 
 const POLL_MS = 1500;
 const STEPS: JobStatus[] = ["chunking", "comparing", "embedding", "writing", "done"];
@@ -26,6 +26,12 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
   const [job, setJob] = useState<IngestJob | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
+  // With data already indexed, adding is the safe default: replacing deletes what the upload lacks.
+  const [mode, setMode] = useState<IngestMode>("replace");
+  const modeChosen = useRef(false);
+  useEffect(() => {
+    if (!modeChosen.current) setMode((corpus?.chunks ?? 0) > 0 ? "append" : "replace");
+  }, [corpus?.chunks]);
   const input = useRef<HTMLInputElement>(null);
   const polling = useRef<number | null>(null);
 
@@ -67,7 +73,7 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
         setError(errorText(t, "empty"));
         return;
       }
-      const started = await api.ingest(data.pages);
+      const started = await api.ingest(data.pages, mode);
       setJob(started);
       polling.current = window.setInterval(async () => {
         try {
@@ -157,7 +163,7 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
               {savedLocally !== null && (
                 <div className={savedLocally ? "hint-ok" : "hint-warn"}>
                   {savedLocally ? t.savedLocally : t.notSavedLocally}
-                  {savedLocally && meta && ` · ${(meta.characters / 1e6).toFixed(1)} M`}
+                  {savedLocally && meta && ` · ${formatSize(meta.characters)}`}
                 </div>
               )}
             </div>
@@ -175,6 +181,19 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
             </div>
           )}
 
+          <fieldset className="mode" disabled={busy}>
+            <legend className="label">{t.modeTitle}</legend>
+            {(["append", "replace"] as IngestMode[]).map((option) => (
+              <label key={option} className={`mode-option ${mode === option ? "mode-active" : ""}`}>
+                <input type="radio" name="mode" value={option} checked={mode === option} onChange={() => { modeChosen.current = true; setMode(option); }} />
+                <span>
+                  <strong>{option === "append" ? t.modeAppend : t.modeReplace}</strong>
+                  <span className="muted">{option === "append" ? t.modeAppendHint : t.modeReplaceHint}</span>
+                </span>
+              </label>
+            ))}
+          </fieldset>
+
           {job && <JobProgress job={job} />}
 
           <div className="card-actions">
@@ -190,6 +209,11 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
       )}
     </section>
   );
+}
+
+/** Stored characters as "1.5 M" / "23 K". */
+function formatSize(characters: number): string {
+  return characters >= 1e6 ? `${(characters / 1e6).toFixed(1)} M` : `${Math.max(1, Math.round(characters / 1e3))} K`;
 }
 
 /** The upload kept in localStorage from an earlier visit. */

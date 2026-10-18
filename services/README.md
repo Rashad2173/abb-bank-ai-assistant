@@ -52,7 +52,7 @@ Interactive API docs: `http://localhost:<port>/docs`.
 | `POST analytics /v1/interactions` | one interaction (sent by chat) → stored row with `id`, `created_at` |
 | `GET analytics /v1/interactions` | `?limit&offset&status` → `{items, total}`, newest first |
 | `GET analytics /v1/stats` | `?days=30` → totals by status / refusal reason / language, per day, per hour, latency p50/p95, reranker and citation shares, tokens, top sources |
-| `POST ingestion /v1/ingest` | `{pages: [...]}` (the `abb_pages.jsonl` format) → `202` job |
+| `POST ingestion /v1/ingest` | `{pages: [...], mode: replace \| append}` (the `abb_pages.jsonl` format) → `202` job. `replace`: the upload becomes the knowledge base; `append`: added, nothing deleted (`scripts/wikipedia_to_pages.py` builds such a file from Wikipedia) |
 | `GET ingestion /v1/ingest/{id}` | job progress: `chunking → comparing → embedding → writing → done/failed` |
 | `GET ingestion /v1/corpus` | chunks in Milvus + last job |
 | `POST inference /v1/embed` | `{texts, kind: query/document}` → `{dense, sparse}` |

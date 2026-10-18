@@ -1,7 +1,7 @@
 // Calls to the services. All go through /api/<service> — the Vite dev proxy or nginx
 // forwards them, so the browser only ever talks to its own origin.
 
-import type { ChatResponse, CorpusInfo, IngestJob, Interaction, Page, Stats, Turn } from "./types";
+import type { ChatResponse, CorpusInfo, IngestJob, IngestMode, Interaction, Page, Stats, Turn } from "./types";
 
 export class ApiError extends Error {
   constructor(
@@ -44,8 +44,8 @@ export const api = {
       body: JSON.stringify({ question, history, session_id: sessionId, quote: quote || null }),
     }),
 
-  ingest: (pages: Page[]) =>
-    call<IngestJob>("/api/ingestion/v1/ingest", { method: "POST", body: JSON.stringify({ pages }) }),
+  ingest: (pages: Page[], mode: IngestMode) =>
+    call<IngestJob>("/api/ingestion/v1/ingest", { method: "POST", body: JSON.stringify({ pages, mode }) }),
 
   job: (jobId: string) => call<IngestJob>(`/api/ingestion/v1/ingest/${jobId}`),
 

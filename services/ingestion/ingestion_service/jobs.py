@@ -18,7 +18,7 @@ from abb_retrieval.models import Chunk
 from abb_retrieval.tokens import TokenCounter
 from service_common.inference_client import InferenceClient
 
-from .schemas import Job
+from .schemas import IngestMode, Job
 
 log = logging.getLogger(__name__)
 
@@ -38,10 +38,11 @@ class Ingestor:
         self.last_job: Job | None = None
         self._task: asyncio.Task | None = None
 
-    def start(self, pages: list[dict]) -> Job:
+    def start(self, pages: list[dict], mode: IngestMode = "replace") -> Job:
         if self._task is not None and not self._task.done():
             raise JobRunning(f"Job {self.last_job.job_id} is still running")
-        job = Job(job_id=uuid.uuid4().hex[:12], status="queued", pages=len(pages), started_at=datetime.now(UTC))
+        job = Job(job_id=uuid.uuid4().hex[:12], status="queued", mode=mode, pages=len(pages),
+                  started_at=datetime.now(UTC))
         self.jobs[job.job_id] = self.last_job = job
         self._task = asyncio.create_task(self._run(job, pages))
         return job
@@ -60,7 +61,8 @@ class Ingestor:
             job.status = "comparing"
             stored = await run_in_threadpool(self._stored_hashes)
             changed = [c for c in chunks if stored.get(c.chunk_id) != content_hash(c)]
-            removed = sorted(set(stored) - {c.chunk_id for c in chunks})
+            # Replace: what the upload no longer contains goes. Append: everything stored stays.
+            removed = sorted(set(stored) - {c.chunk_id for c in chunks}) if job.mode == "replace" else []
             job.unchanged, job.to_embed = len(chunks) - len(changed), len(changed)
 
             if changed:

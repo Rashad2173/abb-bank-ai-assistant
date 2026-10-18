@@ -38,11 +38,14 @@ export interface Turn {
   content: string;
 }
 
+export type IngestMode = "replace" | "append";
+
 export type JobStatus = "queued" | "chunking" | "comparing" | "embedding" | "writing" | "done" | "failed";
 
 export interface IngestJob {
   job_id: string;
   status: JobStatus;
+  mode: IngestMode;
   pages: number;
   chunks: number;
   unchanged: number;

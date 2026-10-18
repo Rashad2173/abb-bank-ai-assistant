@@ -44,7 +44,7 @@ def build_app(settings: Settings | None = None, count_tokens: TokenCounter | Non
         if len(body.pages) > settings.max_pages:
             raise HTTPException(413, f"At most {settings.max_pages} pages per upload")
         try:
-            return request.app.state.ingestor.start([page.model_dump() for page in body.pages])
+            return request.app.state.ingestor.start([page.model_dump() for page in body.pages], body.mode)
         except JobRunning as exc:
             raise HTTPException(409, str(exc)) from exc
 

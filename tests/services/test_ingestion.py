@@ -122,3 +122,28 @@ def test_api_upload_and_job_status():
         assert client.get("/v1/ingest/unknown").status_code == 404
         assert client.post("/v1/ingest", json={"pages": []}).status_code == 422
         assert client.post("/v1/ingest", json={"pages": [{"url": "x"}]}).status_code == 422
+
+
+async def test_append_mode_adds_without_deleting():
+    store, inference = MemoryStore(), CountingInference()
+    ingestor = Ingestor(store, inference, word_count, embed_batch=8)
+    await run(ingestor, PAGES)
+
+    wiki = [page("https://az.wikipedia.org/wiki/ABB", "ABB 1992-ci ildə yaradılıb və Bakıda yerləşir.", title="ABB")]
+    added = ingestor.start(wiki, mode="append")
+    await ingestor.wait()
+    assert added.status == "done" and added.mode == "append"
+    assert added.to_embed == 1 and added.deleted == 0 and store.count() == 3
+
+    replaced = await run(ingestor, wiki)  # default: replace
+    assert replaced.deleted == 2 and store.count() == 1
+
+
+def test_api_passes_the_mode():
+    app = build_app(Settings(_env_file=None), count_tokens=word_count)
+    with TestClient(app) as client:
+        app.state.store = MemoryStore()
+        app.state.ingestor = Ingestor(app.state.store, CountingInference(), word_count, embed_batch=8)
+        job = client.post("/v1/ingest", json={"pages": PAGES, "mode": "append"}).json()
+        assert job["mode"] == "append"
+        assert client.post("/v1/ingest", json={"pages": PAGES, "mode": "merge"}).status_code == 422
