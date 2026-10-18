@@ -10,8 +10,19 @@ import { errorText, useI18n } from "../i18n";
 import type { Source, Turn } from "../types";
 
 const HISTORY_TURNS = 6;
+const SIDEBAR_KEY = "abb.sidebar";
+const MOBILE = "(max-width: 720px)";
 const MAX_QUOTE = 1500;
 const CITATION_RE = /\[(S\d+)\]/g;
+
+function initialSidebar(): boolean {
+  if (window.matchMedia(MOBILE).matches) return false;
+  try {
+    return localStorage.getItem(SIDEBAR_KEY) !== "closed";
+  } catch {
+    return true;
+  }
+}
 
 function plain(answer: string): string {
   return answer.replace(/\s?\[S\d+\]/g, "").trim();
@@ -23,7 +34,7 @@ export function ChatView() {
   const [draft, setDraft] = useState("");
   const [quote, setQuote] = useState<string | null>(null);
   const [pendingIn, setPendingIn] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(initialSidebar);
   const selection = useRef<{ id: string; text: string } | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -67,10 +78,24 @@ export function ChatView() {
     inputRef.current?.focus();
   }
 
+  function setSidebar(next: boolean) {
+    setSidebarOpen(next);
+    try {
+      localStorage.setItem(SIDEBAR_KEY, next ? "open" : "closed");
+    } catch {
+      /* not remembered — fine */
+    }
+  }
+
+  /** On a phone the sidebar is a drawer over the chat — close it after a choice. */
+  function closeOnMobile() {
+    if (window.matchMedia(MOBILE).matches) setSidebarOpen(false);
+  }
+
   function open(id: string) {
     select(id);
     setQuote(null);
-    setSidebarOpen(false);
+    closeOnMobile();
   }
 
   function submit(event: FormEvent) {
@@ -79,10 +104,14 @@ export function ChatView() {
   }
 
   return (
-    <div className={`chat-layout ${sidebarOpen ? "sidebar-open" : ""}`}>
-      <aside className="sidebar" aria-label={t.conversations}>
-        <button className="button button-primary new-chat" disabled={pending} onClick={() => { start(); setSidebarOpen(false); }}>
-          + {t.newChat}
+    <div className={`chat-layout ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`}>
+      <aside className="sidebar" aria-label={t.conversations} aria-hidden={!sidebarOpen}>
+        <div className="sidebar-head">
+          <span className="label">{t.conversations}</span>
+          <button className="icon-button" onClick={() => setSidebar(false)} aria-label={t.hideChats} title={t.hideChats}>«</button>
+        </div>
+        <button className="button new-chat" disabled={pending} onClick={() => { start(); closeOnMobile(); }}>
+          <span aria-hidden>＋</span> {t.newChat}
         </button>
         <ul className="conversation-list">
           {conversations.filter((c) => c.messages.length || c.id === active.id).map((c) => (
@@ -91,71 +120,77 @@ export function ChatView() {
           ))}
         </ul>
       </aside>
+      {sidebarOpen && <div className="sidebar-backdrop" onClick={() => setSidebar(false)} aria-hidden />}
 
       <section className="chat">
-        <button className="link-button sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} aria-expanded={sidebarOpen}>
-          ☰ {t.conversations}
-        </button>
+        {!sidebarOpen && (
+          <button className="icon-button sidebar-show" onClick={() => setSidebar(true)} aria-label={t.showChats} title={t.showChats}>☰</button>
+        )}
         <div className="chat-log" aria-live="polite">
-          {messages.length === 0 && (
-            <div className="welcome">
-              <p>{t.welcome}</p>
-              <div className="examples">
-                {t.examples.map((example) => (
-                  <button key={example} className="chip chip-button" onClick={() => ask(example)}>{example}</button>
-                ))}
+          <div className="chat-column">
+            {messages.length === 0 && (
+              <div className="welcome">
+                <p>{t.welcome}</p>
+                <div className="examples">
+                  {t.examples.map((example) => (
+                    <button key={example} className="chip chip-button" onClick={() => ask(example)}>{example}</button>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {messages.map((message) =>
-            message.role === "user" ? (
-              <div key={message.id} className="msg msg-user">
-                {message.quote && <blockquote className="msg-quote">{message.quote}</blockquote>}
-                <p>{message.content}</p>
+            {messages.map((message) =>
+              message.role === "user" ? (
+                <div key={message.id} className="msg msg-user">
+                  {message.quote && <blockquote className="msg-quote">{message.quote}</blockquote>}
+                  <p>{message.content}</p>
+                </div>
+              ) : (
+                <AssistantMessage
+                  key={message.id}
+                  message={message}
+                  onSelect={(text) => (selection.current = { id: message.id, text })}
+                  onQuote={() => quoteMessage(message)}
+                />
+              ),
+            )}
+
+            {pendingIn === active.id && (
+              <div className="msg msg-assistant msg-pending">
+                <span className="dots" aria-hidden><i /><i /><i /></span> {t.thinking}
               </div>
-            ) : (
-              <AssistantMessage
-                key={message.id}
-                message={message}
-                onSelect={(text) => (selection.current = { id: message.id, text })}
-                onQuote={() => quoteMessage(message)}
-              />
-            ),
-          )}
-
-          {pendingIn === active.id && (
-            <div className="msg msg-assistant msg-pending">
-              <span className="dots" aria-hidden><i /><i /><i /></span> {t.thinking}
-            </div>
-          )}
-          <div ref={bottom} />
+            )}
+            <div ref={bottom} />
+          </div>
         </div>
 
         <form className="composer" onSubmit={submit}>
-          {quote && (
-            <div className="quote-bar">
-              <span className="label">{t.quoting}</span>
-              <span className="quote-text">{quote}</span>
-              <button type="button" className="icon-button" aria-label={t.removeQuote} onClick={() => setQuote(null)}>×</button>
+          <div className="chat-column">
+            {quote && (
+              <div className="quote-bar">
+                <span className="label">{t.quoting}</span>
+                <span className="quote-text">{quote}</span>
+                <button type="button" className="icon-button" aria-label={t.removeQuote} onClick={() => setQuote(null)}>×</button>
+              </div>
+            )}
+            <div className="composer-row">
+              <textarea
+                ref={inputRef}
+                value={draft}
+                maxLength={1000}
+                rows={1}
+                placeholder={t.chatPlaceholder}
+                onChange={(event) => setDraft(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && !event.shiftKey) {
+                    event.preventDefault();
+                    ask(draft);
+                  }
+                }}
+              />
+              <button className="button button-primary" disabled={pending || !draft.trim()}>{t.send}</button>
             </div>
-          )}
-          <div className="composer-row">
-            <textarea
-              ref={inputRef}
-              value={draft}
-              maxLength={1000}
-              rows={1}
-              placeholder={t.chatPlaceholder}
-              onChange={(event) => setDraft(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" && !event.shiftKey) {
-                  event.preventDefault();
-                  ask(draft);
-                }
-              }}
-            />
-            <button className="button button-primary" disabled={pending || !draft.trim()}>{t.send}</button>
+            <p className="disclaimer">{t.disclaimer}</p>
           </div>
         </form>
       </section>

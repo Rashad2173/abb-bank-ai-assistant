@@ -96,7 +96,7 @@ export default function App() {
 
   return (
     <I18nContext.Provider value={i18n}>
-      <div className="app">
+      <div className={`app ${tab === "chat" && chatReady ? "app-chat" : ""}`}>
         <header className="topbar">
           <div className="brand">
             <img className="brand-logo" src="/abb-logo.png" alt="ABB — Azərbaycan Beynəlxalq Bankı" height={30} />
@@ -129,7 +129,7 @@ export default function App() {
           </select>
         </header>
 
-        <main className="content">
+        <main className={`content ${tab === "chat" && chatReady ? "content-full" : ""}`}>
           {tab === "data" && (
             <UploadView
               corpus={corpus}
@@ -147,7 +147,7 @@ export default function App() {
             </Suspense>
           )}
         </main>
-        <footer className="footer">{t.footer}</footer>
+        {!(tab === "chat" && chatReady) && <footer className="footer">{t.footer}</footer>}
       </div>
     </I18nContext.Provider>
   );
