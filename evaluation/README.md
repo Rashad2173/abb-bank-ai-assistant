@@ -18,8 +18,10 @@ evaluation/
 | [02](reports/02_embedding_benchmark.md) / [03](reports/03_embedding_benchmark_set_b.md) embedding benchmark | 3 models × search methods, exact search | retrieval set A / set B (100 + 100) | bge-m3 dense + sparse + reranker: 173 / 200 with all evidence in the top 5, Recall@10 93 % |
 | [04_milvus_check](reports/04_milvus_check.md) | the same through Milvus | sets A + B | identical to exact search; HNSW recall 99.7 %; 4–10 ms per search |
 | [05_guardrail](reports/05_guardrail.md) | refusals, greetings, no false refusals, no prompt leaks | `guardrail/guardrail_set.json` (64) | 64 / 64 — after tuning the rules on this set |
-| [06_guardrail_independent](reports/06_guardrail_independent.md) | the same, written independently and harder | `guardrail/guardrail_set_independent.json` (80) | **79 / 80**; 0 false refusals; 0 leaks |
-| [07_answer_quality](reports/07_answer_quality.md) | the final answer, graded against the source text | `answers/answer_set.json` (56) | **51 correct, 2 partial, 3 wrong; 0 hallucinated facts** |
+| [06_guardrail_independent](reports/06_guardrail_independent.md) | the same, written independently and harder | `guardrail/guardrail_set_independent.json` (80) | **80 / 80**; 0 false refusals; 0 leaks |
+| [07_answer_quality](reports/07_answer_quality.md) | the final answer, graded against the source text | `answers/answer_set.json` (56) | **54 correct, 1 partial, 1 wrong; 0 invented facts** (first run: 51 / 2 / 3) |
+| [08_retrieval_pipeline](reports/08_retrieval_pipeline.md) | query planning (Azerbaijani search, tender filter) on / off | sets A + B, answer set | source page reaches the model: 49 → 51 of 53; Russian 3 → 5 of 5 |
+| [09_retrieval_methods](reports/09_retrieval_methods.md) | dense + sparse vs. dense + BM25 vs. all three, full pipeline | sets A + B, answer set | all three: 174 / 200, 52 / 53 — best or equal everywhere |
 
 ## Question sets
 

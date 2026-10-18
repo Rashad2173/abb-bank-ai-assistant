@@ -27,7 +27,7 @@ GRADES = {
     "C-04": ("correct", ""), "C-05": ("correct", ""), "C-06": ("correct", ""), "C-07": ("correct", ""),
     "C-08": ("correct", ""), "C-09": ("correct", ""), "C-10": ("correct", ""), "C-11": ("correct", "brief"),
     "C-12": ("correct", ""),
-    "C-13": ("partial", "says 46 countries (transfers page); the DigiTransfer page says 50+ — conflict not mentioned"),
+    "C-13": ("correct", "gives both values the site shows (46 / 50+ countries) — the conflict rule works"),
     "C-14": ("correct", ""), "C-15": ("correct", "computed 0.70% of 1 000 USD = 7 USD"), "C-16": ("correct", ""),
     "C-17": ("correct", "adds 'accrued daily, paid monthly' — in the source"),
     "C-18": ("correct", "gives the range per card type (Classic / Max)"),
@@ -36,24 +36,25 @@ GRADES = {
     "C-25": ("correct", "picked the corporate page (100 000 AZN), not the SME one (50 000)"),
     "C-26": ("correct", ""), "C-27": ("correct", "adds 'standard POS commission still applies' — in the source"),
     "C-28": ("correct", "adds PIN-change fee 1 AZN — in the tariff table"),
-    "C-29": ("wrong", "retrieval miss: 'kart məlumatları / beh' matched card-blank tenders; said 'no information'"),
-    "C-30": ("partial", "ambiguous question: answered the newer (2024) tax & customs campaign correctly, not the 2022 one"),
-    "C-31": ("correct", "says it ended"), "C-32": ("correct", "says it ended"), "C-33": ("correct", ""),
+    "C-29": ("wrong", "retrieval miss: the passage is 1st in BM25 but outside the dense / sparse top 100; said 'no information' (dense + sparse + BM25 retrieves it — report 09)"),
+    "C-30": ("correct", "both tax-staff campaigns (2022 and 2024), each marked as ended, with their terms"),
+    "C-31": ("correct", "says it ended; 'at most 3 times' — in the source"), "C-32": ("correct", "says it ended"), "C-33": ("correct", ""),
     "C-34": ("correct", ""), "C-35": ("correct", "adds 'extendable to 30 working days' — in the source"),
-    "C-36": ("correct", ""), "C-37": ("correct", "lists 6 awards from 5 sources, all dated correctly"),
+    "C-36": ("correct", ""), "C-37": ("correct", "awards from several sources, dated correctly; 'fifth year in a row' — in the source"),
     "C-38": ("correct", ""), "C-39": ("correct", ""), "C-40": ("correct", "two sources combined"),
     "C-41": ("correct", "two sources combined"), "C-42": ("correct", "comparison with caveat on currency"),
     "C-43": ("correct", "not on the site → 'no information', nothing invented"),
     "C-44": ("correct", "not on the site → 'no information', nothing invented"),
-    "C-45": ("correct", ""), "C-46": ("correct", "computed 0.90% of 2 500 USD = 22.50 USD"), "C-47": ("correct", ""),
+    "C-45": ("correct", ""), "C-46": ("partial", "22.50 USD is right (0.90% above 200 USD), but the stated bracket '2 000–3 000 USD' comes from the page's second (12-hour) table, where it is 1.5% — rows of two tables mixed"), "C-47": ("correct", ""),
     "C-48": ("correct", "says the 2023 offer ended"), "C-49": ("correct", ""), "C-50": ("correct", ""),
     "C-51": ("correct", ""),
-    "C-52": ("wrong", "Russian question, answer only on an Azerbaijani page (no Russian version); said 'no information'"),
-    "C-53": ("wrong", "Russian question, branch list exists only in Azerbaijani; said 'no information'"),
+    "C-52": ("correct", "fixed by searching in Azerbaijani too (the page has no Russian version)"),
+    "C-53": ("correct", "fixed by searching in Azerbaijani too (the branch list is Azerbaijani only)"),
     "C-54": ("correct", ""), "C-55": ("correct", ""),
     "C-56": ("correct", "not on the site → 'no information', nothing invented"),
 }
-HALLUCINATIONS: set[str] = set()  # none found
+HALLUCINATIONS: set[str] = set()  # facts not in any source: none found
+INACCURATE: set[str] = {"C-46"}  # a detail stated wrongly from a source (rows of two tables mixed)
 
 
 def main() -> None:
@@ -71,20 +72,23 @@ def main() -> None:
         "",
         f"{total} new questions (`evaluation/answers/answer_set.json`) from pages that neither retrieval set uses — "
         "44 Azerbaijani, 6 English, 6 Russian, incl. multi-source, ended-campaign and not-on-the-site questions. Answers from the running chat "
-        "service (bge-m3 dense + sparse → reranker → 10 chunks → gpt-6-luna), each read next to its source text.",
+        "service (query planning with Azerbaijani search → bge-m3 dense + sparse → reranker → 10 chunks → gpt-6-luna, "
+        "answers with the details a customer needs next), each read next to its source text.",
         "",
         "| | Result |",
         "|---|---:|",
         f"| **Correct** | **{verdicts['correct']} / {total}** ({100 * verdicts['correct'] / total:.0f}%) |",
         f"| Partially correct | {verdicts['partial']} / {total} |",
         f"| Wrong | {verdicts['wrong']} / {total} |",
-        f"| **Hallucinated facts** | **{len(HALLUCINATIONS)} / {total}** |",
+        f"| **Invented facts (not in any source)** | **{len(HALLUCINATIONS)} / {total}** |",
+        f"| Detail stated wrongly from a source | {len(INACCURATE)} / {total} |",
         "| Not on the site → said so (no invention) | 3 / 3 |",
         "| Ended campaigns / old offers presented as ended | 4 / 4 |",
         "| Calculations from tariff tables (0.70% of 1 000 USD, 0.90% of 2 500 USD) | 2 / 2 |",
         "",
-        "All three wrong answers are *safe* failures: the right passage was not retrieved and the model said it "
-        "had no information instead of guessing.",
+        "Previous run (before searching non-Azerbaijani questions in Azerbaijani and the fuller-answer prompt): "
+        "51 correct, 2 partial, 3 wrong. The remaining wrong answer is a *safe* failure: the passage was not "
+        "retrieved and the model said it had no information instead of guessing.",
         "",
         "## By question type",
         "",
@@ -99,13 +103,12 @@ def main() -> None:
         "",
         "| Cause | Questions | Fix |",
         "|---|---|---|",
-        "| Russian / English question whose answer exists only on an Azerbaijani page (the branch list and some "
-        "Q&A pages have no translation); retrieval returns same-language chunks | C-52, C-53 | Cross-lingual query "
-        "expansion: also search with an Azerbaijani version of non-Azerbaijani questions and fuse the results |",
-        "| Word overlap with procurement notices ('kart məlumatları' ≈ 'kart pəstahları'); 3 069 tender chunks "
-        "crowd the candidates | C-29 | Down-weight procurement chunks unless the question is about tenders |",
-        "| Two pages give different values (46 vs 50+ countries) and only one was retrieved | C-13 | Data issue "
-        "on the website; the prompt already asks to mention conflicts when both are retrieved |",
+        "| A rare word ('beh') that only keyword search matches | C-29 | dense + sparse + BM25 retrieves the passage "
+        "(report 09) — switch the retrieval method |",
+        "| One page with two tariff tables of the same shape; the model combined rows of both | C-46 | Repeat each "
+        "table's caption in its chunk, or ask the model to name the table it quotes |",
+        "| Fixed since the previous run: Russian questions answered only by Azerbaijani pages | C-52, C-53 | "
+        "Non-Azerbaijani questions are also searched in Azerbaijani |",
         "",
         "## Every answer",
         "",

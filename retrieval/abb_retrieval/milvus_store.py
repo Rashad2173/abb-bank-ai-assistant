@@ -112,7 +112,8 @@ class MilvusStore:
         self.client.flush(self.collection)
 
     def count(self) -> int:
-        return int(self.client.get_collection_stats(self.collection)["row_count"])
+        """Exact number of stored chunks (collection statistics still count deleted rows until compaction)."""
+        return int(self.client.query(self.collection, filter="", output_fields=["count(*)"])[0]["count(*)"])
 
     def exists(self) -> bool:
         return self.client.has_collection(self.collection)

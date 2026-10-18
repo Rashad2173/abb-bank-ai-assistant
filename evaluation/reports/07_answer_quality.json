@@ -12,7 +12,7 @@
    "https://abb-bank.az/ferdi/melumat-merkezi"
   ],
   "status": "answered",
-  "answer": "Bəli. ABB-nin 937 Məlumat Mərkəzi vasitəsilə kartı bloklatmaq və yenidən aktivləşdirmək mümkündür [S8]. Məlumat Mərkəzi 24/7 fəaliyyət göstərir [S5].",
+  "answer": "Bəli, kartınızı ABB-nin 937 Məlumat Mərkəzinə zəng edərək bloklatmaq və ya yenidən aktivləşdirmək olar. Məlumat Mərkəzi bu xidmətləri təqdim edir və 24/7 fəaliyyət göstərir. [S8] [S5]",
   "cited": [
    {
     "id": "S8",
@@ -27,7 +27,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 5851.5,
+  "total_ms": 11537.6,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -45,7 +45,7 @@
    "https://abb-bank.az/ferdi/valyuta-mezenneleri"
   ],
   "status": "answered",
-  "answer": "Bəli. Məzənnələr əməliyyat formasına görə fərqlənə bilər: nağd alış-satış, internet bankçılıq, kart və rəqəmsal əməliyyatlar üçün kurslar ayrı ola bilər. Fərqlər xidmət xərcləri və əməliyyat şərtləri ilə bağlıdır. [S1]",
+  "answer": "Bəli. ABB-də məzənnələr əməliyyat formasına görə fərqlənə bilər: nağd alış-satış, internet bankçılıq, plastik kart və rəqəmsal əməliyyatlar üçün fərqli kurslar tətbiq oluna bilər. [S1]\n\nBu fərqlər xidmət xərcləri və əməliyyat şərtləri ilə əlaqədardır. [S1]",
   "cited": [
    {
     "id": "S1",
@@ -55,7 +55,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 4703.5,
+  "total_ms": 4423.3,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -78,7 +78,7 @@
    "https://abb-bank.az/ferdi/butun-emeliyyatlar/bank-kocurmeleri"
   ],
   "status": "answered",
-  "answer": "Ödəniş tapşırığında bu məlumatlar olmalıdır: köçürmənin tarixi və nömrəsi; göndərənin rekvizitləri (ad, soyad, hesab nömrəsi və varsa VÖEN); alan müştərinin rekvizitləri (adı, hesab nömrəsi və VÖEN); məbləğ rəqəmlə və sözlə, köçürmənin valyutası; köçürmənin təyinatı; imzalar və möhür. Tapşırıq bank tərəfindən 3 iş günü ərzində icra oluna bilər. [S1]",
+  "answer": "ABB daxilində başqa hesaba filial vasitəsilə köçürmə etmək üçün filialınıza ödəniş tapşırığının 2 nüsxəsini təqdim etməlisiniz. Tapşırıqda bu məlumatlar olmalıdır [S1]:\n- Köçürmənin tarixi və nömrəsi;\n- Göndərənin rekvizitləri: ad, soyad, hesab nömrəsi və varsa VÖEN;\n- Alan şəxsin rekvizitləri: adı, hesab nömrəsi və VÖEN;\n- Məbləğ rəqəmlə və sözlə, həmçinin köçürmənin valyutası;\n- Köçürmənin təyinatı;\n- İmzalar və möhür.\n\nÖdəniş tapşırığı bank tərəfindən 3 iş günü ərzində icra oluna bilər [S1].",
   "cited": [
    {
     "id": "S1",
@@ -88,7 +88,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 4122.3,
+  "total_ms": 11890.3,
   "verdict": "correct",
   "note": "omits '2 copies' of the order; all listed fields right",
   "hallucination": false
@@ -106,7 +106,7 @@
    "https://abb-bank.az/ferdi/kartlar/debet-kartlari/qarabag-fk-mc-world-elite"
   ],
   "status": "answered",
-  "answer": "ABB - Qarabağ FK MC World Elite kartı ilə LoungeKey lounge zallarına və Fast Track xidmətinə limitsiz sayda pulsuz daxil olmaq mümkündür [S5].",
+  "answer": "ABB - Qarabağ FK MC World Elite kartı ilə LoungeKey lounge zallarına və Fast Track xidmətinə il ərzində limitsiz sayda pulsuz giriş mümkündür [S5].",
   "cited": [
    {
     "id": "S5",
@@ -116,7 +116,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 6238.2,
+  "total_ms": 11178.1,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -136,7 +136,7 @@
    "https://abb-bank.az/ferdi/kartlar/kredit-kartlari/tamkart-visa-classic"
   ],
   "status": "answered",
-  "answer": "TamKart Classic kredit kartının limiti 300–30 000 AZN, güzəşt müddəti 60 günədəkdir. Kredit vəsaitinin nağdlaşdırılması üzrə komissiya 2,5%-dir (minimum 2 AZN). [S1]",
+  "answer": "TamKart Classic kredit kartının limiti 300–30 000 AZN, güzəşt müddəti 60 günədəkdir. Kredit vəsaitinin nağdlaşdırılması üzrə komissiya 2,5%-dir (minimum 2 AZN) [S1].",
   "cited": [
    {
     "id": "S1",
@@ -146,7 +146,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3980.2,
+  "total_ms": 3109.8,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -164,7 +164,7 @@
    "https://abb-bank.az/ferdi/kesbek/faydali-kesbek"
   ],
   "status": "answered",
-  "answer": "BakıKart QR ilə ictimai nəqliyyatda ödəniş etdikdə keşbek QR kod skan edildikdən sonra hesablanır; hesablanması 10 günədək çəkə bilər [S1]. Kredit ödənişlərinə keşbek tətbiq edilmir [S1].",
+  "answer": "BakıKart QR ilə avtobus ödənişində keşbek QR kod skan edildikdən sonra hesablanır və balansınıza köçməsi 10 günədək çəkə bilər [S1]. Kredit ödənişlərinə keşbek şamil edilmir [S1].",
   "cited": [
    {
     "id": "S1",
@@ -174,7 +174,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3920.0,
+  "total_ms": 3245.4,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -193,7 +193,7 @@
    "https://abb-bank.az/ferdi/pul-kocurmesi"
   ],
   "status": "answered",
-  "answer": "ABB mobile-da başqasının kartına pul köçürmək üçün:\n1. Tətbiqə daxil olun və kartın üzərindən və ya “+” ikonuna toxunaraq köçürmələrə keçin.\n2. “Digər karta” bölməsini seçib kart nömrəsini daxil edin və ya kartı kamera ilə skan edin.\n3. Köçürmə detallarını daxil edib təsdiqləyin. [S1]",
+  "answer": "ABB mobile-da başqasının kartına pul köçürmək üçün bu addımları edin [S1]:\n1. Tətbiqə daxil olun və kart ekranından və ya “+” ikonundan “Köçürmələr” bölməsinə keçin.\n2. “Digər karta” seçin, alıcının kart nömrəsini daxil edin və ya kameradan istifadə edərək kartı skan edin.\n3. Köçürmə detallarını daxil edib əməliyyatı təsdiqləyin.",
   "cited": [
    {
     "id": "S1",
@@ -203,7 +203,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3835.1,
+  "total_ms": 4088.1,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -222,7 +222,7 @@
    "https://abb-bank.az/ferdi/kesbek"
   ],
   "status": "answered",
-  "answer": "Faydalı keşbek üzrə aylıq limit 300 AZN-dir və illik xidmət haqqı yoxdur. [S1]",
+  "answer": "Faydalı keşbek üzrə aylıq limit 300 AZN-dir; illik xidmət haqqı yoxdur. [S1]",
   "cited": [
    {
     "id": "S1",
@@ -232,7 +232,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 4467.4,
+  "total_ms": 3813.1,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -252,17 +252,22 @@
    "https://abb-bank.az/ferdi/pin-kod-deyisimi"
   ],
   "status": "answered",
-  "answer": "PIN kodunu saytdan dəyişmək üçün [PIN dəyişimi səhifəsindəki](https://reg.azericard.com/pindelivery/) təlimatları izləyin: [S1]\n1. Linki açıb kart məlumatlarınızı daxil edin. [S1]\n2. Karta bağlı nömrənizə SMS-lə göndərilən kodu alın. [S1]\n3. SMS kodundakı ulduzların yerinə istədiyiniz PIN-i yazın və “Doldurulmuş rəqəm sırası” xanasına daxil edin. [S1]\n4. “OK” düyməsini vurun; yeni PIN təyin olunacaq. [S1]",
+  "answer": "Kartınızın PIN kodunu saytdan dəyişmək üçün [PIN dəyişimi səhifəsindəki keçidə](https://reg.azericard.com/pindelivery/) daxil olub bu addımları edin [S1]:\n1. Açılan pəncərədə kart məlumatlarınızı daxil edin.\n2. Karta bağlı mobil nömrənizə SMS kodu göndəriləcək.\n3. SMS kodundakı ulduzların yerinə təyin etmək istədiyiniz PIN kodunu yazıb “Doldurulmuş rəqəm sırası” xanasına daxil edin.\n4. “OK” düyməsini basın; bundan sonra yeni PIN kodunuz təyin olunacaq.\n\nPIN kodunuzu asanlıqla təxmin edilə bilən rəqəmlərdən seçməyin [S2].",
   "cited": [
    {
     "id": "S1",
+    "url": "https://abb-bank.az/ferdi/pin-kod-deyisimi",
+    "title": "PIN kod dəyişimi"
+   },
+   {
+    "id": "S2",
     "url": "https://abb-bank.az/ferdi/pin-kod-deyisimi",
     "title": "PIN kod dəyişimi"
    }
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 4325.5,
+  "total_ms": 6214.2,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -281,7 +286,7 @@
    "https://abb-bank.az/ferdi/iane-et"
   ],
   "status": "answered",
-  "answer": "YAŞAT Fondu 8 dekabr 2020-ci il tarixli Prezident fərmanı ilə yaradılıb. Məqsədi şəhid ailələrinin və hərbi əməliyyatlar nəticəsində əlilliyi müəyyən olunmuş şəxslərin sosial müdafiəsi üzrə dövlət tədbirlərinə əlavə dəstək verən vətəndaş cəmiyyəti təşəbbüsləri üçün platforma yaratmaq, həmçinin bu sahədə şəffaflıq, hesabatlılıq və ictimai nəzarəti təmin etməkdir [S1].\n\nBəli, ABB mobile-dan ianə edə bilərsiniz: ödənişlərə daxil olun, “İanə”ni seçin, qurumu və tələb olunan məlumatları qeyd edib ödənişi təsdiqləyin [S1].",
+  "answer": "YAŞAT Fondu 8 dekabr 2020-ci il tarixli Prezident fərmanı ilə yaradılıb. Məqsədi şəhid ailələrinin və hərbi əməliyyatlar nəticəsində əlilliyi müəyyən olunmuş şəxslərin sosial müdafiəsinə dövlət dəstəyini tamamlayan vətəndaş cəmiyyəti təşəbbüsləri üçün platforma yaratmaq, həmçinin bu sahədə şəffaflıq, hesabatlılıq və ictimai nəzarəti təmin etməkdir [S1].\n\nBəli, ABB mobile vasitəsilə ianə edə bilərsiniz [S1]:\n- Tətbiqə daxil olun və kartın üzərindən və ya “+” ikonundan “Ödənişlər”ə keçin.\n- “İanə”ni seçin, YAŞAT Fondunu seçib tələb olunan məlumatları doldurun və ödənişi təsdiqləyin [S1].",
   "cited": [
    {
     "id": "S1",
@@ -291,7 +296,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 4326.6,
+  "total_ms": 4203.5,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -310,7 +315,7 @@
    "https://abb-bank.az/ferdi/karta-medaxil"
   ],
   "status": "answered",
-  "answer": "Bəli, Cash-in bankomatında AZN hesabına ABŞ dolları yatırmaq mümkündür. [S2]",
+  "answer": "Bəli, AZN hesabına USD yatırmaq mümkündür [S2]. Cash-in bankomatında kart nömrəsini daxil edərək kart olmadan da mədaxil edə bilərsiniz [S2].",
   "cited": [
    {
     "id": "S2",
@@ -320,7 +325,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 2856.0,
+  "total_ms": 4767.1,
   "verdict": "correct",
   "note": "brief",
   "hallucination": false
@@ -340,7 +345,7 @@
    "https://abb-bank.az/ferdi/emanetler/emanetli-ipoteka-krediti"
   ],
   "status": "answered",
-  "answer": "Əmanət əsaslı ipoteka kreditində 12 aylıq əmanətin illik faizi 9,5%, 24 aylıq əmanətin isə 7,5%-dir. [S1] Pulu vaxtından əvvəl çıxarsanız, faiz gəliri əldə etmirsiniz. [S1]",
+  "answer": "Əmanət əsaslı ipoteka kreditində 12 aylıq əmanətin illik faizi 9,5%, 24 aylığın isə 7,5%-dir. [S1] Pulu vaxtından əvvəl çıxarsanız, əmanətə faiz gəliri ödənilmir. [S1]",
   "cited": [
    {
     "id": "S1",
@@ -350,7 +355,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3175.4,
+  "total_ms": 3521.1,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -368,20 +373,25 @@
   "sources": [
    "https://abb-bank.az/ferdi/butun-emeliyyatlar"
   ],
-  "note": "says 46 countries (transfers page); the DigiTransfer page says 50+ — conflict not mentioned",
+  "note": "gives both values the site shows (46 / 50+ countries) — the conflict rule works",
   "status": "answered",
-  "answer": "DigiTransfer ilə 46 ölkəyə pul göndərmək mümkündür; köçürmələr EUR və USD valyutalarında aparılır. [S6]",
+  "answer": "DigiTransfer ilə 46 ölkəyə pul göndərmək mümkündür; köçürmələr EUR və USD valyutalarında aparılır [S6]. DigiTransfer tarif bölməsində isə 50-dən çox ölkə göstərilir [S3].",
   "cited": [
    {
     "id": "S6",
     "url": "https://abb-bank.az/ferdi/butun-emeliyyatlar/olkedaxili-ve-olkexarici-kocurmeler",
     "title": "Ölkədaxili və ölkəxarici köçürmələr"
+   },
+   {
+    "id": "S3",
+    "url": "https://abb-bank.az/ferdi/butun-emeliyyatlar/olkedaxili-ve-olkexarici-kocurmeler/digitransfer-pul-kocurme",
+    "title": "DigiTransfer/IBAN ilə köçürmə"
    }
   ],
   "cites_expected_source": false,
   "reranked": true,
-  "total_ms": 2690.9,
-  "verdict": "partial",
+  "total_ms": 3257.9,
+  "verdict": "correct",
   "hallucination": false
  },
  {
@@ -398,7 +408,7 @@
    "https://abb-bank.az/ferdi/butun-kartlar/debet-kartlari/metal-kart"
   ],
   "status": "answered",
-  "answer": "Metal kart üzrə kredit limiti əmanətin 60%-dək, əmanətin valyutasında isə maksimum 50 000-dək ola bilər [S1].",
+  "answer": "Metal kart üzrə kredit limiti əmanətin 60%-dək, əmanətin valyutasında isə 50 000-dək ola bilər [S1]. Limitin müddəti 12 ayadəkdir və əmanət müddətini keçə bilməz [S1].",
   "cited": [
    {
     "id": "S1",
@@ -408,7 +418,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3074.2,
+  "total_ms": 2648.5,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -426,7 +436,7 @@
    "https://abb-bank.az/ferdi/butun-emeliyyatlar/olkedaxili-ve-olkexarici-kocurmeler/western-union"
   ],
   "status": "answered",
-  "answer": "Western Union ilə Türkiyəyə 1 000 USD göndəriş üçün komissiya köçürmə məbləğinin 0,70%-i, yəni **7 USD**-dir. [S1]",
+  "answer": "Western Union ilə Türkiyəyə 1 000 USD göndərmək üçün komissiya köçürmə məbləğinin 0,70%-i, yəni **7 USD** təşkil edir. [S1]",
   "cited": [
    {
     "id": "S1",
@@ -436,7 +446,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 4465.8,
+  "total_ms": 3027.1,
   "verdict": "correct",
   "note": "computed 0.70% of 1 000 USD = 7 USD",
   "hallucination": false
@@ -456,22 +466,17 @@
    "https://abb-bank.az/ferdi/kartlar/debet-kartlari/azal-miles-visa-platinum-mc-black-edition"
   ],
   "status": "answered",
-  "answer": "ABB-AZAL Miles MC Black Edition / Visa Platinum kartı ilə lounge, Fast Track və transfer xidmətlərinin hər birindən ildə 10 dəfə istifadə etmək olar [S3][S7].",
+  "answer": "ABB-AZAL Miles MC Black Edition / Visa Platinum kartı ilə lounge zallarına giriş, Fast Track və transfer xidmətlərinin hər birindən ildə 10 dəfə istifadə etmək olar [S3].",
   "cited": [
    {
     "id": "S3",
     "url": "https://abb-bank.az/ferdi/kartlar/azal-abb-miles-visa-platinum",
     "title": "ABB-AZAL Miles MC Black Edition / Visa Platinum"
-   },
-   {
-    "id": "S7",
-    "url": "https://abb-bank.az/ferdi/kartlar/debet-kartlari/azal-miles-visa-platinum-mc-black-edition",
-    "title": "ABB-AZAL Miles MC Black Edition / Visa Platinum"
    }
   ],
-  "cites_expected_source": true,
+  "cites_expected_source": false,
   "reranked": true,
-  "total_ms": 4200.7,
+  "total_ms": 3009.4,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -490,7 +495,7 @@
    "https://abb-bank.az/ferdi/butun-hesablar"
   ],
   "status": "answered",
-  "answer": "DigiHesab Max hesabında qalığa illik 6%-dək gəlir hesablanır; gəlir gündəlik hesablanıb ayda bir dəfə ödənilir. Faiz hesablanan minimum məbləğ 200 AZN/USD-dir. [S2]\n\nHesabı ABB mobile tətbiqində açmaq üçün “+” işarəsinə toxunun, “DigiHesab Max”ı seçin və açılan pəncərədə “DigiHesab Max aç” düyməsinə klikləyin. [S2]",
+  "answer": "DigiHesab Max hesabında qalığa illik 6%-dək faiz gəliri hesablanır; gəlir gündəlik hesablanır və ayda bir dəfə ödənilir. [S2]\n\nHesabı ABB mobile tətbiqində açın: tətbiqə daxil olun, “+” ikonuna toxunub “DigiHesab Max”ı seçin və açılan pəncərədə “DigiHesab Max aç” düyməsinə klikləyin. [S2]",
   "cited": [
    {
     "id": "S2",
@@ -500,7 +505,7 @@
   ],
   "cites_expected_source": false,
   "reranked": true,
-  "total_ms": 3432.6,
+  "total_ms": 3407.2,
   "verdict": "correct",
   "note": "adds 'accrued daily, paid monthly' — in the source",
   "hallucination": false
@@ -519,7 +524,7 @@
   ],
   "note": "gives the range per card type (Classic / Max)",
   "status": "answered",
-  "answer": "TamKart ilə alışları 24 ayadək hissə-hissə ödəmək olar [S1]. Faktiki illik faiz dərəcəsi TamKart növünə görə dəyişir: Classic üçün 18,40%–40,60%, Max üçün 18,40%–41,60% göstərilir [S9][S7].",
+  "answer": "TamKart alışlarını 24 ayadək hissə-hissə ödəmək olar [S1]. Faktiki illik faiz dərəcəsi kartın növünə görə dəyişir: Classic üçün 18,40%–40,60% [S9], TamKart Max üçün 18,40%–41,60% [S7]. Digər TamKart növlərinin faktiki illik faiz dərəcəsi təqdim olunan məlumatlarda göstərilməyib.",
   "cited": [
    {
     "id": "S1",
@@ -539,7 +544,7 @@
   ],
   "cites_expected_source": false,
   "reranked": true,
-  "total_ms": 3452.9,
+  "total_ms": 3539.0,
   "verdict": "correct",
   "hallucination": false
  },
@@ -557,7 +562,7 @@
    "https://abb-bank.az/biznes/korporativ/odenis-kartlari-1"
   ],
   "status": "answered",
-  "answer": "Şirkətinizin işçiləri üçün ABB-də iki əməkhaqqı kartı var: **Mastercard Standard PayPass Salary** və **Visa Classic PayWave Salary**. Hər ikisi AZN, USD və EUR valyutalarında təqdim olunur. [S1]",
+  "answer": "ABB-də işçiləriniz üçün iki əməkhaqqı kartı mövcuddur: **Mastercard Standard PayPass Salary** və **Visa Classic PayWave Salary**. Hər iki kart AZN, USD və EUR valyutalarında təqdim olunur [S1].",
   "cited": [
    {
     "id": "S1",
@@ -567,7 +572,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3093.3,
+  "total_ms": 2888.8,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -587,7 +592,7 @@
    "https://abb-bank.az/biznes/kicik-ve-orta-biznes/odenis-kartlari/bolt-kart"
   ],
   "status": "answered",
-  "answer": "Bolt kartını sifariş etmək üçün ABB İnternet Bankinqində VÖEN hesabınızla qeydiyyatdan keçin, onlayn bank hesabı açın və hesab açıldıqdan sonra kartı internet bank üzərindən sifariş edin. [S1] Kart 2–3 iş gününə hazır olur; SMS aldıqdan sonra onu MXS filialından götürə bilərsiniz. [S1]",
+  "answer": "Bolt kartını ABB İnternet Bankinqi vasitəsilə sifariş edə bilərsiniz; kart 2–3 iş gününə hazır olur [S1].\n- Əvvəlcə VÖEN hesabınızla ABB İnternet Bankinqində qeydiyyatdan keçin və onlayn bank hesabı açın [S1].\n- Hesab açıldıqdan sonra internet bankinqdən Bolt kartını sifariş edin [S1].\n- Kart hazır olduqda SMS bildirişi alacaqsınız; sonra onu MXS filialından götürə bilərsiniz [S1].",
   "cited": [
    {
     "id": "S1",
@@ -597,7 +602,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3756.9,
+  "total_ms": 4101.4,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -615,7 +620,7 @@
    "https://abb-bank.az/biznes/korporativ/senedli-emeliyyatlar-1/akkreditiv-1"
   ],
   "status": "answered",
-  "answer": "Geriçağrılmayan akkreditiv satıcının (benefisiarın) razılığı olmadan ləğv edilə və ya dəyişdirilə bilməz və emitent bankın qəti öhdəliyidir. Geri çağrıla bilən akkreditiv isə alıcının tapşırığı ilə, satıcı ilə əvvəlcədən razılaşdırılmadan emitent bank tərəfindən dəyişdirilə və ya ləğv edilə bilər; bu halda bankın benefisiar qarşısında öhdəliyi olmur. [S1]",
+  "answer": "Geriçağrılmayan akkreditiv satıcının (benefisiarın) razılığı olmadan ləğv və ya dəyişdirilə bilməz və emitent bankın qəti öhdəliyidir [S1]. Geri çağrıla bilən akkreditiv isə alıcının (prinsipalın) tapşırığı ilə, satıcı ilə əvvəlcədən razılaşdırılmadan emitent bank tərəfindən dəyişdirilə və ya ləğv edilə bilər; bu halda bankın benefisiar qarşısında öhdəliyi olmur [S1].",
   "cited": [
    {
     "id": "S1",
@@ -625,7 +630,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3429.2,
+  "total_ms": 3638.6,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -644,7 +649,7 @@
    "https://abb-bank.az/biznes/mikro-biznes/e-muhasibim"
   ],
   "status": "answered",
-  "answer": "ABB Biz-də vergi bəyannaməsini ödəmək üçün:\n1. E-mühasibim bölməsində vergi növünü seçib bəyannamə yaradın. [S1]\n2. Bəyannamənin ümumi məlumatlarını müvafiq sahələrə daxil edib düzgünlüyünü yoxlayın. [S1]\n3. Yaranmış bəyannaməni telefonunuza yükləyin, e-taxes.gov.az saytına yükləyin və ödənişi orada edin. [S1]\n\nE-mühasibim sadələşdirilmiş və vahid vergi bəyannamələrini dəstəkləyir. [S2]",
+  "answer": "ABB Biz-də E-mühasibim bölməsindən bəyannamə növünü seçib bəyannamə yaradın. Məlumatları daxil edib düzgünlüyünü yoxlayın, sonra bəyannaməni telefonunuza yükləyərək e-taxes.gov.az saytına yükləyin və ödənişi tamamlayın. [S1]\n\nE-mühasibim vasitəsilə sadələşdirilmiş və vahid vergi bəyannamələrini hazırlamaq və müvafiq ödənişləri etmək mümkündür; əməliyyatları şəxsi kabinetdən izləyə bilərsiniz. [S2]",
   "cited": [
    {
     "id": "S1",
@@ -659,7 +664,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 4470.8,
+  "total_ms": 3844.0,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -679,7 +684,7 @@
    "https://abb-bank.az/biznes/kicik-ve-orta-biznes/biznes-kreditleri/subsidiyali-guzestli-kreditler"
   ],
   "status": "answered",
-  "answer": "AR İKZF ilə subsidiyalı kreditin məbləği maksimum **10 000 000 AZN**, faiz dərəcəsi isə **6%-dən başlayır** (subsidiya verildikdən sonra) [S1]. Bir borcalan üçün subsidiya tətbiq edilən kreditin maksimumu **5 000 000 AZN**, əlaqəli borcalanlar qrupu üçün isə **10 000 000 AZN**-dir [S1].",
+  "answer": "AR İKZF ilə subsidiyalı kreditin maksimum məbləği 10 000 000 AZN-dəkdir. Subsidiya tətbiq edildikdən sonra faiz dərəcəsi 6%-dən başlayır [S1].",
   "cited": [
    {
     "id": "S1",
@@ -689,7 +694,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 2992.2,
+  "total_ms": 2612.9,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -710,7 +715,7 @@
    "https://abb-bank.az/biznes/korporativ/online-xidmetler-korporativ/abb-business-api"
   ],
   "status": "answered",
-  "answer": "ABB Business API-yə qoşulmaq üçün bu addımları izləyin [S1]:\n1. **corporateCustomerIntegration@abb-bank.az** ünvanına müraciət edin.\n2. Xidmət üçün texniki sənədləri yükləyin.\n3. Ağ siyahıya əlavə olunması üçün ictimai IP ünvanınızı təqdim edin.\n4. Bank sizə token verir.\n5. İnteqrasiyanı tətbiq etdikdən sonra qarşılıqlı test mərhələsi başlayır.\n6. Qoşulma üçün müqavilə imzalanır və xidmət istifadəyə verilir.",
+  "answer": "ABB Business API-yə qoşulmaq üçün aşağıdakı mərhələləri keçmək lazımdır: [S1]\n- **Müraciət edin:** corporateCustomerIntegration@abb-bank.az ünvanına e-poçt göndərin. [S1]\n- **Texniki sənədləri yükləyin** və ictimai IP ünvanınızı ağ siyahıya əlavə edilməsi üçün təqdim edin. [S1]\n- Bank sizə token verir; inteqrasiyanı tətbiq etdikdən sonra qarşılıqlı test mərhələsi keçirilir. [S1]\n- Sonda ABB Business API inteqrasiya xidmətinə qoşulmaq üçün müqavilə imzalanır. [S1]",
   "cited": [
    {
     "id": "S1",
@@ -720,7 +725,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3366.1,
+  "total_ms": 3737.6,
   "verdict": "correct",
   "note": "steps 5-6 (test, contract) — in the source",
   "hallucination": false
@@ -752,7 +757,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 2987.8,
+  "total_ms": 2706.6,
   "verdict": "correct",
   "hallucination": false
  },
@@ -769,7 +774,7 @@
    "https://abb-bank.az/masin-girovu-ile-kredit-goturmek-olur"
   ],
   "status": "answered",
-  "answer": "Xeyr. ABB-də avtomobil girovu ilə kredit məhsulu nəzərdə tutulmayıb. Bankın digər kredit növləri və şərtləri ilə “Kreditlər” səhifəsində tanış ola bilərsiniz [S1].",
+  "answer": "Xeyr, ABB-də avtomobil girovu ilə kredit məhsulu nəzərdə tutulmayıb [S1]. ABB-nin digər kredit növləri və şərtləri ilə “Kreditlər” səhifəsində tanış ola bilərsiniz [S1].",
   "cited": [
    {
     "id": "S1",
@@ -779,7 +784,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 2678.5,
+  "total_ms": 2733.0,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -797,7 +802,7 @@
    "https://abb-bank.az/abb-biz-mpos-istifadecileri-ucun-xidmet-sertleri-yenilenir"
   ],
   "status": "answered",
-  "answer": "ABB Biz MPOS terminalında ay ərzində qəbul edilən ödənişlərin ümumi məbləği 200 AZN-dən aşağı olduqda, hər aktiv terminal üçün 3 AZN aylıq xidmət haqqı tutulur. Dövriyyə 200 AZN və daha çox olduqda bu xidmət haqqı tutulmur; standart POS komissiyası isə qüvvədə qalır. [S1][S2]",
+  "answer": "ABB Biz MPOS terminalı üzrə aylıq dövriyyə 200 AZN-dən az olduqda hər aktiv terminal üçün 3 AZN aylıq xidmət haqqı tutulur. Dövriyyə 200 AZN və ya daha çox olduqda bu xidmət haqqı tutulmur; standart POS komissiyası isə ayrıca tətbiq olunmağa davam edir [S1][S2].",
   "cited": [
    {
     "id": "S1",
@@ -812,7 +817,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3720.1,
+  "total_ms": 3965.0,
   "verdict": "correct",
   "note": "adds 'standard POS commission still applies' — in the source",
   "hallucination": false
@@ -831,7 +836,7 @@
    "https://abb-bank.az/atmler"
   ],
   "status": "answered",
-  "answer": "ABB bankomatında kartınızı daxil edin, “Digər əməliyyatlar” menyusundan “PIN kodun dəyişdirilməsi” seçin. Əvvəlcə hazırkı PIN kodunuzu, sonra yeni PIN kodunuzu daxil edin [S1]. PIN-Change xidmətinin haqqı 1 AZN-dir [S2].",
+  "answer": "ABB bankomatında kartınızı daxil edin, “Digər əməliyyatlar” menyusundan “PIN kodun dəyişdirilməsi”ni seçin. Əvvəlcə kart üçün hazırkı PIN-i, sonra yeni PIN-i daxil edin [S1]. PIN-Change xidmətinin haqqı 1 AZN-dir [S2].",
   "cited": [
    {
     "id": "S1",
@@ -846,7 +851,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3327.5,
+  "total_ms": 3301.3,
   "verdict": "correct",
   "note": "adds PIN-change fee 1 AZN — in the tariff table",
   "hallucination": false
@@ -865,13 +870,13 @@
    "https://abb-bank.az/deleduzlardan-qorunmagin-12-yolu"
   ],
   "status": "no_information",
-  "answer": "Verilən mənbələrdə satış alıcısına kart məlumatlarını verməklə bağlı ABB-nin tövsiyəsi yoxdur. Məsləhət üçün ABB-nin 937 Çağrı Mərkəzinə, abb-bank.az-a və ya filiala müraciət edin.",
+  "answer": "ABB-nin satış elanlarında beh almaq üçün kart məlumatlarının paylaşılması barədə tövsiyəsi mənbələrdə göstərilmir. Təhlükəsizliklə bağlı rəsmi məsləhət üçün ABB-nin 937 nömrəli Məlumat Mərkəzinə müraciət edin.",
   "cited": [],
   "cites_expected_source": false,
   "reranked": true,
-  "total_ms": 3996.4,
+  "total_ms": 4127.4,
   "verdict": "wrong",
-  "note": "retrieval miss: 'kart məlumatları / beh' matched card-blank tenders; said 'no information'",
+  "note": "retrieval miss: the passage is 1st in BM25 but outside the dense / sparse top 100; said 'no information' (dense + sparse + BM25 retrieves it — report 09)",
   "hallucination": false
  },
  {
@@ -888,7 +893,7 @@
    "https://abb-bank.az/kampaniyalar/abb-den-vergi-xidmeti-iscileri-ucun-kredit"
   ],
   "status": "answered",
-  "answer": "Xeyr, vergi işçiləri üçün göstərilən ABB kredit kampaniyaları artıq bitib. Ən sonuncu, gömrük və vergi işçilərinə aid kampaniya 29.01.2024–15.02.2024 tarixlərində keçirilib və aktiv deyil [S3].\n\nHəmin kampaniyanın şərtləri belə idi: illik faiz dərəcəsi 10,9%-dən başlayırdı, kredit məbləği 40 000 manatadək, müddəti 60 ayadək idi; komissiya tutulmurdu, zamin tələb olunmurdu və TamKart kredit kartı hədiyyə edilirdi [S3]. Kampaniya bəzi müştərilərə illik faizdə 3%, digər bankdakı aktiv kreditini bağlayanlara isə əlavə 2%-dək güzəşt nəzərdə tuturdu [S4].\n\nHazırkı kredit şərtləri barədə məlumat üçün 937-yə zəng edə, abb-bank.az-a baxa və ya filiala müraciət edə bilərsiniz.",
+  "answer": "Xeyr, vergi işçiləri üçün kampaniyalar bitib; hazırda aktiv deyil. 2024-cü il kampaniyası 15 fevralda, 2022-ci il kampaniyası isə 21 fevralda başa çatıb [S3][S1].\n\nKampaniya şərtləri:\n- **2024:** Gömrük və vergi işçiləri üçün illik faiz dərəcəsi 10,9%-dən başlayırdı; kredit 40 000 manatadək, 60 ayadək, 0% komissiya ilə və zaminsiz təklif olunurdu. TamKart kredit kartı hədiyyə edilirdi [S3].\n- **2022:** Vergi xidməti işçilərinə 30 000 manatadək, 60 ayadək, 0% komissiya ilə və illik 15%-dən başlayan faizlə kredit təklif edilirdi; 1 000 manatlıq TamKart hədiyyə olunurdu [S1].",
   "cited": [
    {
     "id": "S3",
@@ -896,16 +901,16 @@
     "title": "ABB-dən Gömrük və Vergi İşçilərinə Özəl Kredit!"
    },
    {
-    "id": "S4",
-    "url": "https://abb-bank.az/kampaniyalar/abb-den-gomruk-ve-vergi-iscilerine-ozel-kredit",
-    "title": "ABB-dən Gömrük və Vergi İşçilərinə Özəl Kredit!"
+    "id": "S1",
+    "url": "https://abb-bank.az/kampaniyalar/abb-den-vergi-xidmeti-iscileri-ucun-kredit",
+    "title": "ABB-dən vergi xidməti işçiləri üçün kredit"
    }
   ],
-  "cites_expected_source": false,
+  "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 4803.7,
-  "verdict": "partial",
-  "note": "ambiguous question: answered the newer (2024) tax & customs campaign correctly, not the 2022 one",
+  "total_ms": 5525.1,
+  "verdict": "correct",
+  "note": "both tax-staff campaigns (2022 and 2024), each marked as ended, with their terms",
   "hallucination": false
  },
  {
@@ -921,7 +926,7 @@
    "https://abb-bank.az/kampaniyalar/kesbek-bahari-yenilikleri-ile-gelir"
   ],
   "status": "answered",
-  "answer": "Xeyr. Bu kampaniya 5 mart–5 aprel 2024-cü il tarixlərində keçirilib və artıq başa çatıb. O, kampaniya müddətində yeni TamKart taksit kartı alanlar üçün 50 AZN-dən yuxarı ödənişə 5 AZN keşbek təklif edirdi. [S1]",
+  "answer": "Xeyr, bu kampaniya artıq bitib və indi qoşulmaq mümkün deyil: müddəti 5 mart–5 aprel 2024-cü il olub [S1]. Kampaniya yalnız həmin müddətdə yeni TamKart taksit kartı əldə edənlər üçün idi; hər 50 AZN-dən yuxarı ödənişə 5 AZN əlavə keşbek verilirdi və bundan maksimum 3 dəfə yararlanmaq olurdu [S1]. ABB-nin cari təklifləri barədə 937-yə zəng edərək, abb-bank.az saytında və ya filialda məlumat ala bilərsiniz.",
   "cited": [
    {
     "id": "S1",
@@ -931,9 +936,9 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3096.4,
+  "total_ms": 4563.8,
   "verdict": "correct",
-  "note": "says it ended",
+  "note": "says it ended; 'at most 3 times' — in the source",
   "hallucination": false
  },
  {
@@ -949,22 +954,22 @@
    "https://abb-bank.az/kampaniyalar/qollar-qazandirir-kampaniyasi"
   ],
   "status": "answered",
-  "answer": "QR ödənişlə hər 1 AZN-ə 2 qol verilirdi. [S3] Kampaniya 11.06.2026–19.07.2026 tarixlərində keçirilib və artıq bitib; aktiv deyil. [S1]",
+  "answer": "QR ödənişlə hər 1 AZN-ə 2 qol verilirdi. “ABB Play – Qollar qazandırır” kampaniyası bitib: 11.06.2026–19.07.2026 tarixlərində keçirilib və hazırda aktiv deyil. [S1] [S3]",
   "cited": [
    {
-    "id": "S3",
+    "id": "S1",
     "url": "https://abb-bank.az/kampaniyalar/qollar-qazandirir-kampaniyasi",
     "title": "\"ABB Play - Qollar qazandırır\" kampaniyası"
    },
    {
-    "id": "S1",
+    "id": "S3",
     "url": "https://abb-bank.az/kampaniyalar/qollar-qazandirir-kampaniyasi",
     "title": "\"ABB Play - Qollar qazandırır\" kampaniyası"
    }
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 2799.0,
+  "total_ms": 3142.9,
   "verdict": "correct",
   "note": "says it ended",
   "hallucination": false
@@ -983,7 +988,7 @@
    "https://abb-bank.az/xeberler/the-banker-abb-ni-ilin-banki-elan-etdi"
   ],
   "status": "answered",
-  "answer": "ABB 2021-ci ildə “The Banker” jurnalının Azərbaycan üzrə “İlin bankı” mükafatını aldı. [S1] Jurnal bunu ABB-nin pandemiya dövründə sürətlə dəyişən biznes mühitinə çevik uyğunlaşması və sağlam maliyyə vəziyyəti ilə əsaslandırdı. [S1] ABB iqtisadiyyatın bərpası prosesində gəlirliliyini qoruyub, kapital mövqeyini gücləndirmişdi. [S1]",
+  "answer": "ABB 2021-ci ildə “The Banker” jurnalının Azərbaycan üzrə “İlin bankı” mükafatını aldı [S1]. Jurnal bunu ABB-nin pandemiya dövründə sürətlə dəyişən biznes mühitinə çevik uyğunlaşması və sağlam maliyyə vəziyyəti ilə əsaslandırdı. Həmçinin ABB iqtisadiyyatın bərpasında gəlirliliyini qoruyub, kapital mövqeyini gücləndirib və sosial layihələrini davam etdirib [S1].",
   "cited": [
    {
     "id": "S1",
@@ -993,7 +998,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3178.7,
+  "total_ms": 3395.3,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -1012,7 +1017,7 @@
    "https://abb-bank.az/xeberler/azerbaycan-beynelxalq-banki-dovlet-vergi-xidmetinin-tedris-merkezi-ile-emekdasliga-basladi"
   ],
   "status": "answered",
-  "answer": "Memorandumu Tədris Mərkəzinin rəisi vəzifəsini icra edən Mirəli Kazımov və ABB-nin Korporativ biznes üzrə baş direktoru Nərgizxanım Biləndərli imzalayıb [S1]. Məqsədi ABB-nin sahibkar müştərilərinin iqtisadiyyat, hüquq, maliyyə, mühasibat uçotu və vergi qanunvericiliyi üzrə biliklərini artırmaq, həmçinin birgə araşdırma, məlumat mübadiləsi və tədbirlərə şərait yaratmaqdır [S1].",
+  "answer": "Memorandumu Tədris Mərkəzinin rəisi vəzifəsini icra edən Mirəli Kazımov və ABB-nin Korporativ biznes üzrə baş direktoru Nərgizxanım Biləndərli imzalayıb [S1]. Məqsədi ABB-nin sahibkar müştərilərinin iqtisadiyyat, hüquq, maliyyə, mühasibat uçotu və vergi qanunvericiliyi üzrə ixtisas biliklərini artırmaqdır [S1].",
   "cited": [
    {
     "id": "S1",
@@ -1022,7 +1027,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3380.4,
+  "total_ms": 3375.1,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -1042,7 +1047,7 @@
    "https://abb-bank.az/haqqimizda/teklif-ve-iradlar"
   ],
   "status": "answered",
-  "answer": "ABB müraciətə ən geci 15 iş günü ərzində cavab verməlidir. Əlavə araşdırma tələb olunarsa, cavab müddəti 30 iş gününədək uzadıla bilər [S1]. Cavabla razılaşmasanız, müraciətinizin yenidən araşdırılması üçün banka təkrar müraciət edə, həmçinin hüquqlarınızın bərpası məqsədilə Azərbaycan Respublikasının Mərkəzi Bankına və ya məhkəməyə müraciət edə bilərsiniz [S1].",
+  "answer": "ABB müraciətinizə ən geci 15 iş günü ərzində cavab verməlidir; əlavə araşdırma tələb olunarsa, müddət 30 iş gününədək uzadıla bilər [S1]. Cavabla razı deyilsinizsə, müraciətin yenidən araşdırılması üçün ABB-yə təkrar müraciət edə, həmçinin hüquqlarınızın bərpası üçün Azərbaycan Respublikası Mərkəzi Bankına və ya məhkəməyə müraciət edə bilərsiniz [S1]. Məlumat və müraciət üçün ABB-nin 937 qaynar xətti ilə əlaqə saxlayın [S1].",
   "cited": [
    {
     "id": "S1",
@@ -1052,7 +1057,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 4280.3,
+  "total_ms": 4507.5,
   "verdict": "correct",
   "note": "adds 'extendable to 30 working days' — in the source",
   "hallucination": false
@@ -1071,7 +1076,7 @@
    "https://abb-bank.az/haqqimizda/rekvizitler"
   ],
   "status": "answered",
-  "answer": "ABB-nin VÖEN-i 9900001881, bank kodu isə 805250-dir [S1].",
+  "answer": "ABB-nin VÖEN-i 9900001881, bank kodu isə 805250-dir. [S1]",
   "cited": [
    {
     "id": "S1",
@@ -1081,7 +1086,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3501.6,
+  "total_ms": 2929.0,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -1100,13 +1105,8 @@
    "https://abb-bank.az/haqqimizda"
   ],
   "status": "answered",
-  "answer": "ABB 2025–2026-cı illərdə aşağıdakı mükafatları qazanıb:\n\n- **2025-ci il üzrə ABA-nın 8 mükafatı:** rəqəmsal ödənişlərdə innovativ layihələr; rəqəmsal ödənişlərin təhlükəsizliyi barədə maarifləndirmə; korporativ sosial məsuliyyət; maliyyə savadlılığı; təhsil; KOB-ların maliyyə əlçatanlığının artırılması; dayanıqlı bankçılıq (ESG); beynəlxalq əməkdaşlığın inkişafı [S1].\n- **2025-ci il üzrə “The Banker”in Azərbaycan üzrə “İlin bankı” mükafatı** [S2].\n- **2025-ci il üzrə “Global Finance”in ölkə üzrə “İlin ən yaxşı bankı” mükafatı** [S9].\n- **2025-ci il üzrə “Euromoney Magazine”in “İlin ən yaxşı rəqəmsal bankı” mükafatı** [S7].\n- **2026-cı ildə “Top Employers Institute”un “Ən yaxşı işəgötürən” mükafatı** [S7].\n- **2026-cı ildə “The Brandon Hall Group”un iki mükafatı:** təlim və inkişaf üzrə rəqəmsal inkişafın dəstəklənməsi; istedadların idarə olunması üzrə ən yaxşı idarəetmə modeli [S10].",
+  "answer": "ABB 2025–2026-cı illərdə müxtəlif sahələr üzrə beynəlxalq və yerli mükafatlara layiq görülüb:\n\n- **2025-ci il üzrə:** “The Banker” jurnalı ABB-ni Azərbaycan üzrə “İlin bankı” seçib; bu, jurnalın ABB-yə ardıcıl beşinci dəfə verdiyi mükafatdır [S2]. “Global Finance” ABB-ni ölkə üzrə “İlin ən yaxşı bankı” seçib [S9]. Həmçinin “Euromoney Magazine” ABB-yə “İlin ən yaxşı rəqəmsal bankı” mükafatını verib [S7].\n- **2025-ci ildəki fəaliyyətinə görə, 2026-cı ildə:** ABB Azərbaycan Banklar Assosiasiyasının (ABA) 8 mükafatını qazanıb: rəqəmsal ödənişlərdə innovativ layihələr; rəqəmsal ödənişlərdə təhlükəsizlik barədə maarifləndirmə; korporativ sosial məsuliyyət; maliyyə savadlılığı; təhsil; KOB-ların maliyyə əlçatanlığının artırılması; dayanıqlı bankçılıq (ESG); beynəlxalq əməkdaşlığın inkişafı [S1].\n- **2026-cı ildə:** “Top Employers Institute” ABB-ni “Ən yaxşı işəgötürən” kimi tanıyıb [S7]. ABB həmçinin “The Brandon Hall Group”un Mükəmməllik Mükafatlarında “Təlim və inkişaf üzrə rəqəmsal inkişafın dəstəklənməsi” və “İstedadların idarə olunması üzrə ən yaxşı idarəetmə modeli” kateqoriyalarında iki mükafat qazanıb [S10].",
   "cited": [
-   {
-    "id": "S1",
-    "url": "https://abb-bank.az/xeberler/en-cox-bankciliq-mukafatini-abb-qazandi",
-    "title": "Ən çox bankçılıq mükafatını ABB qazandı!"
-   },
    {
     "id": "S2",
     "url": "https://abb-bank.az/xeberler/ilin-banki-abb-oldu",
@@ -1123,6 +1123,11 @@
     "title": "ABB - İlin bankı"
    },
    {
+    "id": "S1",
+    "url": "https://abb-bank.az/xeberler/en-cox-bankciliq-mukafatini-abb-qazandi",
+    "title": "Ən çox bankçılıq mükafatını ABB qazandı!"
+   },
+   {
     "id": "S10",
     "url": "https://abb-bank.az/xeberler/abb-insan-kapitalinin-idare-olunmasi-sahesinde-daha-2-nufuzlu-beynelxalq-mukafat-qazandi",
     "title": "ABB insan kapitalının idarə olunması sahəsində daha 2 nüfuzlu beynəlxalq mükafat qazandı!"
@@ -1130,9 +1135,9 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 4988.1,
+  "total_ms": 6845.1,
   "verdict": "correct",
-  "note": "lists 6 awards from 5 sources, all dated correctly",
+  "note": "awards from several sources, dated correctly; 'fifth year in a row' — in the source",
   "hallucination": false
  },
  {
@@ -1149,7 +1154,7 @@
    "https://abb-bank.az/filiallar#filial-610"
   ],
   "status": "answered",
-  "answer": "Suraxanı filialı Bakı şəhəri, Suraxanı rayonu, Əmircan qəsəbəsi, İ.Məmmədov küçəsi 3 ünvanında yerləşir [S1]. Bəli, şənbə günü saat 10:00–14:00 arası işləyir [S1].",
+  "answer": "ABB-nin Suraxanı filialı Bakı şəhəri, Suraxanı rayonu, Əmircan qəsəbəsi, İ.Məmmədov küçəsi 3 ünvanında yerləşir [S1]. Bəli, şənbə günü saat 10:00–14:00 arası işləyir [S1].",
   "cited": [
    {
     "id": "S1",
@@ -1159,7 +1164,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3656.5,
+  "total_ms": 2933.7,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -1177,7 +1182,7 @@
    "https://abb-bank.az/atm#seki"
   ],
   "status": "answered",
-  "answer": "Şəkidə ABB-nin 21 bankomatı var [S1]. F.X.Xoyski küçəsi 1-də, “Şəki ipək”in yanındakı bankomat nağd pul mədaxili (cash-in) qəbul edir və 24/7 işləyir [S3].",
+  "answer": "Şəkidə ABB-nin 21 bankomatı var; onlardan 3-ü nağd pul mədaxili qəbul edir [S1]. İpək fabrikinin yanındakı — F.X.Xoyski küçəsi 1-də yerləşən “Şəki ipək” bankomatına pul yatırmaq olar: o, cash-in xidmətlidir və 24/7 işləyir [S3].",
   "cited": [
    {
     "id": "S1",
@@ -1192,7 +1197,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 2924.9,
+  "total_ms": 3305.0,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -1211,7 +1216,7 @@
    "https://abb-bank.az/terminallar#lenkeran"
   ],
   "status": "answered",
-  "answer": "Lənkəranda ABB-nin 8 bankomatı və 4 ödəniş terminalı var. [S1] [S3]",
+  "answer": "Lənkəranda ABB-nin 8 bankomatı var; onlardan 3-ü nağd pul mədaxili (cash-in) qəbul edir [S1]. Ödəniş terminallarının sayı 4-dür və hamısı cash-in qəbul edir [S3].",
   "cited": [
    {
     "id": "S1",
@@ -1226,7 +1231,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3591.2,
+  "total_ms": 4318.3,
   "verdict": "correct",
   "note": "two sources combined",
   "hallucination": false
@@ -1245,7 +1250,7 @@
    "https://abb-bank.az/filiallar#filial-694"
   ],
   "status": "answered",
-  "answer": "Əcəmi filialı şənbə günü 10:00–17:00 işləyir və Memar Əcəmi metrosuna 10 dəqiqəlik məsafədədir [S1]. Əhmədli filialı da şənbə günü 10:00–17:00 işləyir və Əhmədli metrosuna 1 dəqiqəlik məsafədədir [S2].",
+  "answer": "Əcəmi və Əhmədli filialları şənbə günü saat 17:00-dək işləyir. Əcəmi filialı Memar Əcəmi metrosuna (10 dəqiqə), Əhmədli filialı isə Əhmədli metrosuna (1 dəqiqə) yaxındır. [S1] [S2]",
   "cited": [
    {
     "id": "S1",
@@ -1260,7 +1265,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3111.4,
+  "total_ms": 3211.8,
   "verdict": "correct",
   "note": "two sources combined",
   "hallucination": false
@@ -1279,7 +1284,7 @@
    "https://abb-bank.az/ferdi/kartlar/kredit-kartlari/tamkart-visa-classic"
   ],
   "status": "answered",
-  "answer": "Metal kart üzrə əmanət qarşılığında kredit məbləği əmanətin 60%-dək, əmanətin valyutasında maksimum 50 000-dəkdir [S2]. TamKart Classic-in kredit limiti isə 300–30 000 AZN-dir [S5]. Beləliklə, Metal kartın göstərilən yuxarı həddi 50 000 olsa da, məbləğ əmanətin valyutasında və əmanətin 60%-i ilə məhdudlaşır; TamKart Classic üçün limit AZN-lə 30 000-dir [S2][S5].",
+  "answer": "Metal kart üzrə əmanət qarşılığında kredit məbləği əmanətin 60%-dəkdir və əmanət valyutasında maksimum 50 000-ə qədər ola bilər [S2]. TamKart Classic-in kredit limiti isə 300–30 000 AZN-dir [S5]. Beləliklə, metal kartın göstərilən maksimumu rəqəm etibarilə daha yüksəkdir, lakin məbləğ əmanətin valyutasından və ölçüsündən asılıdır; TamKart Classic limiti AZN ilə müəyyən edilib.",
   "cited": [
    {
     "id": "S2",
@@ -1294,7 +1299,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 4384.2,
+  "total_ms": 3675.9,
   "verdict": "correct",
   "note": "comparison with caveat on currency",
   "hallucination": false
@@ -1309,11 +1314,11 @@
   ],
   "sources": [],
   "status": "no_information",
-  "answer": "ABB-də qızıl külçə satışı barədə təqdim olunan məlumatlarda məlumat yoxdur. Dəqiqləşdirmək üçün 937-yə zəng edə, abb-bank.az-a baxa və ya ABB filialına müraciət edə bilərsiniz.",
+  "answer": "Təqdim olunan məlumatlarda ABB-də qızıl külçə satışı barədə məlumat yoxdur. Dəqiqləşdirmək üçün ABB-nin 937 məlumat mərkəzi ilə əlaqə saxlayın, abb-bank.az saytına baxın və ya filiala müraciət edin.",
   "cited": [],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 4727.0,
+  "total_ms": 3836.1,
   "verdict": "correct",
   "note": "not on the site → 'no information', nothing invented",
   "hallucination": false
@@ -1328,11 +1333,11 @@
   ],
   "sources": [],
   "status": "no_information",
-  "answer": "Mənbələrdə ABB-də kriptovalyuta hesabının açılması barədə məlumat yoxdur. Dəqiqləşdirmək üçün ABB-nin 937 çağrı mərkəzinə, abb-bank.az-a və ya filiala müraciət edin.",
+  "answer": "Mənbələrdə ABB-nin kriptovalyuta hesabı açıb-açmaması barədə məlumat yoxdur. Dəqiqləşdirmək üçün ABB-nin 937 çağrı mərkəzinə, abb-bank.az saytına və ya filiala müraciət edin.",
   "cited": [],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 5092.5,
+  "total_ms": 4308.9,
   "verdict": "correct",
   "note": "not on the site → 'no information', nothing invented",
   "hallucination": false
@@ -1350,7 +1355,7 @@
    "https://abb-bank.az/haqqimizda/rekvizitler"
   ],
   "status": "answered",
-  "answer": "ABB’s SWIFT code is **IBAZAZ2X** [S1]. Its head office is at **67 Nizami Street, AZ1005, Baku, Azerbaijan** [S1].",
+  "answer": "ABB’s SWIFT code is **IBAZAZ2X**, and its head office is at **67 Nizami Street, AZ1005, Baku, Azerbaijan**. [S1]",
   "cited": [
    {
     "id": "S1",
@@ -1360,7 +1365,7 @@
   ],
   "cites_expected_source": false,
   "reranked": true,
-  "total_ms": 3159.7,
+  "total_ms": 4055.2,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -1378,7 +1383,7 @@
    "https://abb-bank.az/ferdi/butun-emeliyyatlar/olkedaxili-ve-olkexarici-kocurmeler/western-union"
   ],
   "status": "answered",
-  "answer": "For a Western Union transfer of USD 2,500 to Ukraine through ABB, the listed commission is 0.90% of the transfer amount—USD 22.50 [S5].",
+  "answer": "Sending 2,500 USD to Ukraine with Western Union costs **22.50 USD** in commission: transfers over 2,000 USD and up to 3,000 USD are charged at 0.90% of the transfer amount [S5].",
   "cited": [
    {
     "id": "S5",
@@ -1388,9 +1393,9 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3540.6,
-  "verdict": "correct",
-  "note": "computed 0.90% of 2 500 USD = 22.50 USD",
+  "total_ms": 4362.8,
+  "verdict": "partial",
+  "note": "22.50 USD is right (0.90% above 200 USD), but the stated bracket '2 000–3 000 USD' comes from the page's second (12-hour) table, where it is 1.5% — rows of two tables mixed",
   "hallucination": false
  },
  {
@@ -1405,7 +1410,7 @@
    "https://abb-bank.az/abb-biz-mpos-istifadecileri-ucun-xidmet-sertleri-yenilenir"
   ],
   "status": "answered",
-  "answer": "Yes. With monthly turnover of 150 AZN (below 200 AZN), the monthly service fee is 3 AZN per active MPOS terminal. [S1]",
+  "answer": "Yes. If your monthly turnover is 150 AZN, which is below 200 AZN, the monthly service fee is 3 AZN per active MPOS terminal. [S1]",
   "cited": [
    {
     "id": "S1",
@@ -1415,7 +1420,7 @@
   ],
   "cites_expected_source": false,
   "reranked": true,
-  "total_ms": 3193.8,
+  "total_ms": 5871.2,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -1434,7 +1439,7 @@
    "https://abb-bank.az/xeberler/tamgenc-kartini-abb-den-pulsuz-elde-et-fevral-2023"
   ],
   "status": "answered",
-  "answer": "No. The February 2023 free-card campaign has ended; it ran from 1 to 15 February 2023 [S5]. TamGənc is for young people aged 18–25 [S3].",
+  "answer": "No. The free online-order campaign ran from 1 to 15 February 2023, so it has ended [S5]. TamGənc is for young people aged 18–25 [S3].",
   "cited": [
    {
     "id": "S5",
@@ -1449,7 +1454,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 2595.8,
+  "total_ms": 3359.8,
   "verdict": "correct",
   "note": "says the 2023 offer ended",
   "hallucination": false
@@ -1467,7 +1472,7 @@
    "https://abb-bank.az/atm#mingecevir"
   ],
   "status": "answered",
-  "answer": "ABB has 14 ATM locations in Mingachevir; 2 accept cash deposits. Both are at Heydar Aliyev Avenue 96, at the ABB Mingachevir branch (listed twice): they accept cash-in deposits and operate 24/7, including weekends. [S1]",
+  "answer": "ABB lists 14 ATM locations in Mingachevir, and 2 accept cash deposits [S1]. The cash-in ATMs are both listed at Heydar Aliyev Avenue 96, at the ABB Mingachevir branch, and operate 24/7, including weekends [S1].",
   "cited": [
    {
     "id": "S1",
@@ -1477,7 +1482,7 @@
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 2947.5,
+  "total_ms": 5846.6,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -1494,12 +1499,12 @@
    "https://abb-bank.az/haqqimizda/arasdirma"
   ],
   "status": "answered",
-  "answer": "ABB has published reports covering several parts of Azerbaijan’s economy, including:\n- **Labor market:** *Statistical Overview of the Labor Market in Azerbaijan*, analyzing labor-market conditions and indicators [S1] [S5].\n- **Retail:** reports on Azerbaijan’s retail sector, including its turnover, product groups, geographic distribution and e-commerce [S1] [S5].\n- **Real estate:** a series of reports on Baku’s real estate market, including editions covering the first quarter of 2025 and the first half of 2026 [S2] [S9].\n- **Tourism:** *Tourism in Numbers*, covering tourism statistics for 2022–2023 [S7].\n- **Transport, agriculture, healthcare, automotive industry and climate change:** these topics are also represented in ABB’s research-document catalogue or report publications [S3] [S5] [S8].",
+  "answer": "ABB has published research reports covering Azerbaijan’s labor market, retail, agriculture, transport, tourism, automotive industry, healthcare, and Baku’s real estate market. Its research collection also includes a report on climate change and its consequences. [S3] [S5]\n\nThe listed reports include *Statistical Overview of the Labor Market in Azerbaijan*; *Navigating Azerbaijan’s Retail Landscape: Trends and Insights*; *General Look at the Agricultural Sector of Azerbaijan: A Statistical Summary*; *Azerbaijan’s Transport Sector: Trends and Insights*; *Tourism in Numbers: Exploring Azerbaijan’s Tourism Statistics*; *Automotive Industry Overview: Global Trends and Azerbaijan*; *Current Status and Development Trends in the Healthcare Sector*; *Impacts and Consequences of Climate Change*; and *Insights into Baku’s Real Estate Market* (including editions 2, 3, 4, and 5). [S3] [S5]\n\nFor example, ABB’s December 2025 reports covered labor-market conditions in 2024–2025, retail-sector indicators, and real-estate trends in Baku during the first three quarters of 2025. [S9] Its transport report discussed freight and passenger transport, vehicle imports, sector investment and employment, and the Zangezur Corridor’s economic prospects. [S10] The reports are available on ABB’s research page. [S5]",
   "cited": [
    {
-    "id": "S1",
-    "url": "https://abb-bank.az/ru/xeberler/abb-den-daha-3-hesabat",
-    "title": "Еще 3 отчета от Банка ABB!"
+    "id": "S3",
+    "url": "https://abb-bank.az/en/haqqimizda/arasdirma",
+    "title": "Research"
    },
    {
     "id": "S5",
@@ -1507,34 +1512,19 @@
     "title": "Research"
    },
    {
-    "id": "S2",
-    "url": "https://abb-bank.az/en/xeberler/abb-dasinmaz-emlak-bazari-ile-bagli-3-cu-hesabatini-yaydi",
-    "title": "ABB Bank Publishes Its Third Report on the Real Estate Market"
-   },
-   {
     "id": "S9",
-    "url": "https://abb-bank.az/en/xeberler/abb-den-dasinmaz-emlak-bazari-ile-bagli-muhum-arasdirma",
-    "title": "Important research on the real estate market"
+    "url": "https://abb-bank.az/xeberler/abb-den-daha-3-hesabat",
+    "title": "ABB-dən daha 3 hesabat!"
    },
    {
-    "id": "S7",
-    "url": "https://abb-bank.az/ru/xeberler/abb-daha-bir-maraqli-hesabat-yaydi",
-    "title": "Банк ABB опубликовал еще один интересный отчет"
-   },
-   {
-    "id": "S3",
-    "url": "https://abb-bank.az/en/haqqimizda/arasdirma",
-    "title": "Research"
-   },
-   {
-    "id": "S8",
-    "url": "https://abb-bank.az/ru/xeberler/abb-iqlim-deyisikliyinin-tesirleri-ile-bagli-hesabat-yaydi",
-    "title": "Банк ABB опубликовал отчет о последствиях изменения климата"
+    "id": "S10",
+    "url": "https://abb-bank.az/ru/xeberler/abb-den-neqliyyat-sektoru-ile-bagli-hesabat",
+    "title": "Отчет о транспортном секторе от Банка ABB!"
    }
   ],
   "cites_expected_source": false,
   "reranked": true,
-  "total_ms": 4432.2,
+  "total_ms": 8845.9,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -1553,7 +1543,7 @@
    "https://abb-bank.az/ferdi/kartlar/kredit-kartlari/tamkart-visa-classic"
   ],
   "status": "answered",
-  "answer": "SMS-информирование по TamKart Classic стоит 5 AZN [S2]. Срок действия карты — 5 лет [S3].",
+  "answer": "Для кредитной карты TamKart Classic SMS-информирование стоит 5 AZN, а срок действия карты — 5 лет. [S2][S6]",
   "cited": [
    {
     "id": "S2",
@@ -1561,14 +1551,14 @@
     "title": "TamKart Classic"
    },
    {
-    "id": "S3",
-    "url": "https://abb-bank.az/ru/ferdi/kartlar/kredit-kartlari/tamkart-visa-classic",
+    "id": "S6",
+    "url": "https://abb-bank.az/ferdi/kartlar/kredit-kartlari/tamkart-visa-classic",
     "title": "TamKart Classic"
    }
   ],
-  "cites_expected_source": false,
+  "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3788.6,
+  "total_ms": 4393.7,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -1584,14 +1574,20 @@
   "sources": [
    "https://abb-bank.az/masin-girovu-ile-kredit-goturmek-olur"
   ],
-  "status": "no_information",
-  "answer": "В предоставленных источниках нет информации о возможности получить в ABB кредит под залог автомобиля. Уточните условия по телефону 937, на сайте abb-bank.az или в отделении ABB.",
-  "cited": [],
-  "cites_expected_source": false,
+  "status": "answered",
+  "answer": "Нет, в ABB не предусмотрен кредит под залог автомобиля. Ознакомиться с другими видами кредитов и их условиями можно на странице «Кредиты» ABB. [S2]",
+  "cited": [
+   {
+    "id": "S2",
+    "url": "https://abb-bank.az/masin-girovu-ile-kredit-goturmek-olur",
+    "title": "Onlayn kredit üçün indi müraciət edin"
+   }
+  ],
+  "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3154.1,
-  "verdict": "wrong",
-  "note": "Russian question, answer only on an Azerbaijani page (no Russian version); said 'no information'",
+  "total_ms": 4923.2,
+  "verdict": "correct",
+  "note": "fixed by searching in Azerbaijani too (the page has no Russian version)",
   "hallucination": false
  },
  {
@@ -1606,14 +1602,20 @@
   "sources": [
    "https://abb-bank.az/filiallar#filial-698"
   ],
-  "status": "no_information",
-  "answer": "В предоставленных источниках не указано, работает ли филиал ABB в Ширване по субботам. Уточните по номеру 937, на сайте abb-bank.az или в отделении ABB.",
-  "cited": [],
-  "cites_expected_source": false,
+  "status": "answered",
+  "answer": "Нет, филиал ABB в Ширване работает с понедельника по пятницу, с 09:00 до 17:00; работа по субботам не указана [S3].",
+  "cited": [
+   {
+    "id": "S3",
+    "url": "https://abb-bank.az/filiallar#filial-698",
+    "title": "Şirvan filialı"
+   }
+  ],
+  "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3431.9,
-  "verdict": "wrong",
-  "note": "Russian question, branch list exists only in Azerbaijani; said 'no information'",
+  "total_ms": 5088.2,
+  "verdict": "correct",
+  "note": "fixed by searching in Azerbaijani too (the branch list is Azerbaijani only)",
   "hallucination": false
  },
  {
@@ -1630,7 +1632,7 @@
    "https://abb-bank.az/biznes/kicik-ve-orta-biznes/biznes-kreditleri/subsidiyali-guzestli-kreditler"
   ],
   "status": "answered",
-  "answer": "Максимальная сумма субсидированного кредита через AR İKZF — до 10 000 000 AZN, срок — до 84 месяцев [S1].",
+  "answer": "Максимальная сумма субсидированного кредита через AR İKZF — до 10 млн AZN, срок — до 84 месяцев (7 лет) [S1].",
   "cited": [
    {
     "id": "S1",
@@ -1640,7 +1642,7 @@
   ],
   "cites_expected_source": false,
   "reranked": true,
-  "total_ms": 2563.7,
+  "total_ms": 4935.1,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -1657,17 +1659,17 @@
    "https://abb-bank.az/terminallar#quba"
   ],
   "status": "answered",
-  "answer": "В Губе указано 4 платёжных терминала ABB; все 4 принимают наличные (cash-in). [S2]",
+  "answer": "В Губе указаны 4 платёжных терминала ABB, и все 4 принимают наличные (cash-in) [S1].",
   "cited": [
    {
-    "id": "S2",
+    "id": "S1",
     "url": "https://abb-bank.az/terminallar#quba",
     "title": "ABB ödəniş terminalları — Quba"
    }
   ],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 3524.8,
+  "total_ms": 4623.4,
   "verdict": "correct",
   "note": "",
   "hallucination": false
@@ -1682,11 +1684,11 @@
   ],
   "sources": [],
   "status": "no_information",
-  "answer": "В предоставленных источниках нет информации о специальном детском депозите с бонусом на день рождения. Уточнить условия можно по номеру 937, на abb-bank.az или в отделении ABB.",
+  "answer": "В предоставленных материалах нет информации о специальном детском депозите с бонусом ко дню рождения ребёнка. Уточните условия в контакт-центре ABB по номеру 937, на abb-bank.az или в отделении.",
   "cited": [],
   "cites_expected_source": true,
   "reranked": true,
-  "total_ms": 4252.1,
+  "total_ms": 5226.6,
   "verdict": "correct",
   "note": "not on the site → 'no information', nothing invented",
   "hallucination": false
