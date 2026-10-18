@@ -236,6 +236,8 @@ function AssistantMessage({ message, onSelect, onQuote }: {
   if (!response) return null;
 
   const byId = new Map(response.sources.map((source) => [source.id, source]));
+  // The model's labels refer to all chunks it was given (S1…S10); the user sees the cited ones numbered 1, 2, 3 …
+  const numberOf = new Map(response.sources.map((source, index) => [source.id, index + 1]));
   const markdown = message.content.replace(CITATION_RE, (_match, id: string) => (byId.has(id) ? `[${id}](#${id})` : ""));
 
   async function copy() {
@@ -269,7 +271,7 @@ function AssistantMessage({ message, onSelect, onQuote }: {
                 if (source) {
                   return (
                     <a className="cite" href={source.url} target="_blank" rel="noreferrer" title={source.title}>
-                      {source.id.slice(1)}
+                      {numberOf.get(source.id)}
                     </a>
                   );
                 }
@@ -283,7 +285,7 @@ function AssistantMessage({ message, onSelect, onQuote }: {
 
         {response.sources.length > 0 && (
           <div className="sources" aria-label={t.sources}>
-            {response.sources.map((source) => <SourceChip key={source.id} source={source} />)}
+            {response.sources.map((source, index) => <SourceChip key={source.id} source={source} number={index + 1} />)}
           </div>
         )}
 
@@ -317,14 +319,14 @@ function AssistantMessage({ message, onSelect, onQuote }: {
   );
 }
 
-function SourceChip({ source }: { source: Source }) {
+function SourceChip({ source, number }: { source: Source; number: number }) {
   const { t } = useI18n();
   const status = source.is_active === false ? t.ended
     : source.is_active === true ? `${t.active}${source.valid_until ? ` · ${t.validUntil} ${source.valid_until}` : ""}`
     : null;
   return (
     <a className="source" href={source.url} target="_blank" rel="noreferrer" title={source.url}>
-      <span className="source-id">{source.id.slice(1)}</span>
+      <span className="source-id">{number}</span>
       <span className="source-title">{source.title}</span>
       {status && <span className={`badge ${source.is_active ? "badge-active" : "badge-ended"}`}>{status}</span>}
       {source.published && <span className="source-date">{source.published}</span>}
