@@ -156,8 +156,9 @@ export function ChatView() {
             )}
 
             {pendingIn === active.id && (
-              <div className="msg msg-assistant msg-pending">
-                <span className="dots" aria-hidden><i /><i /><i /></span> {t.thinking}
+              <div className="msg-assistant msg-pending">
+                <span className="avatar" aria-hidden>ABB</span>
+                <div className="msg-body"><span className="dots" aria-hidden><i /><i /><i /></span> {t.thinking}</div>
               </div>
             )}
             <div ref={bottom} />
@@ -221,94 +222,112 @@ function AssistantMessage({ message, onSelect, onQuote }: {
 }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   const response = message.response;
 
-  if (message.error) return <div className="msg msg-assistant msg-error" role="alert">{message.error}</div>;
+  if (message.error) {
+    return (
+      <div className="msg-assistant">
+        <span className="avatar" aria-hidden>ABB</span>
+        <div className="msg-body msg-error" role="alert">{message.error}</div>
+      </div>
+    );
+  }
   if (!response) return null;
 
   const byId = new Map(response.sources.map((source) => [source.id, source]));
   const markdown = message.content.replace(CITATION_RE, (_match, id: string) => (byId.has(id) ? `[${id}](#${id})` : ""));
 
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(plain(message.content));
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* clipboard blocked — nothing to do */
+    }
+  }
+
   return (
-    <div
-      className={`msg msg-assistant status-${response.status}`}
-      onMouseUp={() => {
-        const text = window.getSelection()?.toString().trim();
-        if (text) onSelect(text);
-      }}
-    >
-      {response.status === "out_of_scope" && <div className="status-note">{t.refused}</div>}
-      {response.status === "no_information" && <div className="status-note">{t.noInfo}</div>}
+    <div className={`msg-assistant status-${response.status}`}>
+      <span className="avatar" aria-hidden>ABB</span>
+      <div
+        className="msg-body"
+        onMouseUp={() => {
+          const text = window.getSelection()?.toString().trim();
+          if (text) onSelect(text);
+        }}
+      >
+        {response.status === "out_of_scope" && <span className="status-pill">{t.refused}</span>}
+        {response.status === "no_information" && <span className="status-pill">{t.noInfo}</span>}
 
-      <div className="answer">
-        <ReactMarkdown
-          components={{
-            a: ({ href, children }) => {
-              const source = href?.startsWith("#S") ? byId.get(href.slice(1)) : undefined;
-              if (source) {
-                return (
-                  <a className="cite" href={source.url} target="_blank" rel="noreferrer" title={source.title}>
-                    {source.id.slice(1)}
-                  </a>
-                );
-              }
-              return <a href={href} target="_blank" rel="noreferrer">{children}</a>;
-            },
-          }}
-        >
-          {markdown}
-        </ReactMarkdown>
-      </div>
-
-      {response.sources.length > 0 && (
-        <div className="sources">
-          <div className="label">{t.sources}</div>
-          {response.sources.map((source) => <SourceCard key={source.id} source={source} />)}
+        <div className="answer">
+          <ReactMarkdown
+            components={{
+              a: ({ href, children }) => {
+                const source = href?.startsWith("#S") ? byId.get(href.slice(1)) : undefined;
+                if (source) {
+                  return (
+                    <a className="cite" href={source.url} target="_blank" rel="noreferrer" title={source.title}>
+                      {source.id.slice(1)}
+                    </a>
+                  );
+                }
+                return <a href={href} target="_blank" rel="noreferrer">{children}</a>;
+              },
+            }}
+          >
+            {markdown}
+          </ReactMarkdown>
         </div>
-      )}
 
-      <div className="msg-actions">
-        <button className="link-button" onClick={onQuote}>❝ {t.quote}</button>
-        <button className="link-button" onClick={() => setOpen(!open)} aria-expanded={open}>{t.details}</button>
-        {!response.reranked && response.status === "answered" && <span className="hint-warn">{t.noReranker}</span>}
+        {response.sources.length > 0 && (
+          <div className="sources" aria-label={t.sources}>
+            {response.sources.map((source) => <SourceChip key={source.id} source={source} />)}
+          </div>
+        )}
+
+        <div className="msg-actions">
+          <button className="action" onClick={onQuote} title={t.quote}><span aria-hidden>❝</span> {t.quote}</button>
+          <button className="action" onClick={copy} title={t.copy}>
+            <span aria-hidden>{copied ? "✓" : "⧉"}</span> {copied ? t.copied : t.copy}
+          </button>
+          <button className="action" onClick={() => setOpen(!open)} aria-expanded={open} title={t.details}>
+            <span aria-hidden>ⓘ</span> {t.details}
+          </button>
+          {!response.reranked && response.status === "answered" && <span className="hint-warn">{t.noReranker}</span>}
+        </div>
+
+        {open && (
+          <dl className="details">
+            <dt>{t.searchedFor}</dt>
+            <dd>{response.search_queries.join(" · ")}</dd>
+            <dt>ms</dt>
+            <dd>
+              total {Math.round(response.timings.total_ms)} · search {Math.round(response.timings.retrieval_ms)} · rerank{" "}
+              {Math.round(response.timings.rerank_ms)} · LLM {Math.round(response.timings.generation_ms)}
+              {response.timings.rewrite_ms > 1 && ` · plan ${Math.round(response.timings.rewrite_ms)}`}
+            </dd>
+            <dt>model</dt>
+            <dd>{response.model} · request {response.request_id}</dd>
+          </dl>
+        )}
       </div>
-
-      {open && (
-        <dl className="details">
-          <dt>{t.searchedFor}</dt>
-          <dd>{response.search_queries.join(" · ")}</dd>
-          <dt>ms</dt>
-          <dd>
-            total {Math.round(response.timings.total_ms)} · search {Math.round(response.timings.retrieval_ms)} · rerank{" "}
-            {Math.round(response.timings.rerank_ms)} · LLM {Math.round(response.timings.generation_ms)}
-            {response.timings.rewrite_ms > 1 && ` · plan ${Math.round(response.timings.rewrite_ms)}`}
-          </dd>
-          <dt>model</dt>
-          <dd>{response.model} · request {response.request_id}</dd>
-        </dl>
-      )}
     </div>
   );
 }
 
-function SourceCard({ source }: { source: Source }) {
+function SourceChip({ source }: { source: Source }) {
   const { t } = useI18n();
+  const status = source.is_active === false ? t.ended
+    : source.is_active === true ? `${t.active}${source.valid_until ? ` · ${t.validUntil} ${source.valid_until}` : ""}`
+    : null;
   return (
-    <a className="source" href={source.url} target="_blank" rel="noreferrer">
+    <a className="source" href={source.url} target="_blank" rel="noreferrer" title={source.url}>
       <span className="source-id">{source.id.slice(1)}</span>
-      <span className="source-body">
-        <span className="source-title">{source.title}</span>
-        <span className="source-meta">
-          {source.is_active === false && <span className="badge badge-ended">{t.ended}</span>}
-          {source.is_active === true && (
-            <span className="badge badge-active">
-              {t.active}{source.valid_until && ` · ${t.validUntil} ${source.valid_until}`}
-            </span>
-          )}
-          {source.published && <span className="badge">{t.published}: {source.published}</span>}
-          <span className="source-url">{source.url.replace("https://", "")}</span>
-        </span>
-      </span>
+      <span className="source-title">{source.title}</span>
+      {status && <span className={`badge ${source.is_active ? "badge-active" : "badge-ended"}`}>{status}</span>}
+      {source.published && <span className="source-date">{source.published}</span>}
     </a>
   );
 }
