@@ -12,6 +12,7 @@ const DashboardView = lazy(() => import("./components/DashboardView").then((m) =
 
 type Tab = "data" | "chat" | "dashboard";
 const LANG_KEY = "abb.lang";
+const LANGUAGE_NAMES: Record<Lang, string> = { az: "AZ · Azərbaycanca", en: "EN · English", ru: "RU · Русский" };
 const THEME_KEY = "abb.theme";
 type Theme = "light" | "dark";
 const STARTED_KEY = "abb.started";
@@ -120,13 +121,12 @@ export default function App() {
                   title={theme === "dark" ? t.themeLight : t.themeDark}>
             {theme === "dark" ? "☀" : "☾"}
           </button>
-          <div className="lang-switch" role="group" aria-label="Language">
+          <select className="lang-select" value={lang} aria-label="Language / Dil / Язык"
+                  onChange={(event) => changeLang(event.target.value as Lang)}>
             {LANGS.map((code) => (
-              <button key={code} className={`lang ${lang === code ? "lang-active" : ""}`} onClick={() => changeLang(code)}>
-                {code.toUpperCase()}
-              </button>
+              <option key={code} value={code}>{LANGUAGE_NAMES[code]}</option>
             ))}
-          </div>
+          </select>
         </header>
 
         <main className="content">
