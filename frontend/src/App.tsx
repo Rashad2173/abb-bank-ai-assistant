@@ -2,7 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react
 
 import { api } from "./api";
 import { ChatView } from "./components/ChatView";
-import { UploadView } from "./components/UploadView";
+import { DataView } from "./components/DataView";
 import { I18nContext, LANGS, TEXTS, type Lang } from "./i18n";
 import { loadMeta } from "./storage";
 import type { CorpusInfo } from "./types";
@@ -131,7 +131,7 @@ export default function App() {
 
         <main className={`content ${tab === "chat" && chatReady ? "content-full" : ""}`}>
           {tab === "data" && (
-            <UploadView
+            <DataView
               corpus={corpus}
               onProcessed={async () => {
                 await refreshCorpus();

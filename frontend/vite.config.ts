@@ -7,6 +7,7 @@ const services = {
   "/api/chat": "http://localhost:8001",
   "/api/analytics": "http://localhost:8002",
   "/api/ingestion": "http://localhost:8003",
+  "/api/scraper": "http://localhost:8005",
 };
 
 export default defineConfig({

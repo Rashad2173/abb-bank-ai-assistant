@@ -12,4 +12,6 @@ class Settings(ServiceSettings):
     embed_timeout: float = 300.0
     """One batch of documents can take long on a CPU."""
     max_pages: int = 20_000
+    max_files: int = 10
+    max_file_mb: int = 25
     log_level: str = "INFO"

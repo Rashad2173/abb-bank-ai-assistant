@@ -49,6 +49,12 @@ class Job(BaseModel):
     finished_at: datetime | None = None
 
 
+class FileIngestResponse(BaseModel):
+    job: Job
+    pages: list[dict]
+    """The pages built from the documents — the UI keeps them in localStorage."""
+
+
 class CorpusInfo(BaseModel):
     collection: str
     chunks: int

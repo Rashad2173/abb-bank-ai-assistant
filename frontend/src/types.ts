@@ -57,6 +57,30 @@ export interface IngestJob {
   finished_at: string | null;
 }
 
+export type ScrapeStatus = "queued" | "discovering" | "crawling" | "network" | "extracting" | "indexing" | "done" | "failed";
+
+export interface ScrapeJob {
+  job_id: string;
+  url: string;
+  mode: IngestMode;
+  status: ScrapeStatus;
+  discovered: number;
+  fetched: number;
+  from_cache: number;
+  failed: number;
+  remaining: number;
+  recent: { url: string; outcome: "cached" | "fetched" | "failed" }[];
+  pages: number;
+  chunks: number;
+  unchanged: number;
+  to_embed: number;
+  embedded: number;
+  deleted: number;
+  error: string | null;
+  started_at: string;
+  finished_at: string | null;
+}
+
 export interface CorpusInfo {
   collection: string;
   chunks: number;

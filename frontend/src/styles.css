@@ -285,3 +285,71 @@ td:last-child, th:last-child { text-align: right; font-variant-numeric: tabular-
 .mode-option > span { display: grid; gap: 0.1rem; font-size: 0.88rem; }
 .mode-option input { margin-top: 0.2rem; accent-color: var(--accent); }
 .mode-active { border-color: var(--accent); background: var(--accent-soft); }
+
+/* Data step: link or file */
+.data-view { display: grid; gap: 1rem; max-width: 760px; margin: 0 auto; }
+.source-switch { justify-self: center; }
+.data-view .upload { max-width: none; }
+.scrape { display: grid; gap: 1rem; }
+.scrape-form { gap: 1rem; }
+.url-row { display: flex; gap: 0.5rem; }
+.url-input {
+  flex: 1; min-width: 0; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 0.6rem 0.8rem;
+}
+.url-input:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+
+/* Live pipeline */
+.pipeline { gap: 1.1rem; }
+.pipeline-head { display: flex; gap: 1rem; align-items: center; }
+.pipeline-head h1 { margin: 0; }
+.pipeline-head p { margin: 0.15rem 0 0; font-variant-numeric: tabular-nums; }
+.pipeline-mascot { height: 92px; width: auto; flex: none; }
+.bobbing { animation: bob 2.4s ease-in-out infinite; transform-origin: bottom center; }
+@keyframes bob { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-6px) rotate(-2deg); } }
+.progress { height: 10px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.progress-fill {
+  height: 100%; border-radius: 999px; transition: width 0.6s ease;
+  background: linear-gradient(90deg, var(--accent), var(--series-1), var(--accent)); background-size: 200% 100%;
+  animation: flow 2s linear infinite;
+}
+@keyframes flow { from { background-position: 200% 0; } to { background-position: 0 0; } }
+.counters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+.counter { background: var(--surface-2); border-radius: 10px; padding: 0.6rem 0.75rem; text-align: center; }
+.counter-value { font-size: 1.5rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+.counter .label { margin: 0; text-transform: none; letter-spacing: 0; }
+.stages { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; }
+.stage { display: flex; gap: 0.7rem; align-items: flex-start; padding: 0.35rem 0; }
+.stage-icon {
+  flex: none; width: 1.5rem; height: 1.5rem; border-radius: 50%; border: 2px solid var(--border);
+  display: grid; place-items: center; font-size: 0.75rem; font-weight: 700; color: var(--accent-ink); margin-top: 0.05rem;
+}
+.stage-done .stage-icon { background: var(--good); border-color: var(--good); }
+.stage-active .stage-icon { border-color: var(--accent); border-top-color: transparent; animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.stage-body { display: grid; }
+.stage-title { font-weight: 500; }
+.stage-pending .stage-title { color: var(--text-muted); }
+.stage-detail { font-size: 0.82rem; color: var(--text-secondary); font-variant-numeric: tabular-nums; min-height: 0.5rem; }
+.ticker { border-top: 1px solid var(--border); padding-top: 0.75rem; }
+.ticker ul { list-style: none; margin: 0.35rem 0 0; padding: 0; display: grid; gap: 0.2rem; }
+.ticker li { display: flex; gap: 0.5rem; align-items: center; font-size: 0.8rem; animation: slide-in 0.35s ease; }
+.ticker-url { color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: ui-monospace, Consolas, monospace; }
+@keyframes slide-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.badge-cached { background: var(--surface-2); color: var(--text-muted); }
+.badge-fetched { background: color-mix(in srgb, var(--good) 14%, transparent); color: var(--good); }
+.badge-failed { background: color-mix(in srgb, var(--critical) 12%, transparent); color: var(--critical); }
+.fact { background: var(--accent-soft); border-radius: 10px; padding: 0.7rem 0.9rem; animation: fade-in 0.6s ease; }
+.fact p { margin: 0.2rem 0 0; }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.scrape-result { display: grid; gap: 0.6rem; }
+@media (prefers-reduced-motion: reduce) {
+  .bobbing, .progress-fill, .stage-active .stage-icon, .ticker li, .fact { animation: none; }
+}
+@media (max-width: 720px) {
+  .url-row { flex-direction: column; }
+  .pipeline-mascot { height: 64px; }
+  .counter-value { font-size: 1.2rem; }
+}
+
+.doc-list { list-style: none; margin: 0.2rem 0 0; padding: 0; display: grid; gap: 0.2rem; font-size: 0.9rem; }

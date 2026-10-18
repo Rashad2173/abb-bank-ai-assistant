@@ -6,9 +6,11 @@ import { api, ApiError } from "../api";
 import { errorText, useI18n } from "../i18n";
 import { parseData, ParseError, type ParsedData } from "../parse";
 import { clearData, loadData, loadMeta, saveData, type StoredMeta } from "../storage";
-import type { CorpusInfo, IngestJob, IngestMode, JobStatus } from "../types";
+import type { CorpusInfo, IngestJob, IngestMode, JobStatus, Page } from "../types";
+import { ModeChoice } from "./ModeChoice";
 
 const POLL_MS = 1500;
+const DOCUMENT_RE = /\.(pdf|txt|md)$/i;
 const STEPS: JobStatus[] = ["chunking", "comparing", "embedding", "writing", "done"];
 
 interface Props {
@@ -21,6 +23,7 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
   const { t } = useI18n();
   const [meta, setMeta] = useState<StoredMeta | null>(loadMeta);
   const [parsed, setParsed] = useState<ParsedData | null>(null);
+  const [documents, setDocuments] = useState<File[] | null>(null);
   const [savedLocally, setSavedLocally] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
   const [job, setJob] = useState<IngestJob | null>(null);
@@ -40,6 +43,21 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
   function stopPolling() {
     if (polling.current !== null) window.clearInterval(polling.current);
     polling.current = null;
+  }
+
+  /** JSON(L) of scraped pages is parsed here; PDF / TXT documents are read by the ingestion service. */
+  async function readFiles(files: File[]) {
+    if (!files.length) return;
+    const docs = files.filter((file) => DOCUMENT_RE.test(file.name));
+    if (docs.length) {
+      setError(null);
+      setJob(null);
+      setParsed(null);
+      setDocuments(docs);
+      return;
+    }
+    setDocuments(null);
+    await readFile(files[0]);
   }
 
   async function readFile(file: File) {
@@ -67,13 +85,20 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
     setError(null);
     setBusy(true);
     try {
-      const data = parsed ?? parseStored();
-      if (!data) {
-        setBusy(false);
-        setError(errorText(t, "empty"));
-        return;
+      let started: IngestJob;
+      if (documents) {
+        const result = await api.ingestFiles(documents, mode);
+        started = result.job;
+        keepDocuments(result.pages);
+      } else {
+        const data = parsed ?? parseStored();
+        if (!data) {
+          setBusy(false);
+          setError(errorText(t, "empty"));
+          return;
+        }
+        started = await api.ingest(data.pages, mode);
       }
-      const started = await api.ingest(data.pages, mode);
       setJob(started);
       polling.current = window.setInterval(async () => {
         try {
@@ -92,8 +117,23 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
       }, POLL_MS);
     } catch (exc) {
       setBusy(false);
+      if (exc instanceof ApiError && exc.status === 422 && documents) {
+        setError(`${t.errors.unreadable} (${exc.message})`);
+        return;
+      }
       const code = exc instanceof ApiError ? (exc.status === 409 ? "busy" : exc.code) : "generic";
       setError(errorText(t, code));
+    }
+  }
+
+  /** The text extracted from the documents is what the browser keeps (like an uploaded data file). */
+  function keepDocuments(pages: Page[]) {
+    const name = documents!.map((file) => file.name).join(", ");
+    try {
+      setMeta(saveData(name, pages.map((page) => JSON.stringify(page)).join("\n"), pages.length));
+      setSavedLocally(true);
+    } catch {
+      setSavedLocally(false);
     }
   }
 
@@ -101,11 +141,12 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
     clearData();
     setMeta(null);
     setParsed(null);
+    setDocuments(null);
     setSavedLocally(null);
     setJob(null);
   }
 
-  const hasData = parsed !== null || meta !== null;
+  const hasData = parsed !== null || documents !== null || meta !== null;
 
   return (
     <section className="upload">
@@ -119,8 +160,7 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
         onDrop={(event) => {
           event.preventDefault();
           setDragging(false);
-          const file = event.dataTransfer.files[0];
-          if (file) readFile(file);
+          readFiles(Array.from(event.dataTransfer.files));
         }}
       >
         <h1>{t.uploadTitle}</h1>
@@ -128,11 +168,11 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
         <input
           ref={input}
           type="file"
-          accept=".jsonl,.json,application/json"
+          accept=".jsonl,.json,.pdf,.txt,.md,application/json,application/pdf,text/plain"
+          multiple
           hidden
           onChange={(event) => {
-            const file = event.target.files?.[0];
-            if (file) readFile(file);
+            readFiles(Array.from(event.target.files ?? []));
             event.target.value = "";
           }}
         />
@@ -173,6 +213,17 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
             </div>
           </div>
 
+          {documents && (
+            <div>
+              <div className="label">{t.documentsLabel}</div>
+              <ul className="doc-list">
+                {documents.map((file) => (
+                  <li key={file.name}>📄 {file.name} <span className="muted">· {Math.max(1, Math.round(file.size / 1024))} KB</span></li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {parsed && (
             <div className="facts">
               <Facts title={t.languages} counts={parsed.byLanguage} />
@@ -181,18 +232,7 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
             </div>
           )}
 
-          <fieldset className="mode" disabled={busy}>
-            <legend className="label">{t.modeTitle}</legend>
-            {(["append", "replace"] as IngestMode[]).map((option) => (
-              <label key={option} className={`mode-option ${mode === option ? "mode-active" : ""}`}>
-                <input type="radio" name="mode" value={option} checked={mode === option} onChange={() => { modeChosen.current = true; setMode(option); }} />
-                <span>
-                  <strong>{option === "append" ? t.modeAppend : t.modeReplace}</strong>
-                  <span className="muted">{option === "append" ? t.modeAppendHint : t.modeReplaceHint}</span>
-                </span>
-              </label>
-            ))}
-          </fieldset>
+          <ModeChoice mode={mode} disabled={busy} onChange={(option) => { modeChosen.current = true; setMode(option); }} />
 
           {job && <JobProgress job={job} />}
 

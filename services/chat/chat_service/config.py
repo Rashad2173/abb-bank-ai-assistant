@@ -19,7 +19,8 @@ class Settings(ServiceSettings):
     openai_reasoning_effort: Literal["minimal", "low", "medium", "high"] = "low"
 
     # Retrieval
-    retrieval_method: Literal["dense+sparse", "dense+bm25", "dense+sparse+bm25", "dense"] = "dense+sparse"
+    retrieval_method: Literal["dense+sparse", "dense+bm25", "dense+sparse+bm25", "dense"] = "dense+sparse+bm25"
+    """All three fused: meaning (dense), learned keywords (sparse), exact words (BM25) — report 09."""
     retrieval_candidates: int = 30
     """Chunks Milvus returns and the reranker re-scores."""
     context_chunks: int = 10

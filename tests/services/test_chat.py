@@ -125,7 +125,7 @@ async def test_without_reranker_milvus_returns_only_the_context_size():
     settings = Settings(_env_file=None, openai_api_key="x", reranker="none", context_chunks=2)
     chat, generator = pipeline(settings=settings, store=store)
     await chat.run(ChatRequest(question="?"))
-    assert [(method, limit) for method, limit, *_ in store.searches] == [("dense+sparse", 2)]
+    assert [(method, limit) for method, limit, *_ in store.searches] == [("dense+sparse+bm25", 2)]
     assert len(generator.seen_chunks) == 2
 
 

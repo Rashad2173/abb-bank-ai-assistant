@@ -325,12 +325,16 @@ function SourceChip({ source, number }: { source: Source; number: number }) {
   const status = source.is_active === false ? t.ended
     : source.is_active === true ? `${t.active}${source.valid_until ? ` · ${t.validUntil} ${source.valid_until}` : ""}`
     : null;
-  return (
-    <a className="source" href={source.url} target="_blank" rel="noreferrer" title={source.url}>
+  const body = (
+    <>
       <span className="source-id">{number}</span>
       <span className="source-title">{source.title}</span>
       {status && <span className={`badge ${source.is_active ? "badge-active" : "badge-ended"}`}>{status}</span>}
       {source.published && <span className="source-date">{source.published}</span>}
-    </a>
+    </>
   );
+  if (!source.url.startsWith("http")) {
+    return <span className="source" title={decodeURIComponent(source.url.replace("upload://", ""))}>📄 {body}</span>;
+  }
+  return <a className="source" href={source.url} target="_blank" rel="noreferrer" title={source.url}>{body}</a>;
 }

@@ -15,6 +15,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
@@ -40,15 +41,30 @@ class CrawlSummary:
     found_via_links: int = 0
 
 
+ProgressCallback = Callable[[str, str], None]
+"""Called with ``(url, outcome)`` for every URL handled: ``"cached"``, ``"fetched"`` or ``"failed"``."""
+
+
 class Crawler:
-    def __init__(self, config: ScraperConfig, store: RawPageStore) -> None:
+    def __init__(self, config: ScraperConfig, store: RawPageStore, on_url: ProgressCallback | None = None) -> None:
         self.config = config
         self.store = store
+        self.on_url = on_url
         self.summary = CrawlSummary()
         self._seen: set[str] = set()
         self._lastmod: dict[str, str | None] = {}
         self._queue: asyncio.Queue[str] = asyncio.Queue()
         self._started = 0.0
+
+    @property
+    def discovered(self) -> int:
+        """URLs found so far (sitemap + links) — for progress displays."""
+        return len(self._seen)
+
+    @property
+    def remaining(self) -> int:
+        """URLs still waiting in the queue."""
+        return self._queue.qsize()
 
     async def crawl(self) -> CrawlSummary:
         self._started = time.monotonic()
@@ -118,15 +134,18 @@ class Crawler:
             try:
                 if url in done:
                     self.summary.from_cache += 1
+                    self._report(url, "cached")
                     continue
                 record, html = await self._fetch(client, url)
                 self.store.append_record(record)
                 if record.error:
                     self.summary.failed += 1
                     log.warning("Failed %s: %s", url, record.error)
+                    self._report(url, "failed")
                 else:
                     self.summary.fetched += 1
                     self._log_progress()
+                    self._report(url, "fetched")
                 if html and self.config.follow_links:
                     self._enqueue_links(html, record.final_url)
             finally:
@@ -151,6 +170,10 @@ class Crawler:
             last_modified=self._lastmod.get(url),
         )
         return record, html
+
+    def _report(self, url: str, outcome: str) -> None:
+        if self.on_url is not None:
+            self.on_url(url, outcome)
 
     def _log_progress(self) -> None:
         if self.summary.fetched % 100 == 0:
