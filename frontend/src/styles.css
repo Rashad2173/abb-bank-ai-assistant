@@ -1,4 +1,4 @@
-/* Tokens: light by default, dark from the OS setting. Series colours are the
+/* Tokens: light by default, dark when <html data-theme="dark"> (the OS setting until the user toggles). Series colours are the
    validated categorical palette (slots 1–4) in its light and dark steps. */
 :root {
   color-scheme: light;
@@ -11,10 +11,10 @@
   --text: #0b0b0b;
   --text-secondary: #52514e;
   --text-muted: #77766f;
-  --accent: #2a78d6;
+  --accent: #0057c2; /* ABB brand blue (from the logo) */
   --accent-ink: #ffffff;
-  --accent-soft: #e6f0fc;
-  --user-bubble: #2a78d6;
+  --accent-soft: #e5eefa;
+  --user-bubble: #0057c2;
   --user-ink: #ffffff;
   --series-1: #2a78d6;
   --series-2: #eb6834;
@@ -30,29 +30,29 @@
   line-height: 1.5;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --bg: #121211;
-    --surface: #1a1a19;
-    --surface-2: #232321;
-    --border: #2f2f2c;
-    --grid: #2a2a27;
-    --hover: rgba(255, 255, 255, 0.05);
-    --text: #f0efec;
-    --text-secondary: #c3c2b7;
-    --text-muted: #94938a;
-    --accent: #3987e5;
-    --accent-soft: #1d2a3b;
-    --user-bubble: #2f6fbf;
-    --series-1: #3987e5;
-    --series-2: #d95926;
-    --series-3: #199e70;
-    --series-4: #c98500;
-    --warning: #fab219;
-    --shadow: none;
-  }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #121211;
+  --surface: #1a1a19;
+  --surface-2: #232321;
+  --border: #2f2f2c;
+  --grid: #2a2a27;
+  --hover: rgba(255, 255, 255, 0.05);
+  --text: #f0efec;
+  --text-secondary: #c3c2b7;
+  --text-muted: #94938a;
+  --accent: #3987e5;
+  --accent-soft: #1d2a3b;
+  --user-bubble: #2f6fbf;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --warning: #fab219;
+  --shadow: none;
 }
+/* The logo is brand blue on transparent — give it a light plate on dark surfaces. */
+:root[data-theme="dark"] .brand-logo { background: #ffffff; border-radius: 6px; padding: 3px 6px; box-sizing: content-box; height: 24px; }
 
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--text); }
@@ -74,7 +74,10 @@ h2 { font-size: 0.95rem; margin: 0; font-weight: 600; }
   background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 2;
 }
 .brand { display: flex; align-items: center; gap: 0.6rem; font-weight: 600; }
-.brand-mark { background: var(--accent); color: var(--accent-ink); border-radius: 8px; padding: 0.2rem 0.45rem; font-size: 0.8rem; letter-spacing: 0.05em; }
+.brand-logo { height: 30px; width: auto; display: block; }
+.brand-name { color: var(--text-secondary); font-weight: 500; padding-left: 0.6rem; border-left: 1px solid var(--border); }
+.footer { text-align: center; font-size: 0.75rem; color: var(--text-muted); padding: 0.75rem 1rem 1rem; }
+.skip { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.75rem; text-align: center; }
 .tabs { display: flex; gap: 0.25rem; margin-left: auto; }
 .tab { border: 0; background: transparent; color: var(--text-secondary); padding: 0.45rem 0.85rem; border-radius: 8px; }
 .tab:hover:not(:disabled) { background: var(--hover); }
@@ -217,4 +220,29 @@ td:last-child, th:last-child { text-align: right; font-variant-numeric: tabular-
   .msg { max-width: 95%; }
   .chat { height: calc(100vh - 9rem); }
   .hbars li { grid-template-columns: 6rem 1fr auto; }
+}
+
+/* Theme toggle */
+.theme-toggle { border: 1px solid var(--border); background: var(--surface); color: var(--text-secondary); border-radius: 8px; width: 2rem; height: 1.9rem; display: grid; place-items: center; }
+.theme-toggle:hover { color: var(--accent); }
+
+/* Chat with conversation sidebar */
+.chat-layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 1rem; height: calc(100vh - 8.5rem); }
+.sidebar { display: flex; flex-direction: column; gap: 0.6rem; min-height: 0; border-right: 1px solid var(--border); padding-right: 0.75rem; }
+.new-chat { width: 100%; }
+.conversation-list { list-style: none; margin: 0; padding: 0; overflow-y: auto; display: grid; gap: 2px; align-content: start; }
+.conversation { display: flex; align-items: center; border-radius: 8px; }
+.conversation:hover { background: var(--hover); }
+.conversation-active { background: var(--accent-soft); }
+.conversation-open { flex: 1; min-width: 0; text-align: left; border: 0; background: none; color: var(--text); padding: 0.45rem 0.55rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.88rem; }
+.conversation-active .conversation-open { color: var(--accent); font-weight: 600; }
+.conversation .icon-button { visibility: hidden; }
+.conversation:hover .icon-button, .conversation-active .icon-button { visibility: visible; }
+.chat-layout .chat { height: 100%; max-width: none; min-width: 0; }
+.sidebar-toggle { display: none; align-self: flex-start; }
+@media (max-width: 720px) {
+  .chat-layout { grid-template-columns: 1fr; height: calc(100vh - 10rem); }
+  .sidebar { display: none; border-right: 0; padding-right: 0; }
+  .sidebar-open .sidebar { display: flex; position: fixed; inset: 6.5rem 1rem auto 1rem; max-height: 60vh; z-index: 3; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.75rem; box-shadow: var(--shadow); }
+  .sidebar-toggle { display: inline-block; }
 }

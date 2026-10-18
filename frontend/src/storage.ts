@@ -11,7 +11,6 @@ import { gunzipSync, gzipSync, strFromU8, strToU8 } from "fflate";
 
 const DATA_KEY = "abb.data.v1";
 const META_KEY = "abb.data.meta.v1";
-const SESSION_KEY = "abb.session";
 const OFFSET = 0x0800;
 const BITS = 15;
 
@@ -106,19 +105,5 @@ export function clearData(): void {
     localStorage.removeItem(META_KEY);
   } catch {
     /* storage unavailable — nothing to clear */
-  }
-}
-
-/** A per-browser id grouping one user's questions in the analytics. */
-export function sessionId(): string {
-  try {
-    let id = localStorage.getItem(SESSION_KEY);
-    if (!id) {
-      id = crypto.randomUUID();
-      localStorage.setItem(SESSION_KEY, id);
-    }
-    return id;
-  } catch {
-    return "anonymous";
   }
 }

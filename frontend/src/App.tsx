@@ -12,6 +12,18 @@ const DashboardView = lazy(() => import("./components/DashboardView").then((m) =
 
 type Tab = "data" | "chat" | "dashboard";
 const LANG_KEY = "abb.lang";
+const THEME_KEY = "abb.theme";
+type Theme = "light" | "dark";
+const STARTED_KEY = "abb.started";
+
+/** Has this browser been through the data step (processed an upload or chose the indexed data)? */
+function hasStarted(): boolean {
+  try {
+    return localStorage.getItem(STARTED_KEY) === "1" || loadMeta() !== null;
+  } catch {
+    return false;
+  }
+}
 
 function initialLang(): Lang {
   try {
@@ -24,8 +36,8 @@ function initialLang(): Lang {
 
 export default function App() {
   const [lang, setLang] = useState<Lang>(initialLang);
+  const [theme, setTheme] = useState<Theme>(() => (document.documentElement.dataset.theme as Theme) ?? "light");
   const [corpus, setCorpus] = useState<CorpusInfo | null>(null);
-  const [hasData, setHasData] = useState(() => loadMeta() !== null);
   const [tab, setTab] = useState<Tab>("data");
   const i18n = useMemo(() => ({ lang, t: TEXTS[lang] }), [lang]);
   const { t } = i18n;
@@ -42,11 +54,34 @@ export default function App() {
     refreshCorpus();
   }, [refreshCorpus]);
 
-  // Chat opens only after data was uploaded and processed (the brief's flow).
-  const chatReady = hasData && (corpus?.chunks ?? 0) > 0;
+  // The brief's flow: upload → processing → chat. A first visit therefore opens on the
+  // data step; the chat unlocks once the search index holds processed data. Visitors
+  // without a file can continue with the data that is already indexed, and returning
+  // visitors open straight on the chat.
+  const chatReady = (corpus?.chunks ?? 0) > 0;
   useEffect(() => {
-    if (chatReady) setTab((current) => (current === "data" ? "chat" : current));
+    if (chatReady && hasStarted()) setTab((current) => (current === "data" ? "chat" : current));
   }, [chatReady]);
+
+  const startChat = () => {
+    try {
+      localStorage.setItem(STARTED_KEY, "1");
+    } catch {
+      /* not remembered — fine */
+    }
+    setTab("chat");
+  };
+
+  const toggleTheme = () => {
+    const next: Theme = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem(THEME_KEY, next);
+    } catch {
+      /* not remembered — fine */
+    }
+  };
 
   const changeLang = (next: Lang) => {
     setLang(next);
@@ -63,7 +98,7 @@ export default function App() {
       <div className="app">
         <header className="topbar">
           <div className="brand">
-            <span className="brand-mark" aria-hidden>ABB</span>
+            <img className="brand-logo" src="/abb-logo.png" alt="ABB — Azərbaycan Beynəlxalq Bankı" height={30} />
             <span className="brand-name">{t.appTitle}</span>
           </div>
           <nav className="tabs" role="tablist">
@@ -81,6 +116,10 @@ export default function App() {
               </button>
             ))}
           </nav>
+          <button className="theme-toggle" onClick={toggleTheme} aria-label={theme === "dark" ? t.themeLight : t.themeDark}
+                  title={theme === "dark" ? t.themeLight : t.themeDark}>
+            {theme === "dark" ? "☀" : "☾"}
+          </button>
           <div className="lang-switch" role="group" aria-label="Language">
             {LANGS.map((code) => (
               <button key={code} className={`lang ${lang === code ? "lang-active" : ""}`} onClick={() => changeLang(code)}>
@@ -94,12 +133,11 @@ export default function App() {
           {tab === "data" && (
             <UploadView
               corpus={corpus}
-              onStored={(stored) => setHasData(stored)}
               onProcessed={async () => {
-                setHasData(true);
                 await refreshCorpus();
-                setTab("chat");
+                startChat();
               }}
+              onSkip={startChat}
             />
           )}
           {tab === "chat" && chatReady && <ChatView />}
@@ -109,6 +147,7 @@ export default function App() {
             </Suspense>
           )}
         </main>
+        <footer className="footer">{t.footer}</footer>
       </div>
     </I18nContext.Provider>
   );

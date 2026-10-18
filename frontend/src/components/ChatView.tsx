@@ -1,34 +1,17 @@
-// The conversation: messages, cited sources, quoting a passage of an answer.
+// The conversations: a sidebar of past chats, messages with cited sources,
+// quoting a passage of an answer.
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import ReactMarkdown from "react-markdown";
 
 import { api, ApiError } from "../api";
+import { useConversations, type Conversation, type Message } from "../conversations";
 import { errorText, useI18n } from "../i18n";
-import { sessionId } from "../storage";
-import type { ChatResponse, Source, Turn } from "../types";
+import type { Source, Turn } from "../types";
 
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  quote?: string;
-  response?: ChatResponse;
-  error?: string;
-}
-
-const HISTORY_KEY = "abb.chat.v1";
 const HISTORY_TURNS = 6;
 const MAX_QUOTE = 1500;
 const CITATION_RE = /\[(S\d+)\]/g;
-
-function loadMessages(): Message[] {
-  try {
-    return JSON.parse(sessionStorage.getItem(HISTORY_KEY) ?? "[]") as Message[];
-  } catch {
-    return [];
-  }
-}
 
 function plain(answer: string): string {
   return answer.replace(/\s?\[S\d+\]/g, "").trim();
@@ -36,53 +19,58 @@ function plain(answer: string): string {
 
 export function ChatView() {
   const { t } = useI18n();
-  const [messages, setMessages] = useState<Message[]>(loadMessages);
+  const { conversations, active, select, append, start, remove } = useConversations();
   const [draft, setDraft] = useState("");
   const [quote, setQuote] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
+  const [pendingIn, setPendingIn] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const selection = useRef<{ id: string; text: string } | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const messages = active.messages;
+  const pending = pendingIn !== null;
 
   useEffect(() => {
-    try {
-      sessionStorage.setItem(HISTORY_KEY, JSON.stringify(messages));
-    } catch {
-      /* not persisted — fine */
-    }
     bottom.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages, pending]);
+  }, [messages.length, pendingIn, active.id]);
 
   async function ask(question: string) {
     const text = question.trim();
     if (!text || pending) return;
+    const conversationId = active.id;
     const history: Turn[] = messages
       .filter((m) => !m.error)
       .map((m) => ({ role: m.role, content: m.role === "assistant" ? plain(m.content) : m.content }))
       .slice(-HISTORY_TURNS);
     const sentQuote = quote ?? undefined;
-    setMessages((all) => [...all, { id: crypto.randomUUID(), role: "user", content: text, quote: sentQuote }]);
+    append(conversationId, { id: crypto.randomUUID(), role: "user", content: text, quote: sentQuote });
     setDraft("");
     setQuote(null);
-    setPending(true);
+    setPendingIn(conversationId);
     try {
-      const response = await api.chat(text, history, sessionId(), sentQuote);
-      setMessages((all) => [...all, { id: response.request_id, role: "assistant", content: response.answer, response }]);
+      // One conversation = one session in the analytics.
+      const response = await api.chat(text, history, conversationId, sentQuote);
+      append(conversationId, { id: response.request_id, role: "assistant", content: response.answer, response });
     } catch (exc) {
       const message = errorText(t, exc instanceof ApiError ? exc.code : "generic");
       const rid = exc instanceof ApiError && exc.requestId ? ` (request ${exc.requestId})` : "";
-      setMessages((all) => [...all, { id: crypto.randomUUID(), role: "assistant", content: "", error: message + rid }]);
+      append(conversationId, { id: crypto.randomUUID(), role: "assistant", content: "", error: message + rid });
     } finally {
-      setPending(false);
+      setPendingIn(null);
       inputRef.current?.focus();
     }
   }
 
   function quoteMessage(message: Message) {
     const selected = selection.current?.id === message.id ? selection.current.text : "";
-    const text = (selected || plain(message.content)).slice(0, MAX_QUOTE);
-    setQuote(text);
+    setQuote((selected || plain(message.content)).slice(0, MAX_QUOTE));
     inputRef.current?.focus();
+  }
+
+  function open(id: string) {
+    select(id);
+    setQuote(null);
+    setSidebarOpen(false);
   }
 
   function submit(event: FormEvent) {
@@ -91,73 +79,103 @@ export function ChatView() {
   }
 
   return (
-    <section className="chat">
-      <div className="chat-log" aria-live="polite">
-        {messages.length === 0 && (
-          <div className="welcome">
-            <p>{t.welcome}</p>
-            <div className="examples">
-              {t.examples.map((example) => (
-                <button key={example} className="chip chip-button" onClick={() => ask(example)}>{example}</button>
-              ))}
+    <div className={`chat-layout ${sidebarOpen ? "sidebar-open" : ""}`}>
+      <aside className="sidebar" aria-label={t.conversations}>
+        <button className="button button-primary new-chat" disabled={pending} onClick={() => { start(); setSidebarOpen(false); }}>
+          + {t.newChat}
+        </button>
+        <ul className="conversation-list">
+          {conversations.filter((c) => c.messages.length || c.id === active.id).map((c) => (
+            <ConversationItem key={c.id} conversation={c} active={c.id === active.id} disabled={pending}
+                              onOpen={() => open(c.id)} onRemove={() => remove(c.id)} />
+          ))}
+        </ul>
+      </aside>
+
+      <section className="chat">
+        <button className="link-button sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} aria-expanded={sidebarOpen}>
+          ☰ {t.conversations}
+        </button>
+        <div className="chat-log" aria-live="polite">
+          {messages.length === 0 && (
+            <div className="welcome">
+              <p>{t.welcome}</p>
+              <div className="examples">
+                {t.examples.map((example) => (
+                  <button key={example} className="chip chip-button" onClick={() => ask(example)}>{example}</button>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {messages.map((message) =>
-          message.role === "user" ? (
-            <div key={message.id} className="msg msg-user">
-              {message.quote && <blockquote className="msg-quote">{message.quote}</blockquote>}
-              <p>{message.content}</p>
+          {messages.map((message) =>
+            message.role === "user" ? (
+              <div key={message.id} className="msg msg-user">
+                {message.quote && <blockquote className="msg-quote">{message.quote}</blockquote>}
+                <p>{message.content}</p>
+              </div>
+            ) : (
+              <AssistantMessage
+                key={message.id}
+                message={message}
+                onSelect={(text) => (selection.current = { id: message.id, text })}
+                onQuote={() => quoteMessage(message)}
+              />
+            ),
+          )}
+
+          {pendingIn === active.id && (
+            <div className="msg msg-assistant msg-pending">
+              <span className="dots" aria-hidden><i /><i /><i /></span> {t.thinking}
             </div>
-          ) : (
-            <AssistantMessage
-              key={message.id}
-              message={message}
-              onSelect={(text) => (selection.current = { id: message.id, text })}
-              onQuote={() => quoteMessage(message)}
-            />
-          ),
-        )}
-
-        {pending && (
-          <div className="msg msg-assistant msg-pending">
-            <span className="dots" aria-hidden><i /><i /><i /></span> {t.thinking}
-          </div>
-        )}
-        <div ref={bottom} />
-      </div>
-
-      <form className="composer" onSubmit={submit}>
-        {quote && (
-          <div className="quote-bar">
-            <span className="label">{t.quoting}</span>
-            <span className="quote-text">{quote}</span>
-            <button type="button" className="icon-button" aria-label={t.removeQuote} onClick={() => setQuote(null)}>×</button>
-          </div>
-        )}
-        <div className="composer-row">
-          <textarea
-            ref={inputRef}
-            value={draft}
-            maxLength={1000}
-            rows={1}
-            placeholder={t.chatPlaceholder}
-            onChange={(event) => setDraft(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                ask(draft);
-              }
-            }}
-          />
-          <button className="button button-primary" disabled={pending || !draft.trim()}>{t.send}</button>
+          )}
+          <div ref={bottom} />
         </div>
-        {messages.length > 0 && (
-          <button type="button" className="link-button" onClick={() => setMessages([])}>{t.newChat}</button>
-        )}
-      </form>
-    </section>
+
+        <form className="composer" onSubmit={submit}>
+          {quote && (
+            <div className="quote-bar">
+              <span className="label">{t.quoting}</span>
+              <span className="quote-text">{quote}</span>
+              <button type="button" className="icon-button" aria-label={t.removeQuote} onClick={() => setQuote(null)}>×</button>
+            </div>
+          )}
+          <div className="composer-row">
+            <textarea
+              ref={inputRef}
+              value={draft}
+              maxLength={1000}
+              rows={1}
+              placeholder={t.chatPlaceholder}
+              onChange={(event) => setDraft(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault();
+                  ask(draft);
+                }
+              }}
+            />
+            <button className="button button-primary" disabled={pending || !draft.trim()}>{t.send}</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  );
+}
+
+function ConversationItem({ conversation, active, disabled, onOpen, onRemove }: {
+  conversation: Conversation; active: boolean; disabled: boolean; onOpen: () => void; onRemove: () => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <li className={`conversation ${active ? "conversation-active" : ""}`}>
+      <button className="conversation-open" disabled={disabled && !active} onClick={onOpen} title={conversation.title}>
+        {conversation.title || t.newChat}
+      </button>
+      {conversation.messages.length > 0 && (
+        <button className="icon-button" aria-label={t.deleteChat} disabled={disabled} onClick={onRemove}>×</button>
+      )}
+    </li>
   );
 }
 

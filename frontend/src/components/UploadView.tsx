@@ -13,11 +13,11 @@ const STEPS: JobStatus[] = ["chunking", "comparing", "embedding", "writing", "do
 
 interface Props {
   corpus: CorpusInfo | null;
-  onStored: (stored: boolean) => void;
   onProcessed: () => void;
+  onSkip: () => void;
 }
 
-export function UploadView({ corpus, onStored, onProcessed }: Props) {
+export function UploadView({ corpus, onProcessed, onSkip }: Props) {
   const { t } = useI18n();
   const [meta, setMeta] = useState<StoredMeta | null>(loadMeta);
   const [parsed, setParsed] = useState<ParsedData | null>(null);
@@ -50,7 +50,6 @@ export function UploadView({ corpus, onStored, onProcessed }: Props) {
       } catch {
         setSavedLocally(false); // quota exceeded / storage blocked — keep it in memory
       }
-      onStored(true);
     } catch (exc) {
       setError(errorText(t, exc instanceof ParseError ? exc.message : "generic"));
     } finally {
@@ -98,7 +97,6 @@ export function UploadView({ corpus, onStored, onProcessed }: Props) {
     setParsed(null);
     setSavedLocally(null);
     setJob(null);
-    onStored(false);
   }
 
   const hasData = parsed !== null || meta !== null;
@@ -136,6 +134,15 @@ export function UploadView({ corpus, onStored, onProcessed }: Props) {
           {busy && !job ? t.reading : hasData ? t.replace : t.chooseFile}
         </button>
       </div>
+
+      {!hasData && (corpus?.chunks ?? 0) > 0 && (
+        <div className="skip">
+          <span className="muted">{t.skipHint}</span>
+          <button className="button" onClick={onSkip}>
+            {t.skip} ({corpus!.chunks.toLocaleString()} {t.chunks})
+          </button>
+        </div>
+      )}
 
       {error && <p className="alert alert-error" role="alert">{error}</p>}
 

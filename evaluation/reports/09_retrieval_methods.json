@@ -1,0 +1,59 @@
+{
+ "dense+sparse · both (chat service)": {
+  "retrieval": {
+   "complete@5": 0.865,
+   "recall@5": 0.885,
+   "recall@10": 0.9375,
+   "mrr": 0.7338313492063492,
+   "recall@5_by_lang": {
+    "az": 0.9096045197740112,
+    "en": 0.5714285714285714,
+    "ru": 0.8888888888888888
+   }
+  },
+  "answer_set_source_in_context": "51/53",
+  "answer_set_by_lang": {
+   "az": "41/42",
+   "en": "5/6",
+   "ru": "5/5"
+  }
+ },
+ "dense+bm25 · both (chat service)": {
+  "retrieval": {
+   "complete@5": 0.87,
+   "recall@5": 0.89,
+   "recall@10": 0.9475,
+   "mrr": 0.7361805555555556,
+   "recall@5_by_lang": {
+    "az": 0.9152542372881356,
+    "en": 0.5714285714285714,
+    "ru": 0.8888888888888888
+   }
+  },
+  "answer_set_source_in_context": "51/53",
+  "answer_set_by_lang": {
+   "az": "42/42",
+   "en": "4/6",
+   "ru": "5/5"
+  }
+ },
+ "dense+sparse+bm25 · both (chat service)": {
+  "retrieval": {
+   "complete@5": 0.87,
+   "recall@5": 0.89,
+   "recall@10": 0.94,
+   "mrr": 0.7373253968253968,
+   "recall@5_by_lang": {
+    "az": 0.9152542372881356,
+    "en": 0.5714285714285714,
+    "ru": 0.8888888888888888
+   }
+  },
+  "answer_set_source_in_context": "52/53",
+  "answer_set_by_lang": {
+   "az": "42/42",
+   "en": "5/6",
+   "ru": "5/5"
+  }
+ }
+}
