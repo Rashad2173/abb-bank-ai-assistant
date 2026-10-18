@@ -130,6 +130,7 @@ export function ChatView() {
           <div className="chat-column">
             {messages.length === 0 && (
               <div className="welcome">
+                <img className="welcome-mascot" src="/assistant-mascot.png" alt="" aria-hidden />
                 <p>{t.welcome}</p>
                 <div className="examples">
                   {t.examples.map((example) => (
@@ -157,7 +158,7 @@ export function ChatView() {
 
             {pendingIn === active.id && (
               <div className="msg-assistant msg-pending">
-                <span className="avatar" aria-hidden>ABB</span>
+                <img className="avatar" src="/assistant-avatar.png" alt="" aria-hidden />
                 <div className="msg-body"><span className="dots" aria-hidden><i /><i /><i /></span> {t.thinking}</div>
               </div>
             )}
@@ -228,7 +229,7 @@ function AssistantMessage({ message, onSelect, onQuote }: {
   if (message.error) {
     return (
       <div className="msg-assistant">
-        <span className="avatar" aria-hidden>ABB</span>
+        <img className="avatar" src="/assistant-avatar.png" alt="" aria-hidden />
         <div className="msg-body msg-error" role="alert">{message.error}</div>
       </div>
     );
@@ -252,7 +253,7 @@ function AssistantMessage({ message, onSelect, onQuote }: {
 
   return (
     <div className={`msg-assistant status-${response.status}`}>
-      <span className="avatar" aria-hidden>ABB</span>
+      <img className="avatar" src="/assistant-avatar.png" alt="" aria-hidden />
       <div
         className="msg-body"
         onMouseUp={() => {
