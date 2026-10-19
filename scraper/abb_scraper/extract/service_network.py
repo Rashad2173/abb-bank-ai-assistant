@@ -48,14 +48,13 @@ def service_network_documents(data: dict[str, Any]) -> list[NetworkDocument]:
 
     documents = [_overview(data, cities)]
     # The filters refer to branch ids; sub-branches and offices have their own id range.
-    documents += [_branch_document(b, "filial", "Filiallar", cities, filters_by_branch[b.get("id")])
-                  for b in branches]
+    documents += [_branch_document(b, "filial", "Filiallar", cities, filters_by_branch[b.get("id")]) for b in branches]
     documents += [_branch_document(b, "sobe", "Şöbələr", cities) for b in data.get("sub_branches", [])]
-    documents += [_branch_document(b, "xarici-ofis", "Xaricdəki ofislər", None)
-                  for b in data.get("abroad_offices", [])]
+    documents += [_branch_document(b, "xarici-ofis", "Xaricdəki ofislər", None) for b in data.get("abroad_offices", [])]
     documents += _grouped_by_city(data.get("atms", []), cities, "atm", "Bankomatlar", "ABB bankomatları (ATM)")
-    documents += _grouped_by_city(data.get("terminals", []), cities, "terminallar", "Ödəniş terminalları",
-                                  "ABB ödəniş terminalları")
+    documents += _grouped_by_city(
+        data.get("terminals", []), cities, "terminallar", "Ödəniş terminalları", "ABB ödəniş terminalları"
+    )
     return documents
 
 
@@ -68,23 +67,32 @@ def coordinates_of(point: dict[str, Any]) -> Coordinates | None:
 
 # --------------------------------------------------------------------------- #
 
+
 def _overview(data: dict[str, Any], cities: CityResolver) -> NetworkDocument:
     branches, atms = data.get("branches", []), data.get("atms", [])
     terminals = data.get("terminals", [])
     title = "ABB xidmət şəbəkəsi: filiallar, şöbələr, bankomatlar və terminallar"
     blocks = [
         Block(title, 1),
-        Block(f"ABB-nin {len(branches)} filialı, {len(data.get('sub_branches', []))} şöbəsi "
-              f"və xaricdə {len(data.get('abroad_offices', []))} ofisi var."),
-        Block(f"Bankomatlar (ATM): {len(atms)}; onlardan {sum(bool(a.get('atmCashIn')) for a in atms)}-i "
-              f"nağd pul mədaxili (cash-in) qəbul edir, {sum(_is_24_7(a) for a in atms)}-i 24/7 işləyir."),
+        Block(
+            f"ABB-nin {len(branches)} filialı, {len(data.get('sub_branches', []))} şöbəsi "
+            f"və xaricdə {len(data.get('abroad_offices', []))} ofisi var."
+        ),
+        Block(
+            f"Bankomatlar (ATM): {len(atms)}; onlardan {sum(bool(a.get('atmCashIn')) for a in atms)}-i "
+            f"nağd pul mədaxili (cash-in) qəbul edir, {sum(_is_24_7(a) for a in atms)}-i 24/7 işləyir."
+        ),
         Block(f"Ödəniş terminalları: {len(terminals)}."),
-        Block("Filiallar şəhərlər üzrə", 2),
     ]
     by_city: dict[str, list[str]] = defaultdict(list)
     for branch in branches:
         by_city[cities.city_of(branch.get("address", ""), coordinates_of(branch))].append(_text(branch.get("title")))
-    blocks += [Block(f"{city}: {', '.join(sorted(names))}") for city, names in sorted(by_city.items())]
+    # Counts are written out: the model miscounts long lists ("how many branches in Baku?").
+    blocks += [
+        Block("Filiallar şəhərlər üzrə", 2),
+        Block(f"Filialı olan şəhər və rayonlar ({len(by_city)}): {', '.join(sorted(by_city))}."),
+    ]
+    blocks += [Block(f"{city} ({len(names)}): {', '.join(sorted(names))}") for city, names in sorted(by_city.items())]
 
     names_by_id = {b.get("id"): _text(b.get("title")) for b in branches}
     for filter_title, ids in data.get("branch_filters", {}).items():

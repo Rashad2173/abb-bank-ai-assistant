@@ -11,12 +11,22 @@ from abb_scraper.service_network import ServiceNetworkError, fetch_service_netwo
 BASE = "https://abb-bank.az"
 
 BRANCH = {
-    "id": 288, "title": "Zaqatala filialı", "address": "Zaqatala, Vidadi küçəsi 28a", "director": "Qalib Tahirzadə",
-    "branch_code": 269, "coordinates": {"lat": 41.62, "lng": 46.64},
+    "id": 288,
+    "title": "Zaqatala filialı",
+    "address": "Zaqatala, Vidadi küçəsi 28a",
+    "director": "Qalib Tahirzadə",
+    "branch_code": 269,
+    "coordinates": {"lat": 41.62, "lng": 46.64},
     "work_time": [{"text": "Bazar ertəsi – Cümə: 09:00-17:00"}],
-    "phone_numbers": [{"text": "(+994 12) 493 00 91"}, {"text": " 937"}, {"text": ", "},
-                      {"text": "40.11618294614122,48.10036742797913"}],
-    "subways": [], "services": [], "emails": [],
+    "phone_numbers": [
+        {"text": "(+994 12) 493 00 91"},
+        {"text": " 937"},
+        {"text": ", "},
+        {"text": "40.11618294614122,48.10036742797913"},
+    ],
+    "subways": [],
+    "services": [],
+    "emails": [],
 }
 DATA = {
     "fetched_at": "2026-10-14T17:00:00+00:00",
@@ -25,8 +35,12 @@ DATA = {
     "abroad_offices": [],
     "branch_filters": {"Həftəsonu işləyən filiallar": [288]},
     "atms": [
-        {"address": "Gəncə ş., Atatürk prospekti 1", "atmCashIn": True, "fullDay": True,
-         "location": {"lat": 40.68, "lon": 46.36}},
+        {
+            "address": "Gəncə ş., Atatürk prospekti 1",
+            "atmCashIn": True,
+            "fullDay": True,
+            "location": {"lat": 40.68, "lon": 46.36},
+        },
         {"address": "GANCA, Nizami küçəsi 5", "atmCashIn": False, "workOnWeekend": True},
     ],
     "terminals": [],
@@ -73,8 +87,9 @@ class TestDocuments:
     def test_overview_has_totals_and_filters(self, documents):
         texts = [b.text for b in documents[f"{BASE}/filiallar"].blocks]
         assert "ABB-nin 2 filialı, 1 şöbəsi və xaricdə 0 ofisi var." in texts
-        assert "Bakı: Nərimanov filialı" in texts
-        assert "Zaqatala: Zaqatala filialı" in texts
+        assert "Filialı olan şəhər və rayonlar (2): Bakı, Zaqatala." in texts
+        assert "Bakı (1): Nərimanov filialı" in texts
+        assert "Zaqatala (1): Zaqatala filialı" in texts
         assert texts[texts.index("Həftəsonu işləyən filiallar") + 1] == "Zaqatala filialı"
 
 
@@ -84,8 +99,12 @@ class TestDocuments:
 
 ACTIONS_JS = "".join(
     f'x=(0,v.createServerReference)("{action_id}",v.callServer,void 0,v.findSourceMapURL,"{name}"),'
-    for name, action_id in [("getBranchFilters", "00aa"), ("getBranches", "40bb"),
-                            ("getSubBranches", "00cc"), ("getAbroadOffices", "00dd")]
+    for name, action_id in [
+        ("getBranchFilters", "00aa"),
+        ("getBranches", "40bb"),
+        ("getSubBranches", "00cc"),
+        ("getAbroadOffices", "00dd"),
+    ]
 )
 
 

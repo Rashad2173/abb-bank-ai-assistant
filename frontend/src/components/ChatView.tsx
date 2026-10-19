@@ -1,11 +1,12 @@
 // The conversations: a sidebar of past chats, messages with cited sources,
 // quoting a passage of an answer.
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
-import { api, ApiError } from "../api";
-import { useConversations, type Conversation, type Message } from "../conversations";
+import { ApiError, api } from "../api";
+import { citedPages, pageNumber } from "../citations";
+import { type Conversation, type Message, useConversations } from "../conversations";
 import { errorText, useI18n } from "../i18n";
 import type { Source, Turn } from "../types";
 
@@ -13,8 +14,6 @@ const HISTORY_TURNS = 6;
 const SIDEBAR_KEY = "abb.sidebar";
 const MOBILE = "(max-width: 720px)";
 const MAX_QUOTE = 1500;
-const CITATION_RE = /\[(S\d+)\]/g;
-
 function initialSidebar(): boolean {
   if (window.matchMedia(MOBILE).matches) return false;
   try {
@@ -41,6 +40,8 @@ export function ChatView() {
   const messages = active.messages;
   const pending = pendingIn !== null;
 
+  // Scroll to the newest message when one is added, an answer arrives or another conversation is opened.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the dependencies are the triggers, not values read here
   useEffect(() => {
     bottom.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages.length, pendingIn, active.id]);
@@ -108,23 +109,55 @@ export function ChatView() {
       <aside className="sidebar" aria-label={t.conversations} aria-hidden={!sidebarOpen}>
         <div className="sidebar-head">
           <span className="label">{t.conversations}</span>
-          <button className="icon-button" onClick={() => setSidebar(false)} aria-label={t.hideChats} title={t.hideChats}>«</button>
+          <button
+            type="button"
+            className="icon-button"
+            onClick={() => setSidebar(false)}
+            aria-label={t.hideChats}
+            title={t.hideChats}
+          >
+            «
+          </button>
         </div>
-        <button className="button new-chat" disabled={pending} onClick={() => { start(); closeOnMobile(); }}>
+        <button
+          type="button"
+          className="button new-chat"
+          disabled={pending}
+          onClick={() => {
+            start();
+            closeOnMobile();
+          }}
+        >
           <span aria-hidden>＋</span> {t.newChat}
         </button>
         <ul className="conversation-list">
-          {conversations.filter((c) => c.messages.length || c.id === active.id).map((c) => (
-            <ConversationItem key={c.id} conversation={c} active={c.id === active.id} disabled={pending}
-                              onOpen={() => open(c.id)} onRemove={() => remove(c.id)} />
-          ))}
+          {conversations
+            .filter((c) => c.messages.length || c.id === active.id)
+            .map((c) => (
+              <ConversationItem
+                key={c.id}
+                conversation={c}
+                active={c.id === active.id}
+                disabled={pending}
+                onOpen={() => open(c.id)}
+                onRemove={() => remove(c.id)}
+              />
+            ))}
         </ul>
       </aside>
       {sidebarOpen && <div className="sidebar-backdrop" onClick={() => setSidebar(false)} aria-hidden />}
 
       <section className="chat">
         {!sidebarOpen && (
-          <button className="icon-button sidebar-show" onClick={() => setSidebar(true)} aria-label={t.showChats} title={t.showChats}>☰</button>
+          <button
+            type="button"
+            className="icon-button sidebar-show"
+            onClick={() => setSidebar(true)}
+            aria-label={t.showChats}
+            title={t.showChats}
+          >
+            ☰
+          </button>
         )}
         <div className="chat-log" aria-live="polite">
           <div className="chat-column">
@@ -134,7 +167,9 @@ export function ChatView() {
                 <p>{t.welcome}</p>
                 <div className="examples">
                   {t.examples.map((example) => (
-                    <button key={example} className="chip chip-button" onClick={() => ask(example)}>{example}</button>
+                    <button type="button" key={example} className="chip chip-button" onClick={() => ask(example)}>
+                      {example}
+                    </button>
                   ))}
                 </div>
               </div>
@@ -159,7 +194,14 @@ export function ChatView() {
             {pendingIn === active.id && (
               <div className="msg-assistant msg-pending">
                 <img className="avatar" src="/assistant-mascot.png" alt="" aria-hidden />
-                <div className="msg-body"><span className="dots" aria-hidden><i /><i /><i /></span> {t.thinking}</div>
+                <div className="msg-body">
+                  <span className="dots" aria-hidden>
+                    <i />
+                    <i />
+                    <i />
+                  </span>{" "}
+                  {t.thinking}
+                </div>
               </div>
             )}
             <div ref={bottom} />
@@ -172,7 +214,9 @@ export function ChatView() {
               <div className="quote-bar">
                 <span className="label">{t.quoting}</span>
                 <span className="quote-text">{quote}</span>
-                <button type="button" className="icon-button" aria-label={t.removeQuote} onClick={() => setQuote(null)}>×</button>
+                <button type="button" className="icon-button" aria-label={t.removeQuote} onClick={() => setQuote(null)}>
+                  ×
+                </button>
               </div>
             )}
             <div className="composer-row">
@@ -190,7 +234,9 @@ export function ChatView() {
                   }
                 }}
               />
-              <button className="button button-primary" disabled={pending || !draft.trim()}>{t.send}</button>
+              <button type="submit" className="button button-primary" disabled={pending || !draft.trim()}>
+                {t.send}
+              </button>
             </div>
             <p className="disclaimer">{t.disclaimer}</p>
           </div>
@@ -200,23 +246,45 @@ export function ChatView() {
   );
 }
 
-function ConversationItem({ conversation, active, disabled, onOpen, onRemove }: {
-  conversation: Conversation; active: boolean; disabled: boolean; onOpen: () => void; onRemove: () => void;
+function ConversationItem({
+  conversation,
+  active,
+  disabled,
+  onOpen,
+  onRemove,
+}: {
+  conversation: Conversation;
+  active: boolean;
+  disabled: boolean;
+  onOpen: () => void;
+  onRemove: () => void;
 }) {
   const { t } = useI18n();
   return (
     <li className={`conversation ${active ? "conversation-active" : ""}`}>
-      <button className="conversation-open" disabled={disabled && !active} onClick={onOpen} title={conversation.title}>
+      <button
+        type="button"
+        className="conversation-open"
+        disabled={disabled && !active}
+        onClick={onOpen}
+        title={conversation.title}
+      >
         {conversation.title || t.newChat}
       </button>
       {conversation.messages.length > 0 && (
-        <button className="icon-button" aria-label={t.deleteChat} disabled={disabled} onClick={onRemove}>×</button>
+        <button type="button" className="icon-button" aria-label={t.deleteChat} disabled={disabled} onClick={onRemove}>
+          ×
+        </button>
       )}
     </li>
   );
 }
 
-function AssistantMessage({ message, onSelect, onQuote }: {
+function AssistantMessage({
+  message,
+  onSelect,
+  onQuote,
+}: {
   message: Message;
   onSelect: (text: string) => void;
   onQuote: () => void;
@@ -230,16 +298,15 @@ function AssistantMessage({ message, onSelect, onQuote }: {
     return (
       <div className="msg-assistant">
         <img className="avatar" src="/assistant-mascot.png" alt="" aria-hidden />
-        <div className="msg-body msg-error" role="alert">{message.error}</div>
+        <div className="msg-body msg-error" role="alert">
+          {message.error}
+        </div>
       </div>
     );
   }
   if (!response) return null;
 
-  const byId = new Map(response.sources.map((source) => [source.id, source]));
-  // The model's labels refer to all chunks it was given (S1…S10); the user sees the cited ones numbered 1, 2, 3 …
-  const numberOf = new Map(response.sources.map((source, index) => [source.id, index + 1]));
-  const markdown = message.content.replace(CITATION_RE, (_match, id: string) => (byId.has(id) ? `[${id}](#${id})` : ""));
+  const { pages, markdown } = citedPages(message.content, response.sources);
 
   async function copy() {
     try {
@@ -254,6 +321,7 @@ function AssistantMessage({ message, onSelect, onQuote }: {
   return (
     <div className={`msg-assistant status-${response.status}`}>
       <img className="avatar" src="/assistant-mascot.png" alt="" aria-hidden />
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: selecting text offers it as a quote; the "Quote" button is the keyboard path */}
       <div
         className="msg-body"
         onMouseUp={() => {
@@ -268,15 +336,20 @@ function AssistantMessage({ message, onSelect, onQuote }: {
           <ReactMarkdown
             components={{
               a: ({ href, children }) => {
-                const source = href?.startsWith("#S") ? byId.get(href.slice(1)) : undefined;
-                if (source) {
+                const number = pageNumber(href);
+                const source = number ? pages[number - 1] : undefined;
+                if (number && source) {
                   return (
                     <a className="cite" href={source.url} target="_blank" rel="noreferrer" title={source.title}>
-                      {numberOf.get(source.id)}
+                      {number}
                     </a>
                   );
                 }
-                return <a href={href} target="_blank" rel="noreferrer">{children}</a>;
+                return (
+                  <a href={href} target="_blank" rel="noreferrer">
+                    {children}
+                  </a>
+                );
               },
             }}
           >
@@ -284,18 +357,28 @@ function AssistantMessage({ message, onSelect, onQuote }: {
           </ReactMarkdown>
         </div>
 
-        {response.sources.length > 0 && (
-          <div className="sources" aria-label={t.sources}>
-            {response.sources.map((source, index) => <SourceChip key={source.id} source={source} number={index + 1} />)}
-          </div>
+        {pages.length > 0 && (
+          <section className="sources" aria-label={t.sources}>
+            {pages.map((source, index) => (
+              <SourceChip key={source.url} source={source} number={index + 1} />
+            ))}
+          </section>
         )}
 
         <div className="msg-actions">
-          <button className="action" onClick={onQuote} title={t.quote}><span aria-hidden>❝</span> {t.quote}</button>
-          <button className="action" onClick={copy} title={t.copy}>
+          <button type="button" className="action" onClick={onQuote} title={t.quote}>
+            <span aria-hidden>❝</span> {t.quote}
+          </button>
+          <button type="button" className="action" onClick={copy} title={t.copy}>
             <span aria-hidden>{copied ? "✓" : "⧉"}</span> {copied ? t.copied : t.copy}
           </button>
-          <button className="action" onClick={() => setOpen(!open)} aria-expanded={open} title={t.details}>
+          <button
+            type="button"
+            className="action"
+            onClick={() => setOpen(!open)}
+            aria-expanded={open}
+            title={t.details}
+          >
             <span aria-hidden>ⓘ</span> {t.details}
           </button>
           {!response.reranked && response.status === "answered" && <span className="hint-warn">{t.noReranker}</span>}
@@ -307,12 +390,14 @@ function AssistantMessage({ message, onSelect, onQuote }: {
             <dd>{response.search_queries.join(" · ")}</dd>
             <dt>ms</dt>
             <dd>
-              total {Math.round(response.timings.total_ms)} · search {Math.round(response.timings.retrieval_ms)} · rerank{" "}
-              {Math.round(response.timings.rerank_ms)} · LLM {Math.round(response.timings.generation_ms)}
+              total {Math.round(response.timings.total_ms)} · search {Math.round(response.timings.retrieval_ms)} ·
+              rerank {Math.round(response.timings.rerank_ms)} · LLM {Math.round(response.timings.generation_ms)}
               {response.timings.rewrite_ms > 1 && ` · plan ${Math.round(response.timings.rewrite_ms)}`}
             </dd>
             <dt>model</dt>
-            <dd>{response.model} · request {response.request_id}</dd>
+            <dd>
+              {response.model} · request {response.request_id}
+            </dd>
           </dl>
         )}
       </div>
@@ -322,9 +407,12 @@ function AssistantMessage({ message, onSelect, onQuote }: {
 
 function SourceChip({ source, number }: { source: Source; number: number }) {
   const { t } = useI18n();
-  const status = source.is_active === false ? t.ended
-    : source.is_active === true ? `${t.active}${source.valid_until ? ` · ${t.validUntil} ${source.valid_until}` : ""}`
-    : null;
+  const status =
+    source.is_active === false
+      ? t.ended
+      : source.is_active === true
+        ? `${t.active}${source.valid_until ? ` · ${t.validUntil} ${source.valid_until}` : ""}`
+        : null;
   const body = (
     <>
       <span className="source-id">{number}</span>
@@ -334,7 +422,15 @@ function SourceChip({ source, number }: { source: Source; number: number }) {
     </>
   );
   if (!source.url.startsWith("http")) {
-    return <span className="source" title={decodeURIComponent(source.url.replace("upload://", ""))}>📄 {body}</span>;
+    return (
+      <span className="source" title={decodeURIComponent(source.url.replace("upload://", ""))}>
+        📄 {body}
+      </span>
+    );
   }
-  return <a className="source" href={source.url} target="_blank" rel="noreferrer" title={source.url}>{body}</a>;
+  return (
+    <a className="source" href={source.url} target="_blank" rel="noreferrer" title={source.url}>
+      {body}
+    </a>
+  );
 }
