@@ -45,7 +45,7 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 |----------|--------|
 | Vector DB: **Milvus** | Required for this case |
 | Embedding model chosen by **benchmark on Azerbaijani data** (bge-m3, text-embedding-3-large, multilingual-e5 candidates) | Site content is mostly Azerbaijani; accuracy over cost |
-| **bge-m3 dense + sparse + bge-reranker-v2-m3** | 173/200 questions with all evidence in the top 5 over two independent question sets; most consistent without the reranker too (`retrieval/README.md`) |
+| **bge-m3 dense + sparse + Milvus BM25, re-ranked by bge-reranker-v2-m3** | bge-m3 was the most consistent model on two independent question sets (`retrieval/README.md`); adding BM25 catches rare exact words — 174/200 questions with all evidence in the top 5, Recall@10 94 % (`evaluation/reports/09_retrieval_methods.md`) |
 | Reranker needs a GPU (or a hosted reranker) in production | ~1 s per question on a GPU, ~47 s on CPU |
 | Scraped chunks must be **human-reviewable** | Chunks will be checked manually |
 
@@ -56,12 +56,18 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 - Campaigns carry `is_active`; news carry a publication date — answers about current
   offers must not present ended or old offers as valid.
 
-## Known constraints / risks
-- Browser `localStorage` is limited to ~5–10 MB per origin; the full site dump
-  (3 languages, ~7k URLs) may exceed it → needs compression and/or a scoped upload.
-  To be decided when building 2.2.
+- Long lists (branches per city) are miscounted by the model → counts are computed by
+  the scraper and written into the data.
 
-## Extras (only after all requirements above are ✅)
-Candidates noted so far:
-- Text of linked PDF documents (tariffs, terms) — the chatbot could quote detailed tariffs
-- Report/document links (PDF URLs) next to document titles, so answers can link to them
+## Known constraints / risks
+- Browser `localStorage` is limited to ~5–10 MB per origin and the full site dump is
+  ~21 MB → solved: gzip + 15-bit packing, 1.5 M characters (`frontend/src/storage.ts`).
+- The reranker needs a GPU for interactive answers; without one the chat falls back to
+  Milvus' order (lower accuracy).
+
+## Extras (beyond the brief)
+- Learning the site from its link, with live progress (scraper service)
+- PDF / TXT document uploads; Add / Replace modes; only changed chunks are embedded
+- Query planning: follow-ups, quoting part of an answer, Azerbaijani search for EN / RU questions
+- Conversation sidebar, dark mode, AZ / EN / RU interface
+- Evaluation sets and reports for every stage (`evaluation/`)
