@@ -1,18 +1,21 @@
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 import pytest
 
 from abb_scraper.extract.validity import campaign_validity
 
-FETCHED = datetime(2026, 10, 14, tzinfo=timezone.utc)
+FETCHED = datetime(2026, 10, 14, tzinfo=UTC)
 
 
-@pytest.mark.parametrize("status", [
-    "Aktiv deyil",
-    "Qeyd: Kampaniya müddəti bitmişdir.",
-    "Примечание: кампания завершена.",
-    "Note* – The campaign has already ended.",
-])
+@pytest.mark.parametrize(
+    "status",
+    [
+        "Aktiv deyil",
+        "Qeyd: Kampaniya müddəti bitmişdir.",
+        "Примечание: кампания завершена.",
+        "Note* – The campaign has already ended.",
+    ],
+)
 def test_explicit_end_status(status):
     validity = campaign_validity(["Kampaniya", "10.02.2026 - 24.12.2026", status], FETCHED)
     assert validity.is_active is False

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseData, ParseError } from "./parse";
+import { ParseError, parseData } from "./parse";
 import { compress, decompress, packBytes, unpackBytes } from "./storage";
 
 describe("15-bit packing", () => {
@@ -22,7 +22,10 @@ describe("15-bit packing", () => {
   });
 
   it("compresses Azerbaijani text and restores it exactly", () => {
-    const text = '{"url":"https://abb-bank.az/ferdi","title":"Əmanətlər — şərtlər","lang":"az","category":"individual"}\n'.repeat(500);
+    const text =
+      '{"url":"https://abb-bank.az/ferdi","title":"Əmanətlər — şərtlər","lang":"az","category":"individual"}\n'.repeat(
+        500,
+      );
     const packed = compress(text);
     expect(decompress(packed)).toBe(text);
     expect(packed.length).toBeLessThan(text.length / 10);

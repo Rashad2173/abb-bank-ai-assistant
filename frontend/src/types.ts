@@ -57,7 +57,15 @@ export interface IngestJob {
   finished_at: string | null;
 }
 
-export type ScrapeStatus = "queued" | "discovering" | "crawling" | "network" | "extracting" | "indexing" | "done" | "failed";
+export type ScrapeStatus =
+  | "queued"
+  | "discovering"
+  | "crawling"
+  | "network"
+  | "extracting"
+  | "indexing"
+  | "done"
+  | "failed";
 
 export interface ScrapeJob {
   job_id: string;

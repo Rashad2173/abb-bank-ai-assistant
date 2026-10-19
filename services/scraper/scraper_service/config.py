@@ -1,3 +1,8 @@
+"""Settings of the scraper service: the page cache, politeness and the ingestion service.
+
+Every field is read from the environment variable of the same name (or ``.env``).
+"""
+
 from __future__ import annotations
 
 from pathlib import Path

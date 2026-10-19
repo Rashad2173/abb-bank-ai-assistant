@@ -54,7 +54,7 @@ def rank(scores: np.ndarray, top_k: int) -> list[list[int]]:
 def reciprocal_rank_fusion(*rankings: list[list[int]], top_k: int, k: int = RRF_K) -> list[list[int]]:
     """Merge rankings of the same queries: score = Σ 1 / (k + rank)."""
     fused = []
-    for per_query in zip(*rankings):
+    for per_query in zip(*rankings, strict=True):
         scores: Counter[int] = Counter()
         for ranking in per_query:
             for position, doc in enumerate(ranking):

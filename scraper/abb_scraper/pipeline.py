@@ -30,11 +30,11 @@ from urllib.parse import urlsplit
 
 from .config import ScraperConfig
 from .discovery import category_of, cms_path, language_of
+from .extract.dates import published_date
 from .extract.html_content import Block
 from .extract.page import PageContent, extract_page
 from .extract.service_network import service_network_documents
 from .extract.text import detect_language, fingerprint
-from .extract.dates import published_date
 from .extract.validity import campaign_validity
 from .models import FaqItem, FetchRecord, Language, Page, Section
 from .storage import RawPageStore
@@ -105,6 +105,7 @@ def run_extraction(config: ScraperConfig, store: RawPageStore) -> ExtractionRepo
 # Step 1 — parse
 # --------------------------------------------------------------------------- #
 
+
 def _parse_cached_pages(store: RawPageStore, config: ScraperConfig, report: ExtractionReport) -> list[_Draft]:
     records: dict[str, FetchRecord] = {}
     for record in store.records():
@@ -165,6 +166,7 @@ def _body_text(content: PageContent) -> str:
 # Step 3 — cross-page repetition
 # --------------------------------------------------------------------------- #
 
+
 def _find_frequent_blocks(drafts: list[_Draft], config: ScraperConfig) -> dict[RepeatKey, str]:
     """Blocks that occur on many pages of the same language → ``{key: example text}``."""
     page_counts: Counter[RepeatKey] = Counter()
@@ -211,6 +213,7 @@ class _KeepOnce:
 # Step 4 — assemble
 # --------------------------------------------------------------------------- #
 
+
 def _faq_key(lang: str, item: FaqItem) -> RepeatKey:
     return (lang, fingerprint(f"{item.question}\n{item.answer}"))
 
@@ -253,7 +256,8 @@ def _assemble_pages(
             blocks = list(content.blocks)
         else:
             blocks = [
-                block for block in content.blocks
+                block
+                for block in content.blocks
                 if (key := (draft.lang, fingerprint(block.text))) not in frequent or keep_once.first_time(key)
             ]
         if _is_home_page(draft.url):
@@ -269,8 +273,11 @@ def _assemble_pages(
             blocks=blocks,
             faq=_faq_for_page(draft, faq_pages, config),
             documents=content.documents,
-            validity=(campaign_validity([b.text for b in content.blocks], draft.record.fetched_at)
-                      if category == "campaigns" else None),
+            validity=(
+                campaign_validity([b.text for b in content.blocks], draft.record.fetched_at)
+                if category == "campaigns"
+                else None
+            ),
             published=published_date(b.text for b in content.blocks) if category in _DATED_CATEGORIES else None,
             last_modified=draft.record.last_modified,
             fetched_at=draft.record.fetched_at,
@@ -293,9 +300,19 @@ def _service_network_pages(config: ScraperConfig) -> list[Page]:
     data = json.loads(config.service_network_path.read_text(encoding="utf-8"))
     fetched_at = datetime.fromisoformat(data["fetched_at"])
     return [
-        _make_page(url=doc.url, lang="az", category="service_network", title=doc.title, description=None,
-                   breadcrumbs=doc.breadcrumbs, blocks=doc.blocks, faq=[], coordinates=doc.coordinates,
-                   last_modified=None, fetched_at=fetched_at)
+        _make_page(
+            url=doc.url,
+            lang="az",
+            category="service_network",
+            title=doc.title,
+            description=None,
+            breadcrumbs=doc.breadcrumbs,
+            blocks=doc.blocks,
+            faq=[],
+            coordinates=doc.coordinates,
+            last_modified=None,
+            fetched_at=fetched_at,
+        )
         for doc in service_network_documents(data)
     ]
 
@@ -316,8 +333,6 @@ def _make_page(*, blocks: list[Block], faq: list[FaqItem], **fields) -> Page:
 
 def _is_home_page(url: str) -> bool:
     return urlsplit(url).path.strip("/") in ("", "en", "ru")
-
-
 
 
 def _contact_blocks(footer_blocks: list[Block]) -> list[Block]:
@@ -346,7 +361,7 @@ def build_sections(blocks: list[Block]) -> list[Section]:
     """
     sections: list[Section] = []
     stack: list[tuple[int, str]] = []
-    top_is_empty = False   # the innermost heading has no content yet
+    top_is_empty = False  # the innermost heading has no content yet
     empty_siblings: list[str] = []  # empty headings directly before the current one, same level
 
     def add_paragraph(text: str, path: list[str]) -> None:
@@ -376,9 +391,9 @@ def build_sections(blocks: list[Block]) -> list[Section]:
             continue  # e.g. a tab "Tariflər" directly inside a section "Tariflər"
         if top_is_empty:
             level = stack[-1][0]
-            if block.heading_level > level:      # the empty heading turns out to be a parent
+            if block.heading_level > level:  # the empty heading turns out to be a parent
                 settle_empty_siblings(path(stack[:-1]))
-            else:                                # it stays empty: one more in the run
+            else:  # it stays empty: one more in the run
                 empty_siblings.append(stack.pop()[1])
                 if block.heading_level < level:  # the run of siblings ends here
                     settle_empty_siblings(path(stack))
@@ -396,6 +411,7 @@ def build_sections(blocks: list[Block]) -> list[Section]:
 # --------------------------------------------------------------------------- #
 # Output
 # --------------------------------------------------------------------------- #
+
 
 def _write_jsonl(pages: list[Page], config: ScraperConfig) -> None:
     config.pages_path.parent.mkdir(parents=True, exist_ok=True)

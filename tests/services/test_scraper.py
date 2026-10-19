@@ -11,12 +11,16 @@ from scraper_service.jobs import ScrapeRunner, UnsupportedSite, check_site
 from scraper_service.main import build_app
 
 
-@pytest.mark.parametrize("url", ["https://abb-bank.az", "abb-bank.az", "https://www.abb-bank.az/az/ferdi", "HTTP://ABB-BANK.AZ/"])
+@pytest.mark.parametrize(
+    "url", ["https://abb-bank.az", "abb-bank.az", "https://www.abb-bank.az/az/ferdi", "HTTP://ABB-BANK.AZ/"]
+)
 def test_abb_links_are_accepted(url):
     assert check_site(url) == "https://abb-bank.az"
 
 
-@pytest.mark.parametrize("url", ["https://az.wikipedia.org/wiki/ABB", "https://kapitalbank.az", "abb-bank.az.evil.com", "nonsense"])
+@pytest.mark.parametrize(
+    "url", ["https://az.wikipedia.org/wiki/ABB", "https://kapitalbank.az", "abb-bank.az.evil.com", "nonsense"]
+)
 def test_other_sites_are_refused(url):
     with pytest.raises(UnsupportedSite):
         check_site(url)
@@ -30,8 +34,11 @@ class FakeCrawler:
     async def crawl(self):
         for url, outcome in [("https://abb-bank.az/", "cached"), ("https://abb-bank.az/new", "fetched")]:
             self.discovered += 1
-            setattr(self.summary, "from_cache" if outcome == "cached" else "fetched",
-                    getattr(self.summary, "from_cache" if outcome == "cached" else "fetched") + 1)
+            setattr(
+                self.summary,
+                "from_cache" if outcome == "cached" else "fetched",
+                getattr(self.summary, "from_cache" if outcome == "cached" else "fetched") + 1,
+            )
             self.on_url(url, outcome)
         return self.summary
 
@@ -62,8 +69,18 @@ def runner(tmp_path, monkeypatch):
 
         async def post(self, path, json, headers):
             sent.update(json)
-            return FakeResponse({"job_id": "i1", "status": "done", "chunks": 3, "unchanged": 2, "to_embed": 1,
-                                 "embedded": 1, "deleted": 0, "error": None})
+            return FakeResponse(
+                {
+                    "job_id": "i1",
+                    "status": "done",
+                    "chunks": 3,
+                    "unchanged": 2,
+                    "to_embed": 1,
+                    "embedded": 1,
+                    "deleted": 0,
+                    "error": None,
+                }
+            )
 
     monkeypatch.setattr(jobs, "Crawler", FakeCrawler)
     monkeypatch.setattr(jobs, "run_extraction", extract)

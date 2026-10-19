@@ -50,7 +50,11 @@ def test_bm25_prefers_documents_with_rare_query_terms():
 
 def question(*evidence: list[str], category="simple", lang="az") -> Question:
     return Question(
-        id="Q", question="?", lang=lang, category=category, expected_answer="",
+        id="Q",
+        question="?",
+        lang=lang,
+        category=category,
+        expected_answer="",
         evidence=[EvidenceRef(url="u", page_index=0, positions=[], chunk_ids=ids) for ids in evidence],
     )
 

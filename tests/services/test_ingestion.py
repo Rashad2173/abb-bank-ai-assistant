@@ -9,8 +9,14 @@ from service_common.inference_client import EmbeddingResult
 
 
 def page(url, *paragraphs, title="Kart"):
-    return {"url": url, "title": title, "lang": "az", "category": "individual",
-            "sections": [{"heading_path": [title], "paragraphs": list(paragraphs)}], "faq": []}
+    return {
+        "url": url,
+        "title": title,
+        "lang": "az",
+        "category": "individual",
+        "sections": [{"heading_path": [title], "paragraphs": list(paragraphs)}],
+        "faq": [],
+    }
 
 
 PAGES = [

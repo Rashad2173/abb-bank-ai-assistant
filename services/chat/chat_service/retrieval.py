@@ -52,32 +52,45 @@ class Retriever:
         if scores is None:
             chunks = [{**chunk, "score": None} for chunk in candidates]
         else:
-            ranked = sorted(zip(scores, range(len(candidates))), key=lambda pair: -pair[0])
-            chunks = [{**candidates[i], "score": round(score, 4)} for score, i in ranked
-                      if score >= self.settings.min_rerank_score]
-        return Retrieval(chunks=chunks[:self.settings.context_chunks], reranked=scores is not None,
-                         retrieval_ms=retrieval_ms, rerank_ms=rerank_ms)
+            ranked = sorted(enumerate(scores), key=lambda pair: -pair[1])
+            chunks = [
+                {**candidates[i], "score": round(score, 4)}
+                for i, score in ranked
+                if score >= self.settings.min_rerank_score
+            ]
+        return Retrieval(
+            chunks=chunks[: self.settings.context_chunks],
+            reranked=scores is not None,
+            retrieval_ms=retrieval_ms,
+            rerank_ms=rerank_ms,
+        )
 
     async def _candidates(self, plan: SearchPlan) -> list[dict]:
         """Every query searched in Milvus; several result lists are fused with Reciprocal Rank Fusion."""
         with dependency("inference service"):
             embedding = await self.inference.embed(plan.queries, kind="query")
-        queries = [Query(text=text, dense=np.asarray(embedding.dense[i], dtype=np.float32), sparse=embedding.sparse[i])
-                   for i, text in enumerate(plan.queries)]
+        queries = [
+            Query(text=text, dense=np.asarray(embedding.dense[i], dtype=np.float32), sparse=embedding.sparse[i])
+            for i, text in enumerate(plan.queries)
+        ]
         limit = self.settings.retrieval_candidates if self.settings.reranker == "http" else self.settings.context_chunks
         search_filter = "" if plan.include_procurement else PROCUREMENT_FILTER
         with dependency("Milvus"):
-            rankings = await run_in_threadpool(self.store.search, queries, self.settings.retrieval_method, limit,
-                                               search_filter)
-            ids = rankings[0] if len(rankings) == 1 else reciprocal_rank_fusion(*([r] for r in rankings), top_k=limit)[0]
+            rankings = await run_in_threadpool(
+                self.store.search, queries, self.settings.retrieval_method, limit, search_filter
+            )
+            ids = (
+                rankings[0] if len(rankings) == 1 else reciprocal_rank_fusion(*([r] for r in rankings), top_k=limit)[0]
+            )
             return await run_in_threadpool(self.store.fetch, ids)
 
     async def _rerank_scores(self, question: str, candidates: list[dict]) -> list[float] | None:
         if self.settings.reranker == "none" or not candidates:
             return None
         try:
-            return await self.inference.rerank(question, [c["text"] for c in candidates],
-                                               timeout=self.settings.rerank_timeout)
+            return await self.inference.rerank(
+                question, [c["text"] for c in candidates], timeout=self.settings.rerank_timeout
+            )
         except Exception as exc:  # timeout, connection refused, 5xx … — answer without reranking
             log.warning("reranker unavailable, using Milvus order", extra={"error": f"{type(exc).__name__}: {exc}"})
             return None

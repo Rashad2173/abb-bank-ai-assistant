@@ -18,19 +18,39 @@ from urllib.parse import quote
 
 import httpx
 
-USER_AGENT = "abb-assistant-case-study/1.0 (https://github.com/Rashad2173/abb-bank-ai-assistant)"  # Wikimedia: identify + contact
+# Wikimedia asks clients to identify themselves with a contact address.
+USER_AGENT = "abb-assistant-case-study/1.0 (https://github.com/Rashad2173/abb-bank-ai-assistant)"
 _HEADING_RE = re.compile(r"^(=+)\s*(.*?)\s*\1\s*$")
-_SKIPPED_SECTIONS = {"istinadlar", "xarici keçidlər", "həmçinin bax", "mənbə", "references", "external links",
-                     "see also", "notes", "sources", "further reading"}
+_SKIPPED_SECTIONS = {
+    "istinadlar",
+    "xarici keçidlər",
+    "həmçinin bax",
+    "mənbə",
+    "references",
+    "external links",
+    "see also",
+    "notes",
+    "sources",
+    "further reading",
+}
 
 
 def fetch(lang: str, title: str) -> tuple[str, str]:
     """``(canonical title, plain text)`` of one article."""
     response = httpx.get(
         f"https://{lang}.wikipedia.org/w/api.php",
-        params={"action": "query", "prop": "extracts", "explaintext": 1, "exsectionformat": "wiki",
-                "redirects": 1, "titles": title, "format": "json", "formatversion": 2},
-        headers={"User-Agent": USER_AGENT}, timeout=30,
+        params={
+            "action": "query",
+            "prop": "extracts",
+            "explaintext": 1,
+            "exsectionformat": "wiki",
+            "redirects": 1,
+            "titles": title,
+            "format": "json",
+            "formatversion": 2,
+        },
+        headers={"User-Agent": USER_AGENT},
+        timeout=30,
     )
     response.raise_for_status()
     page = response.json()["query"]["pages"][0]
@@ -55,7 +75,7 @@ def to_page(lang: str, title: str, text: str) -> dict:
         if heading:
             flush()
             level = len(heading.group(1)) - 1  # "==" is level 1 under the title
-            path = path[:level] + [heading.group(2)]
+            path = [*path[:level], heading.group(2)]
             skipping = heading.group(2).strip().lower() in _SKIPPED_SECTIONS
         elif line.strip():
             paragraphs.append(line.strip())

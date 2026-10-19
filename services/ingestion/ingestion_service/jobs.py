@@ -28,8 +28,9 @@ class JobRunning(RuntimeError):
 
 
 class Ingestor:
-    def __init__(self, store: MilvusStore, inference: InferenceClient, count_tokens: TokenCounter,
-                 embed_batch: int) -> None:
+    def __init__(
+        self, store: MilvusStore, inference: InferenceClient, count_tokens: TokenCounter, embed_batch: int
+    ) -> None:
         self.store = store
         self.inference = inference
         self.count_tokens = count_tokens
@@ -41,8 +42,9 @@ class Ingestor:
     def start(self, pages: list[dict], mode: IngestMode = "replace") -> Job:
         if self._task is not None and not self._task.done():
             raise JobRunning(f"Job {self.last_job.job_id} is still running")
-        job = Job(job_id=uuid.uuid4().hex[:12], status="queued", mode=mode, pages=len(pages),
-                  started_at=datetime.now(UTC))
+        job = Job(
+            job_id=uuid.uuid4().hex[:12], status="queued", mode=mode, pages=len(pages), started_at=datetime.now(UTC)
+        )
         self.jobs[job.job_id] = self.last_job = job
         self._task = asyncio.create_task(self._run(job, pages))
         return job
@@ -91,7 +93,7 @@ class Ingestor:
         dense: list[list[float]] = []
         sparse: list[dict[int, float]] = []
         for start in range(0, len(chunks), self.embed_batch):
-            batch = chunks[start:start + self.embed_batch]
+            batch = chunks[start : start + self.embed_batch]
             result = await self.inference.embed([c.text for c in batch], kind="document")
             dense += result.dense
             sparse += result.sparse

@@ -21,3 +21,6 @@ docs/ABB_DATA_QUALITY_*
 
 # Personal notes (kept locally only)
 docs/DEVELOPMENT_LOG.md
+
+# Build artefacts
+*.tsbuildinfo

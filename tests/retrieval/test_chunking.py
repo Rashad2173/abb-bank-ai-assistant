@@ -1,3 +1,5 @@
+from itertools import pairwise
+
 from abb_retrieval.chunking import chunk_page
 from abb_retrieval.config import ChunkingConfig
 
@@ -26,17 +28,16 @@ def chunk(p: dict):
 
 
 def test_small_sections_are_packed_with_sub_headings_and_context_header():
-    chunks = chunk(page(sections=[
-        (["TamKart Gold", "Tariflər"], ["İllik faiz dərəcəsi: 22%"]),
-        (["TamKart Gold", "Tariflər", "Komissiya"], ["Nağdlaşdırma: 1%"]),
-    ]))
-    assert len(chunks) == 1
-    assert chunks[0].text == (
-        "TamKart Gold\nTariflər\n\n"
-        "İllik faiz dərəcəsi: 22%\n"
-        "## Komissiya\n"
-        "Nağdlaşdırma: 1%"
+    chunks = chunk(
+        page(
+            sections=[
+                (["TamKart Gold", "Tariflər"], ["İllik faiz dərəcəsi: 22%"]),
+                (["TamKart Gold", "Tariflər", "Komissiya"], ["Nağdlaşdırma: 1%"]),
+            ]
+        )
     )
+    assert len(chunks) == 1
+    assert chunks[0].text == ("TamKart Gold\nTariflər\n\nİllik faiz dərəcəsi: 22%\n## Komissiya\nNağdlaşdırma: 1%")
     assert chunks[0].heading_path == ["Tariflər"]
     assert chunks[0].sources == ["sections[0].paragraphs[0]", "sections[1].paragraphs[0]"]
     assert chunks[0].page_index == 7
@@ -57,7 +58,7 @@ def test_large_section_is_split_into_windows_with_one_paragraph_overlap():
     assert len(chunks) > 1
     assert all(c.token_count <= CONFIG.max_tokens for c in chunks)
     # the last paragraph of a window starts the next one
-    for previous, current in zip(chunks, chunks[1:]):
+    for previous, current in pairwise(chunks):
         assert previous.sources[-1] == current.sources[0]
     covered = {s for c in chunks for s in c.sources}
     assert covered == {f"sections[0].paragraphs[{i}]" for i in range(5)}
@@ -121,9 +122,17 @@ def test_news_chunks_show_the_publication_date():
 
 def test_identical_chunks_of_different_pages_are_merged_with_their_categories():
     from abb_retrieval.merging import merge_identical_chunks
+
     first = chunk(page(sections=[(["A"], ["Eyni mətn burada yazılıb."])]))[0]
-    second = first.model_copy(update={"url": "https://abb-bank.az/ferdi", "chunk_id": "other",
-                                      "page_index": 9, "category": "home", "categories": ["home"]})
+    second = first.model_copy(
+        update={
+            "url": "https://abb-bank.az/ferdi",
+            "chunk_id": "other",
+            "page_index": 9,
+            "category": "home",
+            "categories": ["home"],
+        }
+    )
     merged = merge_identical_chunks([first, second])
     assert [c.chunk_id for c in merged] == [first.chunk_id]
     assert merged[0].related_urls == ["https://abb-bank.az/ferdi"]
@@ -133,6 +142,7 @@ def test_identical_chunks_of_different_pages_are_merged_with_their_categories():
 
 def test_sections_shared_by_many_tenders_become_one_common_chunk():
     from abb_retrieval.merging import merge_shared_sections
+
     config = ChunkingConfig(shared_section_min_pages=3)
 
     def tender(i: int, body: str):

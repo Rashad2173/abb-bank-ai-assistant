@@ -1,3 +1,8 @@
+"""Settings of the inference service (``INFERENCE_`` environment variables): models and device.
+
+Every field is read from ``INFERENCE_<FIELD>`` in the environment (or ``.env``).
+"""
+
 from __future__ import annotations
 
 from typing import Literal

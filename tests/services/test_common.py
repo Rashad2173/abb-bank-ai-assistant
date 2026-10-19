@@ -76,9 +76,10 @@ def test_errors_are_json_with_a_code_and_the_request_id():
 
     boom = client.get("/boom", headers={"X-Request-ID": "r2"})
     assert boom.status_code == 500
-    assert boom.json() == {"error": {"code": "internal_error",
-                                     "message": "Internal error - see the service log for this request id."},
-                           "request_id": "r2"}
+    assert boom.json() == {
+        "error": {"code": "internal_error", "message": "Internal error - see the service log for this request id."},
+        "request_id": "r2",
+    }
 
 
 def test_dependency_only_wraps_the_given_errors():

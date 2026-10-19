@@ -24,7 +24,9 @@ class TestNormalizeText:
 
     def test_markdown_links_keep_their_text_and_document_urls(self):
         assert normalize_text("[ASAN Finans](https://asan.az) vasitəsilə") == "ASAN Finans vasitəsilə"
-        assert normalize_text("[Yüklə](https://cdn.abb-bank.az/tarif.pdf)") == "Yüklə (https://cdn.abb-bank.az/tarif.pdf)"
+        assert (
+            normalize_text("[Yüklə](https://cdn.abb-bank.az/tarif.pdf)") == "Yüklə (https://cdn.abb-bank.az/tarif.pdf)"
+        )
 
 
 class TestFingerprint:
@@ -42,13 +44,17 @@ class TestDetectLanguage:
         assert detect_language(text) == "az"
 
     def test_english_with_azerbaijani_product_names(self):
-        text = ("Get a cash loan of up to 70,000 AZN without visiting the branch. TamKart and ABB-Qarabağ "
-                "cards give cashback on every purchase.")
+        text = (
+            "Get a cash loan of up to 70,000 AZN without visiting the branch. TamKart and ABB-Qarabağ "
+            "cards give cashback on every purchase."
+        )
         assert detect_language(text) == "en"
 
     def test_russian(self):
-        text = ("Получите наличный кредит до 70 000 AZN, не посещая филиал банка. "
-                "Без поручителей и справок о доходах, полностью онлайн через ABB mobile.")
+        text = (
+            "Получите наличный кредит до 70 000 AZN, не посещая филиал банка. "
+            "Без поручителей и справок о доходах, полностью онлайн через ABB mobile."
+        )
         assert detect_language(text) == "ru"
 
     def test_too_little_text(self):

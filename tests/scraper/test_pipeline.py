@@ -1,6 +1,6 @@
 import json
 from dataclasses import replace
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from abb_scraper.extract.html_content import Block
 from abb_scraper.models import FetchRecord, Page
@@ -81,25 +81,42 @@ def test_build_sections_empty_siblings_before_a_real_heading_are_a_list():
 
 
 def cache_page(store: RawPageStore, url: str, html: str) -> None:
-    store.append_record(FetchRecord(
-        url=url, status=200, final_url=url, fetched_at=datetime.now(timezone.utc),
-        cache_file=store.save_html(url, html),
-    ))
+    store.append_record(
+        FetchRecord(
+            url=url,
+            status=200,
+            final_url=url,
+            fetched_at=datetime.now(UTC),
+            cache_file=store.save_html(url, html),
+        )
+    )
 
 
 def test_run_extraction_end_to_end(config):
     config = replace(config, boilerplate_min_pages=3)  # the banner is on 4 pages, page texts on at most 2
     store = RawPageStore(config.raw_dir, config.manifest_path)
     cache_page(store, "https://abb-bank.az/", page_html(f"<h1>ABB</h1><p>{LONG_TEXT}</p>{BANNER}"))
-    cache_page(store, "https://abb-bank.az/ferdi/kartlar", page_html(f"<h1>Kartlar</h1><p>{LONG_TEXT} Kart.</p>{BANNER}" + FAQ))
-    cache_page(store, "https://abb-bank.az/ferdi/kartlar/tam", page_html(f"<h1>Tam</h1><p>{LONG_TEXT} Tam.</p>{BANNER}" + FAQ))
-    cache_page(store, "https://abb-bank.az/ferdi/kartlar/tam/kopya", page_html(f"<h1>Tam</h1><p>{LONG_TEXT} Tam.</p>{BANNER}" + FAQ))
+    cache_page(
+        store, "https://abb-bank.az/ferdi/kartlar", page_html(f"<h1>Kartlar</h1><p>{LONG_TEXT} Kart.</p>{BANNER}" + FAQ)
+    )
+    cache_page(
+        store, "https://abb-bank.az/ferdi/kartlar/tam", page_html(f"<h1>Tam</h1><p>{LONG_TEXT} Tam.</p>{BANNER}" + FAQ)
+    )
+    cache_page(
+        store,
+        "https://abb-bank.az/ferdi/kartlar/tam/kopya",
+        page_html(f"<h1>Tam</h1><p>{LONG_TEXT} Tam.</p>{BANNER}" + FAQ),
+    )
     cache_page(store, "https://abb-bank.az/bos", page_html("<h1>Boş</h1>"))
 
     report = run_extraction(config, store)
 
     pages = {p.url: p for p in map(Page.model_validate_json, config.pages_path.read_text("utf-8").splitlines())}
-    assert set(pages) == {"https://abb-bank.az/", "https://abb-bank.az/ferdi/kartlar", "https://abb-bank.az/ferdi/kartlar/tam"}
+    assert set(pages) == {
+        "https://abb-bank.az/",
+        "https://abb-bank.az/ferdi/kartlar",
+        "https://abb-bank.az/ferdi/kartlar/tam",
+    }
 
     def page_text(url: str) -> str:
         return " ".join(p for s in pages[url].sections for p in s.paragraphs)
@@ -136,7 +153,7 @@ def test_short_labels_stay_on_every_page_while_repeated_sentences_are_kept_once(
 
     pages = [Page.model_validate_json(line) for line in config.pages_path.read_text("utf-8").splitlines()]
     texts = [[p for s in page.sections for p in s.paragraphs] for page in pages]
-    assert all("Məbləğ" in t for t in texts)                                            # label kept everywhere
+    assert all("Məbləğ" in t for t in texts)  # label kept everywhere
     assert sum("ABB mobile yükləmək üçün QR kodu skan edin." in t for t in texts) == 1  # banner kept once
 
 
@@ -150,14 +167,18 @@ def test_widely_repeated_faq_is_kept_once_and_remembers_the_other_pages(config):
 
     pages = {p.url: p for p in map(Page.model_validate_json, config.pages_path.read_text("utf-8").splitlines())}
     general = pages["https://abb-bank.az/ferdi/kartlar"].faq
-    assert [(f.answer, f.also_on) for f in general] == [("Onlayn müraciət ilə.", ["https://abb-bank.az/ferdi/kartlar/tam"])]
+    assert [(f.answer, f.also_on) for f in general] == [
+        ("Onlayn müraciət ilə.", ["https://abb-bank.az/ferdi/kartlar/tam"])
+    ]
     assert pages["https://abb-bank.az/ferdi/kartlar/tam"].faq == []
 
 
 def test_campaign_pages_get_validity_and_documents(config):
     store = RawPageStore(config.raw_dir, config.manifest_path)
-    body = (f"<h1>Yay kampaniyası</h1><p>01.06.2024 - 31.08.2024</p><p>Aktiv deyil</p><p>{LONG_TEXT}</p>"
-            '<p>Qaydalar: <a href="https://cdn.abb-bank.az/qaydalar.pdf">Yüklə</a></p>')
+    body = (
+        f"<h1>Yay kampaniyası</h1><p>01.06.2024 - 31.08.2024</p><p>Aktiv deyil</p><p>{LONG_TEXT}</p>"
+        '<p>Qaydalar: <a href="https://cdn.abb-bank.az/qaydalar.pdf">Yüklə</a></p>'
+    )
     cache_page(store, "https://abb-bank.az/kampaniyalar/yay", page_html(body))
 
     run_extraction(config, store)
@@ -177,8 +198,12 @@ AZ_TENDER = (
 def test_untranslated_copies_are_dropped_when_the_original_exists(config):
     store = RawPageStore(config.raw_dir, config.manifest_path)
     cache_page(store, "https://abb-bank.az/tender/a", page_html(AZ_TENDER))
-    cache_page(store, "https://abb-bank.az/en/tender/a", page_html(AZ_TENDER.replace("Tender<", "Tender (EN)<"), lang="en"))
-    cache_page(store, "https://abb-bank.az/en/tender/b", page_html(AZ_TENDER.replace("CyberArk", "Oracle"), lang="en"))  # no AZ original
+    cache_page(
+        store, "https://abb-bank.az/en/tender/a", page_html(AZ_TENDER.replace("Tender<", "Tender (EN)<"), lang="en")
+    )
+    cache_page(
+        store, "https://abb-bank.az/en/tender/b", page_html(AZ_TENDER.replace("CyberArk", "Oracle"), lang="en")
+    )  # no AZ original
 
     report = run_extraction(config, store)
 

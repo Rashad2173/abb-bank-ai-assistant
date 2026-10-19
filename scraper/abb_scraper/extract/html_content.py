@@ -11,6 +11,7 @@ from __future__ import annotations
 import re
 from collections.abc import Iterator
 from dataclasses import dataclass, field
+from itertools import zip_longest
 
 from bs4 import BeautifulSoup, NavigableString, Tag
 from bs4.element import PreformattedString
@@ -18,20 +19,65 @@ from bs4.element import PreformattedString
 from .text import decode_cf_email, fingerprint, is_document_url, normalize_text
 
 BLOCK_TAGS = (
-    "address", "article", "aside", "blockquote", "dd", "div", "dl", "dt",
-    "fieldset", "figcaption", "figure", "footer", "h1", "h2", "h3", "h4", "h5",
-    "h6", "header", "hr", "li", "main", "ol", "p", "pre", "section", "table",
-    "tbody", "td", "tfoot", "th", "thead", "tr", "ul",
+    "address",
+    "article",
+    "aside",
+    "blockquote",
+    "dd",
+    "div",
+    "dl",
+    "dt",
+    "fieldset",
+    "figcaption",
+    "figure",
+    "footer",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "header",
+    "hr",
+    "li",
+    "main",
+    "ol",
+    "p",
+    "pre",
+    "section",
+    "table",
+    "tbody",
+    "td",
+    "tfoot",
+    "th",
+    "thead",
+    "tr",
+    "ul",
 )
 
 NON_CONTENT_TAGS = (
-    "script", "style", "noscript", "svg", "template", "form", "button", "input",
-    "select", "textarea", "img", "picture", "video", "iframe", "dialog", "nav",
-    "header", "footer",
+    "script",
+    "style",
+    "noscript",
+    "svg",
+    "template",
+    "form",
+    "button",
+    "input",
+    "select",
+    "textarea",
+    "img",
+    "picture",
+    "video",
+    "iframe",
+    "dialog",
+    "nav",
+    "header",
+    "footer",
 )
 NON_CONTENT_SELECTORS = (
-    "#rate-this-page",               # "Rate this page" widget
-    "[id^=app-banner]",              # "Download ABB mobile / scan the QR code" banner
+    "#rate-this-page",  # "Rate this page" widget
+    "[id^=app-banner]",  # "Download ABB mobile / scan the QR code" banner
     "[role=dialog]",
     "[class*=typography-body-button]",  # call-to-action button labels
 )
@@ -146,6 +192,7 @@ def iter_blocks(node: Tag) -> Iterator[Block]:
 # Internals
 # --------------------------------------------------------------------------- #
 
+
 def _decode_cf_emails(soup: BeautifulSoup) -> None:
     """Replace Cloudflare e-mail protection placeholders with the real address."""
     for node in soup.select("[data-cfemail]"):
@@ -202,10 +249,7 @@ def _inline_streamed_segments(soup: BeautifulSoup, html: str) -> None:
 def _content_root(soup: BeautifulSoup) -> Tag:
     """The element that wraps the page content (the parent of the site header)."""
     header = soup.find("header")
-    if header is not None and isinstance(header.parent, Tag):
-        root = header.parent
-    else:
-        root = soup.body or soup
+    root = header.parent if header is not None and isinstance(header.parent, Tag) else soup.body or soup
 
     # Streamed segments without a placeholder would otherwise be lost.
     for segment in soup.select("div[hidden][id^='S:']"):
@@ -240,7 +284,12 @@ def _table_blocks(table: Tag) -> Iterator[Block]:
             yield Block(" | ".join(cell or _EMPTY_CELL for cell in row))
         return
     for row in body:
-        pairs = [f"{label}: {cell or _EMPTY_CELL}" for label, cell in zip(header, row) if label or cell]
+        # A row with more cells than the header keeps the extra ones unlabelled instead of dropping them.
+        pairs = [
+            f"{label}: {cell or _EMPTY_CELL}" if label else cell
+            for label, cell in zip_longest(header, row, fillvalue="")
+            if label or cell
+        ]
         yield Block("; ".join(pairs))
 
 

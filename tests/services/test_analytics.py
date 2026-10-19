@@ -11,13 +11,27 @@ from analytics_service.stats import compute_stats, period_start
 
 def interaction(**overrides):
     return {
-        "request_id": "r1", "session_id": "s1", "question": "Zaqatalada neçə bankomat var?",
-        "standalone_question": "Zaqatalada neçə bankomat var?", "answer": "12 [S1]", "status": "answered",
-        "refusal_reason": "none", "language": "az", "grounded": True,
+        "request_id": "r1",
+        "session_id": "s1",
+        "question": "Zaqatalada neçə bankomat var?",
+        "standalone_question": "Zaqatalada neçə bankomat var?",
+        "answer": "12 [S1]",
+        "status": "answered",
+        "refusal_reason": "none",
+        "language": "az",
+        "grounded": True,
         "sources": [{"url": "https://abb-bank.az/atm#zaqatala", "title": "ATM — Zaqatala"}],
-        "retrieved_chunk_ids": ["a"], "top_score": 0.9, "model": "gpt-6-luna", "reranked": True,
-        "input_tokens": 100, "output_tokens": 20, "retrieval_ms": 10, "rerank_ms": 900,
-        "generation_ms": 3000, "total_ms": 4000, **overrides,
+        "retrieved_chunk_ids": ["a"],
+        "top_score": 0.9,
+        "model": "gpt-6-luna",
+        "reranked": True,
+        "input_tokens": 100,
+        "output_tokens": 20,
+        "retrieval_ms": 10,
+        "rerank_ms": 900,
+        "generation_ms": 3000,
+        "total_ms": 4000,
+        **overrides,
     }
 
 
@@ -47,9 +61,18 @@ def test_browse_newest_first_with_status_filter(api):
 
 def test_stats_endpoint(api):
     api.post("/v1/interactions", json=interaction())
-    api.post("/v1/interactions", json=interaction(request_id="r2", status="out_of_scope",
-                                                  refusal_reason="other_bank", sources=[], grounded=False,
-                                                  reranked=False, total_ms=2000))
+    api.post(
+        "/v1/interactions",
+        json=interaction(
+            request_id="r2",
+            status="out_of_scope",
+            refusal_reason="other_bank",
+            sources=[],
+            grounded=False,
+            reranked=False,
+            total_ms=2000,
+        ),
+    )
     stats = api.get("/v1/stats", params={"days": 7}).json()
     assert stats["total"] == 2
     assert stats["by_status"] == {"answered": 1, "out_of_scope": 1}
@@ -62,8 +85,9 @@ def test_stats_endpoint(api):
 
 def test_stats_use_baku_days_and_percentiles():
     def row(hour_utc, total_ms, status="answered"):
-        return Interaction(**interaction(status=status, total_ms=total_ms),
-                           created_at=datetime(2026, 10, 16, hour_utc, 30, tzinfo=UTC))
+        return Interaction(
+            **interaction(status=status, total_ms=total_ms), created_at=datetime(2026, 10, 16, hour_utc, 30, tzinfo=UTC)
+        )
 
     # 21:30 UTC on 16 Oct is 01:30 on 17 Oct in Baku.
     rows = [row(10, 1000), row(21, 3000), row(21, 5000, status="no_information")]

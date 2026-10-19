@@ -1,6 +1,8 @@
 """Ask the running chat service every question of an answer set and store the answers for grading.
 
-    python scripts/collect_answers.py            # evaluation/answers/answer_set.json → evaluation/reports/07_answers_raw.json
+    python scripts/collect_answers.py
+
+Reads ``evaluation/answers/answer_set.json``, writes ``evaluation/reports/07_answers_raw.json``.
 """
 
 from __future__ import annotations
@@ -16,8 +18,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def ask(chat_url: str, item: dict) -> dict:
-    response = httpx.post(f"{chat_url}/v1/chat", json={"question": item["question"], "session_id": "answer-eval"},
-                          timeout=180)
+    response = httpx.post(
+        f"{chat_url}/v1/chat", json={"question": item["question"], "session_id": "answer-eval"}, timeout=180
+    )
     response.raise_for_status()
     body = response.json()
     return {
@@ -25,8 +28,7 @@ def ask(chat_url: str, item: dict) -> dict:
         "status": body["status"],
         "answer": body["answer"],
         "cited": [{"id": s["id"], "url": s["url"], "title": s["title"]} for s in body["sources"]],
-        "cites_expected_source": not item["sources"] or any(
-            s["url"] in item["sources"] for s in body["sources"]),
+        "cites_expected_source": not item["sources"] or any(s["url"] in item["sources"] for s in body["sources"]),
         "reranked": body["reranked"],
         "total_ms": body["timings"]["total_ms"],
     }

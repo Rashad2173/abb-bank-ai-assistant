@@ -6,7 +6,6 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 
-
 PROJECT_ENV_FILE = Path(__file__).resolve().parents[3] / ".env"
 """``<repository>/.env`` wherever a service is started from (absent in containers)."""
 

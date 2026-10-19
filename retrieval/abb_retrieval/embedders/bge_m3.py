@@ -25,9 +25,14 @@ class BgeM3Embedder(Embedder):
 
     def _encode(self, texts: list[str]) -> Embeddings:
         output = self.model.encode(
-            texts, batch_size=self.batch_size, max_length=1024,
-            return_dense=True, return_sparse=True, return_colbert_vecs=False,
+            texts,
+            batch_size=self.batch_size,
+            max_length=1024,
+            return_dense=True,
+            return_sparse=True,
+            return_colbert_vecs=False,
         )
-        sparse = [{int(token): float(weight) for token, weight in weights.items()}
-                  for weights in output["lexical_weights"]]
+        sparse = [
+            {int(token): float(weight) for token, weight in weights.items()} for weights in output["lexical_weights"]
+        ]
         return Embeddings(dense=normalize(output["dense_vecs"]), sparse=sparse)

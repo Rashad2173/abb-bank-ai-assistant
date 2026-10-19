@@ -51,8 +51,14 @@ def page_from_file(filename: str, data: bytes) -> dict:
         for number, page_text in enumerate(page_texts, start=1)
         if (paragraphs := to_paragraphs(page_text))
     ]
-    return {"url": f"upload://{quote(name)}", "title": title, "lang": lang, "category": "document",
-            "sections": sections, "faq": []}
+    return {
+        "url": f"upload://{quote(name)}",
+        "title": title,
+        "lang": lang,
+        "category": "document",
+        "sections": sections,
+        "faq": [],
+    }
 
 
 def to_paragraphs(text: str) -> list[str]:

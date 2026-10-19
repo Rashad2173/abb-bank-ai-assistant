@@ -144,7 +144,7 @@ class _PageChunker:
     def _carry_over(self, window: list[_Piece], lead_in: _Piece | None, next_piece: _Piece) -> list[_Piece]:
         if lead_in is not None and _is_list_item(next_piece.text):
             return [lead_in]
-        return window[-self.config.overlap_paragraphs:] if self.config.overlap_paragraphs else []
+        return window[-self.config.overlap_paragraphs :] if self.config.overlap_paragraphs else []
 
     def _split_piece(self, piece: _Piece, budget: int) -> Iterator[_Piece]:
         """A paragraph longer than the budget, as sentence groups (or hard cuts as a last resort)."""
@@ -190,7 +190,7 @@ class _PageChunker:
 
     def _estimated_tokens(self, group: list[_Part]) -> int:
         prefix = _common_prefix([part.path for part in group])
-        subheadings = sum(self.count(" > ".join(part.path[len(prefix):])) for part in group)
+        subheadings = sum(self.count(" > ".join(part.path[len(prefix) :])) for part in group)
         return self.count(self._header(prefix)) + subheadings + sum(part.tokens for part in group)
 
     def _emit_section_chunk(self, group: list[_Part]) -> None:
@@ -198,7 +198,7 @@ class _PageChunker:
         lines: list[str] = []
         previous_subpath: tuple[str, ...] = ()
         for part in group:
-            subpath = part.path[len(prefix):]
+            subpath = part.path[len(prefix) :]
             if subpath and subpath != previous_subpath:
                 lines.append("## " + " > ".join(subpath))
             previous_subpath = subpath
@@ -232,27 +232,35 @@ class _PageChunker:
         lines = [self.title, self.status_line, self.date_line, " > ".join(path)]
         return "\n".join(line for line in lines if line)
 
-    def _add(self, chunk_type: str, path: tuple[str, ...], text: str, sources: list[str],
-             related_urls: list[str] | None = None) -> None:
+    def _add(
+        self,
+        chunk_type: str,
+        path: tuple[str, ...],
+        text: str,
+        sources: list[str],
+        related_urls: list[str] | None = None,
+    ) -> None:
         url = self.page["url"]
-        self._chunks.append(Chunk(
-            chunk_id=f"{hashlib.sha1(url.encode()).hexdigest()[:10]}-{len(self._chunks):03d}",
-            url=url,
-            lang=self.page["lang"],
-            category=self.page["category"],
-            title=self.title,
-            heading_path=list(path),
-            chunk_type=chunk_type,
-            text=text,
-            token_count=self.count(text),
-            page_index=self.page_index,
-            sources=sources,
-            is_active=self.validity.get("is_active"),
-            valid_until=self.validity.get("valid_until"),
-            published=self.page.get("published"),
-            related_urls=related_urls or [],
-            categories=[self.page["category"]],
-        ))
+        self._chunks.append(
+            Chunk(
+                chunk_id=f"{hashlib.sha1(url.encode()).hexdigest()[:10]}-{len(self._chunks):03d}",
+                url=url,
+                lang=self.page["lang"],
+                category=self.page["category"],
+                title=self.title,
+                heading_path=list(path),
+                chunk_type=chunk_type,
+                text=text,
+                token_count=self.count(text),
+                page_index=self.page_index,
+                sources=sources,
+                is_active=self.validity.get("is_active"),
+                valid_until=self.validity.get("valid_until"),
+                published=self.page.get("published"),
+                related_urls=related_urls or [],
+                categories=[self.page["category"]],
+            )
+        )
 
 
 def _is_list_item(text: str) -> bool:

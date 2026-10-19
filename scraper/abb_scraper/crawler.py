@@ -17,7 +17,7 @@ import logging
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import httpx
 
@@ -83,10 +83,7 @@ class Crawler:
             if self.config.follow_links:
                 self._enqueue_links_of_cached_pages(done.values())
 
-            workers = [
-                asyncio.create_task(self._worker(client, done))
-                for _ in range(self.config.concurrency)
-            ]
+            workers = [asyncio.create_task(self._worker(client, done)) for _ in range(self.config.concurrency)]
             await self._queue.join()
             for worker in workers:
                 worker.cancel()
@@ -152,7 +149,7 @@ class Crawler:
                 self._queue.task_done()
 
     async def _fetch(self, client: httpx.AsyncClient, url: str) -> tuple[FetchRecord, str | None]:
-        fetched_at = datetime.now(timezone.utc)
+        fetched_at = datetime.now(UTC)
         try:
             response = await request(client, self.config, "GET", url)
         except (httpx.HTTPError, RetryableStatusError) as exc:
@@ -180,6 +177,8 @@ class Crawler:
             elapsed = time.monotonic() - self._started
             log.info(
                 "Fetched %d pages (%.1f pages/s), queue: %d, failed: %d",
-                self.summary.fetched, self.summary.fetched / elapsed,
-                self._queue.qsize(), self.summary.failed,
+                self.summary.fetched,
+                self.summary.fetched / elapsed,
+                self._queue.qsize(),
+                self.summary.failed,
             )

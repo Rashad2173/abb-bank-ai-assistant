@@ -61,13 +61,14 @@ class CorpusMismatchError(RuntimeError):
 # Parsing the Markdown document
 # --------------------------------------------------------------------------- #
 
+
 def parse_question_set(markdown: str) -> list[Question]:
     sections = [(m.start(), m.group(1)) for m in _SECTION_RE.finditer(markdown)]
     starts = list(_QUESTION_RE.finditer(markdown))
     questions = []
     for i, match in enumerate(starts):
         end = starts[i + 1].start() if i + 1 < len(starts) else len(markdown)
-        block = markdown[match.end():end]
+        block = markdown[match.end() : end]
         section = next(number for start, number in reversed(sections) if start < match.start())
         questions.append(_parse_block(match.group(1), CATEGORIES[section], block))
     return questions
@@ -126,6 +127,7 @@ def parse_snippet_set(items: list[dict]) -> list[Question]:
 # Step 1 — freeze the evidence texts
 # --------------------------------------------------------------------------- #
 
+
 def freeze_evidence(questions: list[Question], pages: list[dict], corpus_path: Path, expected_sha: str | None) -> None:
     """Store the text at every evidence position. Only valid on the documented corpus version."""
     actual_sha = hashlib.sha256(corpus_path.read_bytes()).hexdigest()
@@ -178,6 +180,7 @@ def apply_additions(questions: list[Question], additions: list[dict]) -> None:
 # Step 2 — attach chunks
 # --------------------------------------------------------------------------- #
 
+
 def attach_chunks(questions: list[Question], chunks: list[Chunk], pages: list[dict]) -> list[str]:
     """Fill in the chunk ids of every piece of evidence; returns the problems found.
 
@@ -190,8 +193,10 @@ def attach_chunks(questions: list[Question], chunks: list[Chunk], pages: list[di
     chunks_of_url: dict[str, list[Chunk]] = defaultdict(list)
     for chunk in chunks:
         # A merged chunk also stands for the chunks of other pages merged into it.
-        for url, page_index, sources in [(chunk.url, chunk.page_index, chunk.sources),
-                                         *((a.url, a.page_index, a.sources) for a in chunk.aliases)]:
+        for url, page_index, sources in [
+            (chunk.url, chunk.page_index, chunk.sources),
+            *((a.url, a.page_index, a.sources) for a in chunk.aliases),
+        ]:
             chunks_of_url[url].append(chunk)
             for source in sources:
                 for key in _match_keys(position_text(pages[page_index], source)):
@@ -211,8 +216,9 @@ def attach_chunks(questions: list[Question], chunks: list[Chunk], pages: list[di
     return problems
 
 
-def _chunks_with_evidence(ref: EvidenceRef, index: dict[tuple[str, object], list[str]],
-                          by_id: dict[str, Chunk]) -> list[str]:
+def _chunks_with_evidence(
+    ref: EvidenceRef, index: dict[tuple[str, object], list[str]], by_id: dict[str, Chunk]
+) -> list[str]:
     """Chunks containing the evidence.
 
     * A table header row ("Əmanət müddəti | Aylıq | Müddətin sonu") is shared by
@@ -223,7 +229,7 @@ def _chunks_with_evidence(ref: EvidenceRef, index: dict[tuple[str, object], list
       chunk of the evidence's own section.
     """
     paths = ref.section_paths or [[] for _ in ref.texts]
-    pairs = list(zip(ref.texts, paths))
+    pairs = list(zip(ref.texts, paths, strict=True))
     specific = [(text, path) for text, path in pairs if not _is_table_header(text)] or pairs
 
     ids = []
@@ -245,8 +251,11 @@ def _is_in_section(chunk: Chunk, heading: str) -> bool:
 
 def _chunks_with_alternatives(ref: EvidenceRef, chunks_of_url: dict[str, list[Chunk]]) -> list[str]:
     snippets = [fingerprint(snippet) for snippet in ref.alternatives]
-    return [chunk.chunk_id for chunk in chunks_of_url.get(ref.url, [])
-            if any(snippet in fingerprint(chunk.text) for snippet in snippets)]
+    return [
+        chunk.chunk_id
+        for chunk in chunks_of_url.get(ref.url, [])
+        if any(snippet in fingerprint(chunk.text) for snippet in snippets)
+    ]
 
 
 def _is_table_header(text: str) -> bool:

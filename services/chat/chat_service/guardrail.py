@@ -38,7 +38,7 @@ def check_answer(generation: Generation, chunks: Sequence[dict]) -> CheckedAnswe
     answered = generation.status == "answered"
 
     # Labels in the order they appear in the text, then any listed only in source_ids.
-    in_text = [label for label in dict.fromkeys(_CITATION_RE.findall(generation.answer))]
+    in_text = list(dict.fromkeys(_CITATION_RE.findall(generation.answer)))
     labels = [label for label in dict.fromkeys([*in_text, *generation.source_ids]) if label in by_label]
     unknown = set(in_text) - set(by_label)
     if unknown:
@@ -51,5 +51,6 @@ def check_answer(generation: Generation, chunks: Sequence[dict]) -> CheckedAnswe
     grounded = answered and bool(labels)
     if answered and not grounded:
         log.warning("answer without citations", extra={"status": generation.status})
-    return CheckedAnswer(generation=generation, cited=[by_label[label] for label in labels], labels=labels,
-                         grounded=grounded)
+    return CheckedAnswer(
+        generation=generation, cited=[by_label[label] for label in labels], labels=labels, grounded=grounded
+    )

@@ -41,8 +41,16 @@ def compute_stats(rows: Sequence[Interaction], days: int, today: date) -> Stats:
         by_status=dict(statuses),
         by_refusal_reason=dict(Counter(row.refusal_reason for row in rows if row.status == REFUSED)),
         by_language=dict(Counter(row.language for row in rows)),
-        per_day=[DayCount(date=day, total=sum(c.values()), answered=c["answered"], refused=c[REFUSED],
-                          no_information=c["no_information"]) for day, c in per_day.items()],
+        per_day=[
+            DayCount(
+                date=day,
+                total=sum(c.values()),
+                answered=c["answered"],
+                refused=c[REFUSED],
+                no_information=c["no_information"],
+            )
+            for day, c in per_day.items()
+        ],
         by_hour=hours,
         latency=_latency([row.total_ms for row in rows]),
         reranked_share=_share(sum(row.reranked for row in rows), len(rows)),
@@ -72,8 +80,11 @@ def _latency(values: list[float]) -> LatencyStats:
     if not values:
         return LatencyStats(avg_ms=0, p50_ms=0, p95_ms=0)
     ordered = sorted(values)
-    return LatencyStats(avg_ms=round(sum(ordered) / len(ordered), 1), p50_ms=_percentile(ordered, 0.50),
-                        p95_ms=_percentile(ordered, 0.95))
+    return LatencyStats(
+        avg_ms=round(sum(ordered) / len(ordered), 1),
+        p50_ms=_percentile(ordered, 0.50),
+        p95_ms=_percentile(ordered, 0.95),
+    )
 
 
 def _percentile(ordered: list[float], q: float) -> float:

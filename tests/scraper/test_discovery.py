@@ -24,23 +24,29 @@ def test_parse_sitemap():
     }
 
 
-@pytest.mark.parametrize(("raw", "expected"), [
-    ("https://abb-bank.az/ferdi/", "https://abb-bank.az/ferdi"),
-    ("https://www.ABB-bank.az/ferdi?utm=x#top", "https://abb-bank.az/ferdi"),
-    ("http://abb-bank.az//ferdi//kartlar", "https://abb-bank.az/ferdi/kartlar"),
-    ("https://abb-bank.az/", "https://abb-bank.az/"),
-])
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        ("https://abb-bank.az/ferdi/", "https://abb-bank.az/ferdi"),
+        ("https://www.ABB-bank.az/ferdi?utm=x#top", "https://abb-bank.az/ferdi"),
+        ("http://abb-bank.az//ferdi//kartlar", "https://abb-bank.az/ferdi/kartlar"),
+        ("https://abb-bank.az/", "https://abb-bank.az/"),
+    ],
+)
 def test_normalize_url_canonicalizes(raw, expected):
     assert normalize_url(raw, HOST) == expected
 
 
-@pytest.mark.parametrize("raw", [
-    "https://cdn.abb-bank.az/tarif.pdf",          # other host
-    "https://abb-bank.az/files/tarif.PDF",        # document
-    "https://abb-bank.az/_next/static/chunk.js",  # framework asset
-    "https://abb-bank.az/search?q=kredit",        # search results
-    "mailto:office@abb-bank.az",
-])
+@pytest.mark.parametrize(
+    "raw",
+    [
+        "https://cdn.abb-bank.az/tarif.pdf",  # other host
+        "https://abb-bank.az/files/tarif.PDF",  # document
+        "https://abb-bank.az/_next/static/chunk.js",  # framework asset
+        "https://abb-bank.az/search?q=kredit",  # search results
+        "mailto:office@abb-bank.az",
+    ],
+)
 def test_normalize_url_rejects_non_pages(raw):
     assert normalize_url(raw, HOST) is None
 
@@ -53,16 +59,19 @@ def test_extract_links_resolves_relative_links_and_filters():
     }
 
 
-@pytest.mark.parametrize(("url", "lang", "category"), [
-    ("https://abb-bank.az/", "az", "home"),
-    ("https://abb-bank.az/ferdi/kartlar", "az", "individual"),
-    ("https://abb-bank.az/en/biznes", "en", "business"),
-    ("https://abb-bank.az/ru", "ru", "home"),
-    ("https://abb-bank.az/haqqimizda/rehberlik", "az", "about"),
-    ("https://abb-bank.az/en/haqqimizda/satinalmalar/bildirisler", "en", "procurement"),
-    ("https://abb-bank.az/500-azn-kredit", "az", "general"),
-    ("https://abb-bank.az/ferdiler", "az", "general"),  # a prefix match must end at a "/"
-])
+@pytest.mark.parametrize(
+    ("url", "lang", "category"),
+    [
+        ("https://abb-bank.az/", "az", "home"),
+        ("https://abb-bank.az/ferdi/kartlar", "az", "individual"),
+        ("https://abb-bank.az/en/biznes", "en", "business"),
+        ("https://abb-bank.az/ru", "ru", "home"),
+        ("https://abb-bank.az/haqqimizda/rehberlik", "az", "about"),
+        ("https://abb-bank.az/en/haqqimizda/satinalmalar/bildirisler", "en", "procurement"),
+        ("https://abb-bank.az/500-azn-kredit", "az", "general"),
+        ("https://abb-bank.az/ferdiler", "az", "general"),  # a prefix match must end at a "/"
+    ],
+)
 def test_language_and_category(url, lang, category):
     assert language_of(url) == lang
     assert category_of(url) == category

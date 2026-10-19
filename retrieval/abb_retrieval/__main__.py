@@ -27,7 +27,14 @@ from .chunk_report import write_chunk_report
 from .config import ChunkingConfig, Paths
 from .corpus import chunk_corpus, load_chunks, load_pages, load_questions, write_jsonl
 from .embedders import MODEL_NAMES
-from .evalset import apply_additions, attach_chunks, corpus_sha_of, freeze_evidence, parse_question_set, parse_snippet_set
+from .evalset import (
+    apply_additions,
+    attach_chunks,
+    corpus_sha_of,
+    freeze_evidence,
+    parse_question_set,
+    parse_snippet_set,
+)
 from .tokens import load_token_counter
 
 log = logging.getLogger("abb_retrieval")
@@ -36,14 +43,27 @@ log = logging.getLogger("abb_retrieval")
 def main() -> None:
     parser = argparse.ArgumentParser(prog="abb_retrieval")
     parser.add_argument("command", choices=("freeze", "chunk", "evalset", "benchmark", "index", "milvus-check"))
-    parser.add_argument("--models", nargs="+", choices=MODEL_NAMES, default=list(MODEL_NAMES),
-                        help="embedding models to benchmark (default: all)")
+    parser.add_argument(
+        "--models",
+        nargs="+",
+        choices=MODEL_NAMES,
+        default=list(MODEL_NAMES),
+        help="embedding models to benchmark (default: all)",
+    )
     parser.add_argument("--no-rerank", action="store_true", help="skip the reranker step of the benchmark")
-    parser.add_argument("--set", choices=("a", "b"), default="a", dest="question_set",
-                        help="evalset/benchmark: question set A (default) or the independent set B")
+    parser.add_argument(
+        "--set",
+        choices=("a", "b"),
+        default="a",
+        dest="question_set",
+        help="evalset/benchmark: question set A (default) or the independent set B",
+    )
     parser.add_argument("--milvus-uri", default=os.environ.get("MILVUS_URI", "http://localhost:19530"))
-    parser.add_argument("--corpus", type=Path,
-                        help="freeze: the corpus version the question set was written for (default: data/abb_pages.jsonl)")
+    parser.add_argument(
+        "--corpus",
+        type=Path,
+        help="freeze: the corpus version the question set was written for (default: data/abb_pages.jsonl)",
+    )
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)-7s %(name)s: %(message)s")
 
@@ -103,9 +123,17 @@ def run_benchmark_command(paths: Paths, models: list[str], rerank: bool, questio
     from .benchmark_report import write_benchmark_report
 
     if question_set == "b":
-        questions_path, name, source = paths.questions_b, "03_embedding_benchmark_set_b", "evaluation/retrieval/question_set_b.json"
+        questions_path, name, source = (
+            paths.questions_b,
+            "03_embedding_benchmark_set_b",
+            "evaluation/retrieval/question_set_b.json",
+        )
     else:
-        questions_path, name, source = paths.questions, "02_embedding_benchmark", "evaluation/retrieval/abb_100_soru_kaynakli.md"
+        questions_path, name, source = (
+            paths.questions,
+            "02_embedding_benchmark",
+            "evaluation/retrieval/abb_100_soru_kaynakli.md",
+        )
     chunks, questions = load_chunks(paths.chunks), load_questions(questions_path)
     result = run_benchmark(chunks, questions, models, paths.embeddings_dir, rerank=rerank)
     report = write_benchmark_report(result, questions, chunks, paths.reports_dir, name=name, source=source)

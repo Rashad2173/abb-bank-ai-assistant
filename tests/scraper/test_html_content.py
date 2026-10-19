@@ -70,9 +70,11 @@ def test_drops_carousel_step_numbers_and_separators():
 class TestTables:
     def test_header_row_in_td_cells_and_empty_cells_keep_their_column(self):
         """The CMS writes headers as <td>; an empty cell must not shift the next value."""
-        table = ("<table><tr><td>Müddət</td><td>Aylıq</td><td>Müddətin sonu</td></tr>"
-                 "<tr><td>1 ay</td><td></td><td>6.5%</td></tr>"
-                 "<tr><td>3 ay</td><td>7%</td><td>7.25%</td></tr></table>")
+        table = (
+            "<table><tr><td>Müddət</td><td>Aylıq</td><td>Müddətin sonu</td></tr>"
+            "<tr><td>1 ay</td><td></td><td>6.5%</td></tr>"
+            "<tr><td>3 ay</td><td>7%</td><td>7.25%</td></tr></table>"
+        )
         assert texts(parse_html(page_html(table)).blocks) == [
             "Müddət: 1 ay; Aylıq: –; Müddətin sonu: 6.5%",
             "Müddət: 3 ay; Aylıq: 7%; Müddətin sonu: 7.25%",
@@ -80,8 +82,10 @@ class TestTables:
 
     def test_two_column_key_value_table_has_no_header(self):
         """Fitch ratings: the first row is data, even though it has no digits."""
-        table = ("<table><tr><td>Uzunmüddətli defolt reytinqi</td><td>BB+</td></tr>"
-                 "<tr><td>Qısamüddətli reytinq</td><td>B</td></tr></table>")
+        table = (
+            "<table><tr><td>Uzunmüddətli defolt reytinqi</td><td>BB+</td></tr>"
+            "<tr><td>Qısamüddətli reytinq</td><td>B</td></tr></table>"
+        )
         assert texts(parse_html(page_html(table)).blocks) == [
             "Uzunmüddətli defolt reytinqi | BB+",
             "Qısamüddətli reytinq | B",
@@ -92,9 +96,22 @@ class TestTables:
         assert texts(parse_html(page_html(table)).blocks) == ["Komissiya | 1%", "SMS | –"]
 
     def test_merged_header_cells_label_every_column(self):
-        table = ('<table><tr><th>Kart</th><th colspan="2">Limit</th></tr>'
-                 "<tr><td>Gold</td><td>AZN</td><td>USD</td></tr></table>")
+        table = (
+            '<table><tr><th>Kart</th><th colspan="2">Limit</th></tr>'
+            "<tr><td>Gold</td><td>AZN</td><td>USD</td></tr></table>"
+        )
         assert texts(parse_html(page_html(table)).blocks) == ["Kart: Gold; Limit: AZN; Limit: USD"]
+
+    def test_rows_wider_or_narrower_than_the_header_lose_no_cell(self):
+        table = (
+            "<table><tr><th>Kart</th><th>Limit</th></tr>"
+            "<tr><td>Gold</td><td>5000 AZN</td><td>gündəlik</td></tr>"
+            "<tr><td>Classic</td></tr></table>"
+        )
+        assert texts(parse_html(page_html(table)).blocks) == [
+            "Kart: Gold; Limit: 5000 AZN; gündəlik",
+            "Kart: Classic; Limit: –",
+        ]
 
 
 class TestInlineSpacing:
@@ -107,9 +124,12 @@ class TestInlineSpacing:
         assert texts(parsed.blocks) == ["Kredit kalkulyatoru ilə hesablayın"]
 
     def test_line_breaks_and_block_styled_spans_separate_words(self):
-        parsed = parse_html(page_html(
-            '<p>70 000 AZN-dək<br>Məbləğ</p><p><span class="lg:block">60 ay</span><span class="block">Müddət</span></p>'
-        ))
+        parsed = parse_html(
+            page_html(
+                "<p>70 000 AZN-dək<br>Məbləğ</p>"
+                '<p><span class="lg:block">60 ay</span><span class="block">Müddət</span></p>'
+            )
+        )
         assert texts(parsed.blocks) == ["70 000 AZN-dək Məbləğ", "60 ay Müddət"]
 
 
@@ -120,8 +140,12 @@ def test_links_to_documents_keep_their_url():
 
 def test_drops_truncated_preview_of_text_that_is_on_the_page():
     article = "VISA Beynəlxalq Ödəniş Sisteminin regiondakı əsas tərəfdaşlarından olan ABB mükafat aldı."
-    parsed = parse_html(page_html(f"<p>VISA Beynəlxalq Ödəniş Sisteminin regiondakı...</p><p>{article}</p>"
-                                  "<p>Başqa bir mətnin qısa versiyası belə görünür...</p>"))
+    parsed = parse_html(
+        page_html(
+            f"<p>VISA Beynəlxalq Ödəniş Sisteminin regiondakı...</p><p>{article}</p>"
+            "<p>Başqa bir mətnin qısa versiyası belə görünür...</p>"
+        )
+    )
     # the second preview has no full text on the page, so it is kept
     assert texts(parsed.blocks) == [article, "Başqa bir mətnin qısa versiyası belə görünür..."]
 

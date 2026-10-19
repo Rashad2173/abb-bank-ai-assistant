@@ -2,8 +2,8 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react
 
 import { api } from "./api";
 import { ChatView } from "./components/ChatView";
-import { DataView } from "./components/DataView";
-import { I18nContext, LANGS, TEXTS, type Lang } from "./i18n";
+import { DataStep } from "./components/DataStep";
+import { I18nContext, LANGS, type Lang, TEXTS } from "./i18n";
 import { loadMeta } from "./storage";
 import type { CorpusInfo } from "./types";
 
@@ -102,9 +102,10 @@ export default function App() {
             <img className="brand-logo" src="/abb-logo.png" alt="ABB — Azərbaycan Beynəlxalq Bankı" height={30} />
             <span className="brand-name">{t.appTitle}</span>
           </div>
-          <nav className="tabs" role="tablist">
+          <div className="tabs" role="tablist">
             {(["data", "chat", "dashboard"] as Tab[]).map((name) => (
               <button
+                type="button"
                 key={name}
                 role="tab"
                 aria-selected={tab === name}
@@ -116,22 +117,33 @@ export default function App() {
                 {name === "data" ? t.tabData : name === "chat" ? t.tabChat : t.tabDashboard}
               </button>
             ))}
-          </nav>
-          <button className="theme-toggle" onClick={toggleTheme} aria-label={theme === "dark" ? t.themeLight : t.themeDark}
-                  title={theme === "dark" ? t.themeLight : t.themeDark}>
+          </div>
+          <button
+            type="button"
+            className="theme-toggle"
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? t.themeLight : t.themeDark}
+            title={theme === "dark" ? t.themeLight : t.themeDark}
+          >
             {theme === "dark" ? "☀" : "☾"}
           </button>
-          <select className="lang-select" value={lang} aria-label="Language / Dil / Язык"
-                  onChange={(event) => changeLang(event.target.value as Lang)}>
+          <select
+            className="lang-select"
+            value={lang}
+            aria-label="Language / Dil / Язык"
+            onChange={(event) => changeLang(event.target.value as Lang)}
+          >
             {LANGS.map((code) => (
-              <option key={code} value={code}>{LANGUAGE_NAMES[code]}</option>
+              <option key={code} value={code}>
+                {LANGUAGE_NAMES[code]}
+              </option>
             ))}
           </select>
         </header>
 
         <main className={`content ${tab === "chat" && chatReady ? "content-full" : ""}`}>
           {tab === "data" && (
-            <DataView
+            <DataStep
               corpus={corpus}
               onProcessed={async () => {
                 await refreshCorpus();

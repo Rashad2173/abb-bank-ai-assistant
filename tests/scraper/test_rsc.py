@@ -43,10 +43,16 @@ def test_iter_dicts_preserves_document_order():
 
 class TestExtractAccordionItems:
     def test_finds_items_anywhere_in_the_tree(self):
-        faq = {"groups": [{"items": [
-            {"id": 1, "trigger": "Kimlər kredit ala bilər?", "content": "<p>20 yaşdan yuxarı</p>"},
-            {"id": 2, "trigger": "Faiz nə qədərdir?", "content": "<p>10.9%-dən</p>"},
-        ]}]}
+        faq = {
+            "groups": [
+                {
+                    "items": [
+                        {"id": 1, "trigger": "Kimlər kredit ala bilər?", "content": "<p>20 yaşdan yuxarı</p>"},
+                        {"id": 2, "trigger": "Faiz nə qədərdir?", "content": "<p>10.9%-dən</p>"},
+                    ]
+                }
+            ]
+        }
         rows = parse_flight_rows(f"5:{json.dumps(faq)}\n")
         assert extract_accordion_items(list(rows.values()), rows) == [
             ("Kimlər kredit ala bilər?", "<p>20 yaşdan yuxarı</p>"),

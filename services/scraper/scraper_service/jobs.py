@@ -62,8 +62,9 @@ class ScrapeRunner:
         site = check_site(url)
         if self._task is not None and not self._task.done():
             raise JobRunning(f"Job {self.last_job.job_id} is still running")
-        job = ScrapeJob(job_id=uuid.uuid4().hex[:12], url=site, mode=mode, status="queued",
-                        started_at=datetime.now(UTC))
+        job = ScrapeJob(
+            job_id=uuid.uuid4().hex[:12], url=site, mode=mode, status="queued", started_at=datetime.now(UTC)
+        )
         self.jobs[job.job_id] = self.last_job = job
         self._task = asyncio.create_task(self._run(job))
         return job
@@ -97,7 +98,9 @@ class ScrapeRunner:
 
     async def _crawl(self, job: ScrapeJob, config: ScraperConfig, store: RawPageStore) -> None:
         recent: deque[RecentUrl] = deque(maxlen=RECENT_URLS)
-        crawler = Crawler(config, store, on_url=lambda url, outcome: recent.appendleft(RecentUrl(url=url, outcome=outcome)))
+        crawler = Crawler(
+            config, store, on_url=lambda url, outcome: recent.appendleft(RecentUrl(url=url, outcome=outcome))
+        )
         job.status = "discovering"
         # The crawler re-reads cached pages synchronously while discovering links, so it runs on
         # its own event loop in a worker thread: this loop stays free to answer progress requests.

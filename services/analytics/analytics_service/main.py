@@ -53,14 +53,19 @@ def build_app(settings: Settings | None = None) -> FastAPI:
         return row
 
     @app.get("/v1/interactions", response_model=InteractionPage, tags=["interactions"])
-    def browse(db: Db, limit: Annotated[int, Query(ge=1, le=200)] = 50, offset: Annotated[int, Query(ge=0)] = 0,
-               status: str | None = None) -> InteractionPage:
+    def browse(
+        db: Db,
+        limit: Annotated[int, Query(ge=1, le=200)] = 50,
+        offset: Annotated[int, Query(ge=0)] = 0,
+        status: str | None = None,
+    ) -> InteractionPage:
         query = select(Interaction)
         if status:
             query = query.where(Interaction.status == status)
         total = db.scalar(select(func.count()).select_from(query.subquery()))
-        rows = db.scalars(query.order_by(Interaction.created_at.desc(), Interaction.id.desc())
-                          .limit(limit).offset(offset)).all()
+        rows = db.scalars(
+            query.order_by(Interaction.created_at.desc(), Interaction.id.desc()).limit(limit).offset(offset)
+        ).all()
         return InteractionPage(items=[InteractionOut.model_validate(row) for row in rows], total=total)
 
     @app.get("/v1/stats", response_model=Stats, tags=["interactions"])
@@ -78,6 +83,7 @@ def _ready_checks(app: FastAPI):
             with app.state.sessions() as db:
                 db.execute(text("SELECT 1"))
                 return db.scalar(select(func.count()).select_from(Interaction))
+
         return f"{await run_in_threadpool(count)} interactions stored"
 
     return {"database": database}

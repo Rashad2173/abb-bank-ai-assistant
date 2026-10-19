@@ -10,7 +10,7 @@ from service_common import configure_logging, create_app
 
 from . import __version__
 from .config import Settings
-from .models import ModelUnavailable, Models
+from .models import Models, ModelUnavailable
 from .schemas import EmbedRequest, EmbedResponse, RerankRequest, RerankResponse
 
 SERVICE = "inference"

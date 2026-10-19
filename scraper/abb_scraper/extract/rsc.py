@@ -47,11 +47,11 @@ def parse_flight_rows(payload: str) -> dict[str, Any]:
         row_id = data[pos:colon].decode().strip()
         pos = colon + 1
 
-        if data[pos:pos + 1] == b"T":
+        if data[pos : pos + 1] == b"T":
             comma = data.find(b",", pos)
-            length = int(data[pos + 1:comma], 16)
+            length = int(data[pos + 1 : comma], 16)
             start = comma + 1
-            rows[row_id] = data[start:start + length].decode("utf-8", errors="replace")
+            rows[row_id] = data[start : start + length].decode("utf-8", errors="replace")
             pos = start + length
             continue
 

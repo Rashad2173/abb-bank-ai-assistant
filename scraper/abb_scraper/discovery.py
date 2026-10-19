@@ -14,8 +14,25 @@ _HREF_RE = re.compile(r'href="([^"]+)"')
 # Paths that never contain page content.
 _EXCLUDED_PREFIXES = ("/_next/", "/cdn-cgi/", "/api/", "/search")
 _EXCLUDED_EXTENSIONS = (
-    ".pdf", ".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp", ".ico", ".zip",
-    ".doc", ".docx", ".xls", ".xlsx", ".mp4", ".css", ".js", ".json", ".xml", ".txt",
+    ".pdf",
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".gif",
+    ".svg",
+    ".webp",
+    ".ico",
+    ".zip",
+    ".doc",
+    ".docx",
+    ".xls",
+    ".xlsx",
+    ".mp4",
+    ".css",
+    ".js",
+    ".json",
+    ".xml",
+    ".txt",
 )
 _LANGUAGE_PREFIXES: tuple[Language, ...] = ("en", "ru")
 

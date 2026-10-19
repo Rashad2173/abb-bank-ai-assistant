@@ -47,8 +47,9 @@ def merge_shared_sections(chunks: list[Chunk], config: ChunkingConfig, count_tok
         if chunk.category in config.shared_section_categories:
             groups[(chunk.lang, fingerprint(body_of(chunk)))].append(chunk)
 
-    shared = {key: group for key, group in groups.items()
-              if len({c.url for c in group}) >= config.shared_section_min_pages}
+    shared = {
+        key: group for key, group in groups.items() if len({c.url for c in group}) >= config.shared_section_min_pages
+    }
     merged_ids: dict[str, Chunk] = {}
     for (lang, _), group in shared.items():
         common = _common_chunk(group[0], lang, count_tokens)
@@ -75,21 +76,26 @@ def _common_chunk(first: Chunk, lang: str, count_tokens: TokenCounter) -> Chunk:
     title = COMMON_SECTION_TITLES.get(lang, COMMON_SECTION_TITLES["az"])
     header = "\n".join([title, " > ".join(first.heading_path)]) if first.heading_path else title
     text = f"{header}\n\n{body_of(first)}"
-    return first.model_copy(update={
-        "title": title,
-        "text": text,
-        "token_count": count_tokens(text),  # the header changed
-        "published": None,  # common to tenders of many dates
-        "aliases": [*first.aliases, ChunkAlias(url=first.url, page_index=first.page_index,
-                                               sources=first.sources, category=first.category)],
-        "related_urls": list(first.related_urls),
-        "categories": list(first.categories),
-    })
+    return first.model_copy(
+        update={
+            "title": title,
+            "text": text,
+            "token_count": count_tokens(text),  # the header changed
+            "published": None,  # common to tenders of many dates
+            "aliases": [
+                *first.aliases,
+                ChunkAlias(url=first.url, page_index=first.page_index, sources=first.sources, category=first.category),
+            ],
+            "related_urls": list(first.related_urls),
+            "categories": list(first.categories),
+        }
+    )
 
 
 def _absorb(kept: Chunk, other: Chunk) -> None:
-    kept.aliases.append(ChunkAlias(url=other.url, page_index=other.page_index,
-                                   sources=other.sources, category=other.category))
+    kept.aliases.append(
+        ChunkAlias(url=other.url, page_index=other.page_index, sources=other.sources, category=other.category)
+    )
     kept.aliases.extend(other.aliases)
     for url in [other.url, *other.related_urls]:
         if url != kept.url and url not in kept.related_urls:

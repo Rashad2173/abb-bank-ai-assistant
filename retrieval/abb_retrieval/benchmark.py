@@ -22,7 +22,6 @@ from .metrics import QuestionResult, evaluate_question
 from .models import Chunk, Question
 from .search import BM25, dense_scores, rank, reciprocal_rank_fusion, sparse_scores
 
-
 TOP_K = 50
 RERANK_CANDIDATES = 30
 RERANKER_ID = "BAAI/bge-reranker-v2-m3"
@@ -78,12 +77,13 @@ def run_benchmark(
             rankings[f"{method} + reranker"] = rerank(reranker, queries, texts, rankings[method])
             rerank_seconds[method] = time.perf_counter() - started
 
-    result = BenchmarkResult(chunk_count=len(chunks), question_count=len(questions), model_stats=stats,
-                             rerank_seconds=rerank_seconds)
+    result = BenchmarkResult(
+        chunk_count=len(chunks), question_count=len(questions), model_stats=stats, rerank_seconds=rerank_seconds
+    )
     for method, per_query in rankings.items():
         ids = [[chunks[i].chunk_id for i in ranking] for ranking in per_query]
         result.rankings[method] = ids
-        result.results[method] = [evaluate_question(q, r) for q, r in zip(questions, ids)]
+        result.results[method] = [evaluate_question(q, r) for q, r in zip(questions, ids, strict=True)]
     return result
 
 
@@ -91,7 +91,10 @@ def run_benchmark(
 # Embedding (cached)
 # --------------------------------------------------------------------------- #
 
-def _embed(name: str, texts: list[str], queries: list[str], cache_dir: Path) -> tuple[Embeddings, Embeddings, ModelStats]:
+
+def _embed(
+    name: str, texts: list[str], queries: list[str], cache_dir: Path
+) -> tuple[Embeddings, Embeddings, ModelStats]:
     cache = EmbeddingCache(name, cache_dir)
     documents, doc_meta = cache.documents(texts)
     query_vectors, query_meta = cache.queries(queries)
@@ -111,15 +114,17 @@ def _embed(name: str, texts: list[str], queries: list[str], cache_dir: Path) -> 
 # Reranking
 # --------------------------------------------------------------------------- #
 
+
 def load_reranker():
     from FlagEmbedding import FlagReranker
+
     return FlagReranker(RERANKER_ID, use_fp16=True)
 
 
 def rerank(reranker, queries: list[str], texts: list[str], rankings: list[list[int]]) -> list[list[int]]:
     reranked = []
-    for query, ranking in zip(queries, rankings):
+    for query, ranking in zip(queries, rankings, strict=True):
         candidates = ranking[:RERANK_CANDIDATES]
         scores = reranker.compute_score([[query, texts[i]] for i in candidates], max_length=1024)
-        reranked.append([doc for _, doc in sorted(zip(scores, candidates), key=lambda pair: -pair[0])])
+        reranked.append([doc for _, doc in sorted(zip(scores, candidates, strict=True), key=lambda pair: -pair[0])])
     return reranked

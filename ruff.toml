@@ -1,0 +1,26 @@
+# Lint settings for all Python code:  ruff check .
+line-length = 120
+target-version = "py312"
+extend-exclude = ["data", "frontend"]
+
+[lint]
+select = [
+    "E", "W",  # pycodestyle
+    "F",       # pyflakes
+    "I",       # import order
+    "B",       # bugbear: likely bugs
+    "UP",      # modern syntax
+    "SIM",     # simplifications
+    "C4",      # comprehensions
+    "RUF",     # ruff-specific
+]
+ignore = [
+    # Azerbaijani and Russian text (ə, ı, Cyrillic) is the content of this project, not a typo.
+    "RUF001", "RUF002", "RUF003",
+]
+
+[lint.isort]
+known-first-party = [
+    "abb_scraper", "abb_retrieval", "service_common",
+    "chat_service", "analytics_service", "ingestion_service", "inference_service", "scraper_service",
+]

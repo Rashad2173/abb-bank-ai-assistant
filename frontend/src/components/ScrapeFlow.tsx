@@ -2,9 +2,9 @@
 // a stage-by-stage pipeline, live counters, the URLs being read and short facts
 // about what the system does — so the minutes of waiting are worth watching.
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 
-import { api, ApiError } from "../api";
+import { ApiError, api } from "../api";
 import { errorText, useI18n } from "../i18n";
 import { parseData } from "../parse";
 import { saveData } from "../storage";
@@ -15,7 +15,13 @@ const POLL_MS = 800;
 const FACT_MS = 6000;
 const STAGES: ScrapeStatus[] = ["discovering", "crawling", "network", "extracting", "indexing", "done"];
 // Share of the progress bar per stage (roughly their duration on a cached run).
-const WEIGHTS: Partial<Record<ScrapeStatus, number>> = { discovering: 10, crawling: 15, network: 5, extracting: 50, indexing: 20 };
+const WEIGHTS: Partial<Record<ScrapeStatus, number>> = {
+  discovering: 10,
+  crawling: 15,
+  network: 5,
+  extracting: 50,
+  indexing: 20,
+};
 
 interface Props {
   corpus: CorpusInfo | null;
@@ -51,7 +57,13 @@ export function ScrapeFlow({ corpus, onDone }: Props) {
     };
   }, [running, t.facts.length]);
 
-  useEffect(() => () => stopPolling(), []);
+  // Stop polling when the view is left.
+  useEffect(
+    () => () => {
+      if (polling.current !== null) window.clearInterval(polling.current);
+    },
+    [],
+  );
 
   function stopPolling() {
     if (polling.current !== null) window.clearInterval(polling.current);
@@ -98,7 +110,12 @@ export function ScrapeFlow({ corpus, onDone }: Props) {
     }
   }
 
-  const elapsed = job ? Math.max(0, Math.round(((job.finished_at ? Date.parse(job.finished_at) : now) - Date.parse(job.started_at)) / 1000)) : 0;
+  const elapsed = job
+    ? Math.max(
+        0,
+        Math.round(((job.finished_at ? Date.parse(job.finished_at) : now) - Date.parse(job.started_at)) / 1000),
+      )
+    : 0;
 
   return (
     <div className="scrape">
@@ -109,25 +126,60 @@ export function ScrapeFlow({ corpus, onDone }: Props) {
             <p className="muted">{t.scrapeHint}</p>
           </div>
           <div className="url-row">
-            <input className="url-input" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://abb-bank.az"
-                   aria-label="URL" spellCheck={false} />
-            <button className="button button-primary" disabled={!url.trim()}>{t.scrapeStart}</button>
+            <input
+              className="url-input"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="https://abb-bank.az"
+              aria-label="URL"
+              spellCheck={false}
+            />
+            <button type="submit" className="button button-primary" disabled={!url.trim()}>
+              {t.scrapeStart}
+            </button>
           </div>
-          <ModeChoice mode={mode} onChange={(m) => { modeChosen.current = true; setMode(m); }} />
-          {job?.status === "failed" && <p className="alert alert-error">{t.steps.failed}: {job.error}</p>}
-          {error && <p className="alert alert-error" role="alert">{error}</p>}
+          <ModeChoice
+            mode={mode}
+            onChange={(m) => {
+              modeChosen.current = true;
+              setMode(m);
+            }}
+          />
+          {job?.status === "failed" && (
+            <p className="alert alert-error">
+              {t.steps.failed}: {job.error}
+            </p>
+          )}
+          {error && (
+            <p className="alert alert-error" role="alert">
+              {error}
+            </p>
+          )}
         </form>
       ) : (
         <div className="card pipeline">
           <div className="pipeline-head">
-            <img className={`pipeline-mascot ${running ? "bobbing" : ""}`} src="/assistant-mascot.png" alt="" aria-hidden />
+            <img
+              className={`pipeline-mascot ${running ? "bobbing" : ""}`}
+              src="/assistant-mascot.png"
+              alt=""
+              aria-hidden
+            />
             <div>
               <h1>{job.status === "done" ? t.scrapeDone : t.scrapeRunning}</h1>
-              <p className="muted">{job.url} · {formatClock(elapsed)}</p>
+              <p className="muted">
+                {job.url} · {formatClock(elapsed)}
+              </p>
             </div>
           </div>
 
-          <div className="progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress(job))}>
+          <div
+            className="progress"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(progress(job))}
+          >
             <div className="progress-fill" style={{ width: `${progress(job)}%` }} />
           </div>
 
@@ -140,7 +192,9 @@ export function ScrapeFlow({ corpus, onDone }: Props) {
           <ol className="stages">
             {STAGES.map((stage) => (
               <li key={stage} className={`stage stage-${stageState(job.status, stage)}`}>
-                <span className="stage-icon" aria-hidden>{stageState(job.status, stage) === "done" ? "✓" : ""}</span>
+                <span className="stage-icon" aria-hidden>
+                  {stageState(job.status, stage) === "done" ? "✓" : ""}
+                </span>
                 <span className="stage-body">
                   <span className="stage-title">{t.scrapeStages[stage]}</span>
                   <span className="stage-detail">{stageDetail(job, stage, t)}</span>
@@ -150,17 +204,18 @@ export function ScrapeFlow({ corpus, onDone }: Props) {
           </ol>
 
           {running && job.recent.length > 0 && (
-            <div className="ticker" aria-label={t.readingNow}>
+            <section className="ticker" aria-label={t.readingNow}>
               <div className="label">{t.readingNow}</div>
               <ul>
                 {job.recent.slice(0, 6).map((r, i) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: a retried URL can appear twice; the list is replaced on every poll
                   <li key={`${r.url}-${i}`}>
                     <span className={`badge badge-${r.outcome}`}>{t.outcomes[r.outcome]}</span>
                     <span className="ticker-url">{r.url.replace(/^https:\/\/abb-bank\.az/, "") || "/"}</span>
                   </li>
                 ))}
               </ul>
-            </div>
+            </section>
           )}
 
           {running && (
@@ -178,8 +233,12 @@ export function ScrapeFlow({ corpus, onDone }: Props) {
                 {saved === false && ` · ${t.notSavedLocally}`}
               </p>
               <div className="card-actions">
-                <button className="button button-primary" onClick={onDone}>{t.goToChat}</button>
-                <button className="button button-quiet" onClick={() => setJob(null)}>{t.scrapeAgain}</button>
+                <button type="button" className="button button-primary" onClick={onDone}>
+                  {t.goToChat}
+                </button>
+                <button type="button" className="button button-quiet" onClick={() => setJob(null)}>
+                  {t.scrapeAgain}
+                </button>
               </div>
             </div>
           )}

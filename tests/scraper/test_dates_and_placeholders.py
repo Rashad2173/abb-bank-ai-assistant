@@ -6,12 +6,15 @@ from abb_scraper.extract.dates import published_date
 from abb_scraper.extract.text import is_placeholder
 
 
-@pytest.mark.parametrize(("line", "expected"), [
-    ("16 İyul, 2024", date(2024, 7, 16)),
-    ("15 апреля, 2024", date(2024, 4, 15)),
-    ("15 April, 2021", date(2021, 4, 15)),
-    ("9 May 2025", date(2025, 5, 9)),
-])
+@pytest.mark.parametrize(
+    ("line", "expected"),
+    [
+        ("16 İyul, 2024", date(2024, 7, 16)),
+        ("15 апреля, 2024", date(2024, 4, 15)),
+        ("15 April, 2021", date(2021, 4, 15)),
+        ("9 May 2025", date(2025, 5, 9)),
+    ],
+)
 def test_published_date(line, expected):
     assert published_date(["Başlıq", line, "Mətn"]) == expected
 

@@ -26,9 +26,17 @@ READY_CHECK_TIMEOUT = 5.0  # seconds per dependency
 ReadyCheck = Callable[[], Awaitable[str]]
 """Returns a short detail ("9604 chunks") or raises if the dependency is not usable."""
 
-_ERROR_CODES = {400: "invalid_request", 401: "unauthorized", 403: "forbidden", 404: "not_found",
-                405: "method_not_allowed", 413: "payload_too_large", 422: "invalid_request",
-                429: "rate_limited", 503: "dependency_unavailable"}
+_ERROR_CODES = {
+    400: "invalid_request",
+    401: "unauthorized",
+    403: "forbidden",
+    404: "not_found",
+    405: "method_not_allowed",
+    413: "payload_too_large",
+    422: "invalid_request",
+    429: "rate_limited",
+    503: "dependency_unavailable",
+}
 
 
 def request_id() -> str:
@@ -55,8 +63,13 @@ def create_app(
             response = await call_next(request)
             response.headers[REQUEST_ID_HEADER] = rid
             if request.url.path not in ("/health", "/ready"):
-                log.info("%s %s -> %d", request.method, request.url.path, response.status_code,
-                         extra={"duration_ms": round(1000 * (time.perf_counter() - started), 1)})
+                log.info(
+                    "%s %s -> %d",
+                    request.method,
+                    request.url.path,
+                    response.status_code,
+                    extra={"duration_ms": round(1000 * (time.perf_counter() - started), 1)},
+                )
             return response
         finally:
             current_request_id.reset(token)
@@ -72,8 +85,11 @@ def create_app(
 
     @app.exception_handler(DependencyUnavailable)
     async def dependency_error(request: Request, exc: DependencyUnavailable) -> JSONResponse:
-        log.error("dependency unavailable", exc_info=exc.__cause__ or exc,
-                  extra={"dependency": exc.dependency, "request_id": _request_id_of(request)})
+        log.error(
+            "dependency unavailable",
+            exc_info=exc.__cause__ or exc,
+            extra={"dependency": exc.dependency, "request_id": _request_id_of(request)},
+        )
         return _error(request, 503, "dependency_unavailable", str(exc))
 
     @app.exception_handler(Exception)
@@ -87,11 +103,10 @@ def create_app(
     async def health() -> HealthResponse:
         return HealthResponse(service=service, version=version)
 
-    @app.get("/ready", response_model=ReadyResponse, tags=["operations"],
-             responses={503: {"model": ReadyResponse}})
+    @app.get("/ready", response_model=ReadyResponse, tags=["operations"], responses={503: {"model": ReadyResponse}})
     async def ready() -> JSONResponse:
         checks = ready_checks(app)
-        results = dict(zip(checks, await asyncio.gather(*(_run_check(c) for c in checks.values()))))
+        results = dict(zip(checks, await asyncio.gather(*(_run_check(c) for c in checks.values())), strict=True))
         status = "ready" if all(r.ok for r in results.values()) else "not_ready"
         body = ReadyResponse(status=status, service=service, checks=results)
         return JSONResponse(body.model_dump(), status_code=200 if status == "ready" else 503)

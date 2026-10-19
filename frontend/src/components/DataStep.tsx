@@ -15,16 +15,28 @@ interface Props {
   onSkip: () => void;
 }
 
-export function DataView({ corpus, onProcessed, onSkip }: Props) {
+export function DataStep({ corpus, onProcessed, onSkip }: Props) {
   const { t } = useI18n();
   const [source, setSource] = useState<Source>("link");
   return (
     <section className="data-view">
       <div className="segmented source-switch" role="tablist" aria-label={t.tabData}>
-        <button role="tab" aria-selected={source === "link"} className={source === "link" ? "active" : ""} onClick={() => setSource("link")}>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={source === "link"}
+          className={source === "link" ? "active" : ""}
+          onClick={() => setSource("link")}
+        >
           🔗 {t.sourceLink}
         </button>
-        <button role="tab" aria-selected={source === "file"} className={source === "file" ? "active" : ""} onClick={() => setSource("file")}>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={source === "file"}
+          className={source === "file" ? "active" : ""}
+          onClick={() => setSource("file")}
+        >
           📄 {t.sourceFile}
         </button>
       </div>
@@ -33,10 +45,12 @@ export function DataView({ corpus, onProcessed, onSkip }: Props) {
       ) : (
         <UploadView corpus={corpus} onProcessed={onProcessed} onSkip={onSkip} />
       )}
-      {source === "link" && (corpus?.chunks ?? 0) > 0 && (
+      {source === "link" && corpus && corpus.chunks > 0 && (
         <div className="skip">
           <span className="muted">{t.skipHint}</span>
-          <button className="button" onClick={onSkip}>{t.skip} ({corpus!.chunks.toLocaleString()} {t.chunks})</button>
+          <button type="button" className="button" onClick={onSkip}>
+            {t.skip} ({corpus.chunks.toLocaleString()} {t.chunks})
+          </button>
         </div>
       )}
     </section>

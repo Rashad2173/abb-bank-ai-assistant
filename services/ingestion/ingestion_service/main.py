@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
-
 from typing import Annotated
 
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
@@ -52,8 +51,9 @@ def build_app(settings: Settings | None = None, count_tokens: TokenCounter | Non
             raise HTTPException(409, str(exc)) from exc
 
     @app.post("/v1/ingest/files", response_model=FileIngestResponse, status_code=202, tags=["ingestion"])
-    async def ingest_files(request: Request, files: Annotated[list[UploadFile], File()],
-                           mode: Annotated[IngestMode, Form()] = "append") -> FileIngestResponse:
+    async def ingest_files(
+        request: Request, files: Annotated[list[UploadFile], File()], mode: Annotated[IngestMode, Form()] = "append"
+    ) -> FileIngestResponse:
         """PDF / TXT documents → pages → the same job as ``/v1/ingest`` (default: added to the index)."""
         if len(files) > settings.max_files:
             raise HTTPException(413, f"At most {settings.max_files} files per upload")

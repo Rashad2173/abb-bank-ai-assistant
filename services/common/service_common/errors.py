@@ -16,9 +16,10 @@ class DependencyUnavailable(RuntimeError):
 @contextmanager
 def dependency(name: str, *errors: type[BaseException]) -> Iterator[None]:
     """Turn ``errors`` raised inside the block into :class:`DependencyUnavailable` (``Exception`` if none given)."""
+    caught: tuple[type[BaseException], ...] = errors or (Exception,)
     try:
         yield
     except DependencyUnavailable:
         raise
-    except (errors or (Exception,)) as exc:
+    except caught as exc:
         raise DependencyUnavailable(name, exc) from exc

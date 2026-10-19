@@ -30,7 +30,9 @@ def build_app(settings: Settings | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         inference = InferenceClient(settings.inference_url, timeout=settings.embed_timeout)
-        openai_client = AsyncOpenAI(api_key=settings.openai_api_key or None, timeout=settings.llm_timeout, max_retries=2)
+        openai_client = AsyncOpenAI(
+            api_key=settings.openai_api_key or None, timeout=settings.llm_timeout, max_retries=2
+        )
         store = MilvusStore(settings.milvus_uri, settings.milvus_collection)  # connects lazily on first call
         app.state.settings = settings
         app.state.store, app.state.inference, app.state.openai = store, inference, openai_client

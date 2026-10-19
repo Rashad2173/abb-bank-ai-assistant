@@ -52,8 +52,19 @@ METHODS = {
 }
 
 _OUTPUT_FIELDS = ["chunk_id"]
-CHUNK_FIELDS = ["chunk_id", "url", "title", "lang", "category", "chunk_type", "is_active", "valid_until",
-                "published", "related_urls", "text"]
+CHUNK_FIELDS = [
+    "chunk_id",
+    "url",
+    "title",
+    "lang",
+    "category",
+    "chunk_type",
+    "is_active",
+    "valid_until",
+    "published",
+    "related_urls",
+    "text",
+]
 """What the chat service shows the LLM and the user."""
 
 
@@ -106,8 +117,10 @@ class MilvusStore:
         if embeddings.sparse is None:
             raise ValueError("bge-m3 embeddings with sparse vectors are required")
         for start in range(0, len(chunks), batch_size):
-            rows = [_row(chunk, embeddings.dense[i], embeddings.sparse[i])
-                    for i, chunk in enumerate(chunks[start:start + batch_size], start)]
+            rows = [
+                _row(chunk, embeddings.dense[i], embeddings.sparse[i])
+                for i, chunk in enumerate(chunks[start : start + batch_size], start)
+            ]
             write(self.collection, rows)
         self.client.flush(self.collection)
 
@@ -120,8 +133,9 @@ class MilvusStore:
 
     def content_hashes(self) -> dict[str, str]:
         """``chunk_id → content hash`` of everything stored — what ingestion compares against."""
-        iterator = self.client.query_iterator(self.collection, batch_size=2000, filter="",
-                                              output_fields=["chunk_id", "content_hash"])
+        iterator = self.client.query_iterator(
+            self.collection, batch_size=2000, filter="", output_fields=["chunk_id", "content_hash"]
+        )
         hashes: dict[str, str] = {}
         try:
             while batch := iterator.next():
@@ -134,31 +148,47 @@ class MilvusStore:
         """The stored chunks (:data:`CHUNK_FIELDS`) in the order of ``chunk_ids``."""
         if not chunk_ids:
             return []
-        rows = {row["chunk_id"]: row for row in self.client.get(self.collection, ids=list(chunk_ids),
-                                                                 output_fields=CHUNK_FIELDS)}
+        rows = {
+            row["chunk_id"]: row
+            for row in self.client.get(self.collection, ids=list(chunk_ids), output_fields=CHUNK_FIELDS)
+        }
         return [rows[cid] for cid in chunk_ids if cid in rows]
 
     # ------------------------------------------------------------------ #
     # Search
     # ------------------------------------------------------------------ #
 
-    def search(self, queries: Sequence[Query], method: str, limit: int, filter: str = "",
-               batch_size: int = 50) -> list[list[str]]:
+    def search(
+        self, queries: Sequence[Query], method: str, limit: int, filter: str = "", batch_size: int = 50
+    ) -> list[list[str]]:
         """Chunk ids per query, best first."""
         searches = METHODS[method]
         results: list[list[str]] = []
         for batch in _batches(queries, batch_size):
             if len(searches) == 1:
                 hits = self.client.search(
-                    self.collection, data=_data(batch, searches[0]), anns_field=searches[0], limit=limit,
-                    filter=filter, search_params=_search_params(searches[0]), output_fields=_OUTPUT_FIELDS,
+                    self.collection,
+                    data=_data(batch, searches[0]),
+                    anns_field=searches[0],
+                    limit=limit,
+                    filter=filter,
+                    search_params=_search_params(searches[0]),
+                    output_fields=_OUTPUT_FIELDS,
                 )
             else:
-                requests = [AnnSearchRequest(data=_data(batch, field), anns_field=field, limit=limit,
-                                             param=_search_params(field), expr=filter or None)
-                            for field in searches]
-                hits = self.client.hybrid_search(self.collection, requests, RRFRanker(RRF_K), limit=limit,
-                                                 output_fields=_OUTPUT_FIELDS)
+                requests = [
+                    AnnSearchRequest(
+                        data=_data(batch, field),
+                        anns_field=field,
+                        limit=limit,
+                        param=_search_params(field),
+                        expr=filter or None,
+                    )
+                    for field in searches
+                ]
+                hits = self.client.hybrid_search(
+                    self.collection, requests, RRFRanker(RRF_K), limit=limit, output_fields=_OUTPUT_FIELDS
+                )
             results += [[hit["entity"]["chunk_id"] for hit in per_query] for per_query in hits]
         return results
 
@@ -178,17 +208,33 @@ class MilvusStore:
         schema.add_field("is_active", DataType.BOOL, nullable=True)
         schema.add_field("valid_until", DataType.VARCHAR, max_length=10, nullable=True)  # ISO date
         schema.add_field("published", DataType.VARCHAR, max_length=10, nullable=True)
-        schema.add_field("related_urls", DataType.ARRAY, element_type=DataType.VARCHAR, max_length=_URL_BYTES,
-                         max_capacity=_MAX_RELATED)
+        schema.add_field(
+            "related_urls",
+            DataType.ARRAY,
+            element_type=DataType.VARCHAR,
+            max_length=_URL_BYTES,
+            max_capacity=_MAX_RELATED,
+        )
         schema.add_field("text", DataType.VARCHAR, max_length=_TEXT_BYTES)
         schema.add_field("content_hash", DataType.VARCHAR, max_length=16)
-        schema.add_field("lexical_text", DataType.VARCHAR, max_length=_TEXT_BYTES,
-                         enable_analyzer=True, analyzer_params=LEXICAL_ANALYZER)
+        schema.add_field(
+            "lexical_text",
+            DataType.VARCHAR,
+            max_length=_TEXT_BYTES,
+            enable_analyzer=True,
+            analyzer_params=LEXICAL_ANALYZER,
+        )
         schema.add_field("dense", DataType.FLOAT_VECTOR, dim=DENSE_DIMENSION)
         schema.add_field("sparse", DataType.SPARSE_FLOAT_VECTOR)
         schema.add_field("bm25", DataType.SPARSE_FLOAT_VECTOR)
-        schema.add_function(Function(name="lexical_bm25", function_type=FunctionType.BM25,
-                                     input_field_names=["lexical_text"], output_field_names=["bm25"]))
+        schema.add_function(
+            Function(
+                name="lexical_bm25",
+                function_type=FunctionType.BM25,
+                input_field_names=["lexical_text"],
+                output_field_names=["bm25"],
+            )
+        )
         return schema
 
     def _indexes(self):
@@ -224,8 +270,21 @@ def _row(chunk: Chunk, dense: np.ndarray, sparse: SparseVector) -> dict:
 
 def content_hash(chunk: Chunk) -> str:
     """Changes whenever anything stored for the chunk changes (text or metadata)."""
-    payload = chunk.model_dump_json(include={"url", "title", "lang", "category", "categories", "chunk_type",
-                                             "is_active", "valid_until", "published", "related_urls", "text"})
+    payload = chunk.model_dump_json(
+        include={
+            "url",
+            "title",
+            "lang",
+            "category",
+            "categories",
+            "chunk_type",
+            "is_active",
+            "valid_until",
+            "published",
+            "related_urls",
+            "text",
+        }
+    )
     return hashlib.sha256(payload.encode()).hexdigest()[:16]
 
 
@@ -245,4 +304,4 @@ def _search_params(field: str) -> dict:
 
 def _batches(items: Sequence, size: int) -> Iterator[Sequence]:
     for start in range(0, len(items), size):
-        yield items[start:start + size]
+        yield items[start : start + size]

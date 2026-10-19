@@ -47,9 +47,16 @@ class Models:
         self.embedder = BgeM3Embedder(use_fp16=fp16, devices=self.device)
         if self.settings.load_reranker:
             from FlagEmbedding import FlagReranker
+
             self.reranker = FlagReranker(RERANKER_ID, use_fp16=fp16, devices=[self.device])
-        log.info("models loaded", extra={"device": self.device, "reranker": self.reranker is not None,
-                                         "seconds": round(time.perf_counter() - started, 1)})
+        log.info(
+            "models loaded",
+            extra={
+                "device": self.device,
+                "reranker": self.reranker is not None,
+                "seconds": round(time.perf_counter() - started, 1),
+            },
+        )
 
     async def embed(self, texts: list[str], kind: str):
         embedder = self._require(self.embedder, "embedding model")
@@ -61,7 +68,9 @@ class Models:
         reranker = self._require(self.reranker, "reranker")
         pairs = [[query, document] for document in documents]
         async with self._lock:
-            scores = await run_in_threadpool(reranker.compute_score, pairs, max_length=RERANK_MAX_LENGTH, normalize=True)
+            scores = await run_in_threadpool(
+                reranker.compute_score, pairs, max_length=RERANK_MAX_LENGTH, normalize=True
+            )
         return [float(s) for s in (scores if isinstance(scores, list) else [scores])]
 
     @staticmethod
@@ -79,4 +88,5 @@ def _resolve_device(setting: str) -> str:
     if setting != "auto":
         return setting
     import torch
+
     return "cuda" if torch.cuda.is_available() else "cpu"

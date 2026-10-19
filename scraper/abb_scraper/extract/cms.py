@@ -22,28 +22,86 @@ from .text import fingerprint, is_document_url
 
 # Components that hold no textual content of their own (widgets, link lists,
 # calculators, application forms, the app download banner).
-EXCLUDED_COMPONENTS = frozenset({
-    "tabs.loan-calculator", "tabs.deposit-calculator", "tabs.car-loan-calculator",
-    "tabs.mortgage-calculator", "ui-sections.divider", "ui-sections.quick-links",
-    "ui-sections.our-services", "ui-sections.relevant-now", "ui-sections.campaigns",
-    "ui-sections.currency", "full-page.service-network", "ui-sections.app-banner",
-})
+EXCLUDED_COMPONENTS = frozenset(
+    {
+        "tabs.loan-calculator",
+        "tabs.deposit-calculator",
+        "tabs.car-loan-calculator",
+        "tabs.mortgage-calculator",
+        "ui-sections.divider",
+        "ui-sections.quick-links",
+        "ui-sections.our-services",
+        "ui-sections.relevant-now",
+        "ui-sections.campaigns",
+        "ui-sections.currency",
+        "full-page.service-network",
+        "ui-sections.app-banner",
+    }
+)
 EXCLUDED_COMPONENT_PREFIXES = ("forms.",)
 
 # Sub-trees that are never content: media, buttons, SEO, translations, parents.
-SKIPPED_KEYS = frozenset({
-    "buttons", "button", "localizations", "seo", "parent", "image", "img", "images",
-    "icon", "iconBefore", "iconAfter", "qr_image", "inner_image", "mobile_download_button",
-    "download_links", "section_settings", "layout_data", "url", "spacing",
-})
+SKIPPED_KEYS = frozenset(
+    {
+        "buttons",
+        "button",
+        "localizations",
+        "seo",
+        "parent",
+        "image",
+        "img",
+        "images",
+        "icon",
+        "iconBefore",
+        "iconAfter",
+        "qr_image",
+        "inner_image",
+        "mobile_download_button",
+        "download_links",
+        "section_settings",
+        "layout_data",
+        "url",
+        "spacing",
+    }
+)
 # Scalar fields that hold technical values, not text.
-TECHNICAL_KEYS = frozenset({
-    "__component", "id", "documentId", "createdAt", "updatedAt", "publishedAt", "locale",
-    "slug", "link", "href", "provider", "layout", "variant", "size", "theme", "background",
-    "bullet", "tableTheme", "tableVariant", "tagColor", "gtm_event_name", "aria_label",
-    "name", "hash", "ext", "mime", "etag", "tab_query_parameter_key", "visa_reference_id",
-    "mastercard_reference_id", "alternativeText", "caption", "pageRatingTheme",
-})
+TECHNICAL_KEYS = frozenset(
+    {
+        "__component",
+        "id",
+        "documentId",
+        "createdAt",
+        "updatedAt",
+        "publishedAt",
+        "locale",
+        "slug",
+        "link",
+        "href",
+        "provider",
+        "layout",
+        "variant",
+        "size",
+        "theme",
+        "background",
+        "bullet",
+        "tableTheme",
+        "tableVariant",
+        "tagColor",
+        "gtm_event_name",
+        "aria_label",
+        "name",
+        "hash",
+        "ext",
+        "mime",
+        "etag",
+        "tab_query_parameter_key",
+        "visa_reference_id",
+        "mastercard_reference_id",
+        "alternativeText",
+        "caption",
+        "pageRatingTheme",
+    }
+)
 HEADING_KEYS = ("title", "heading_before", "heading_gradient", "heading_after")
 FAQ_KEYS = frozenset({"trigger", "content"})
 
@@ -241,4 +299,4 @@ def _document_urls(node: dict[str, Any]) -> list[str]:
 
 def _is_faq_item(node: dict[str, Any]) -> bool:
     """FAQ items are extracted separately (see :func:`rsc.extract_accordion_items`)."""
-    return FAQ_KEYS <= node.keys() and isinstance(node.get("trigger"), str)
+    return node.keys() >= FAQ_KEYS and isinstance(node.get("trigger"), str)

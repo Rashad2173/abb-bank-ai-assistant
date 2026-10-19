@@ -79,9 +79,10 @@ def load(path: Path) -> Embeddings:
     data = np.load(path)
     sparse = None
     if "sp_data" in data:
-        matrix = sp.csr_matrix((data["sp_data"], data["sp_indices"], data["sp_indptr"]),
-                               shape=(len(data["dense"]), BGE_M3_VOCABULARY))
-        sparse = [dict(zip(row.indices.tolist(), row.data.tolist())) for row in matrix]
+        matrix = sp.csr_matrix(
+            (data["sp_data"], data["sp_indices"], data["sp_indptr"]), shape=(len(data["dense"]), BGE_M3_VOCABULARY)
+        )
+        sparse = [dict(zip(row.indices.tolist(), row.data.tolist(), strict=True)) for row in matrix]
     return Embeddings(data["dense"], sparse)
 
 
@@ -97,6 +98,7 @@ def _tokens_used(model: Embedder) -> int:
 def _free_gpu() -> None:
     try:
         import torch
+
         torch.cuda.empty_cache()
     except ImportError:
         pass

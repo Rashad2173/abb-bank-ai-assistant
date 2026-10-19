@@ -16,8 +16,10 @@ def make_pdf(pages: list[list[str]], title: str | None = None) -> bytes:
         content = "BT /F1 11 Tf 72 740 Td 14 TL " + " ".join(f"({line}) Tj T*" for line in lines) + " ET"
         page_id, content_id = len(objects) + 1, len(objects) + 2
         kids.append(f"{page_id} 0 R")
-        objects.append(f"<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Contents {content_id} 0 R"
-                       f"/Resources<</Font<</F1 {len(pages) * 2 + 3} 0 R>>>>>>")
+        objects.append(
+            f"<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Contents {content_id} 0 R"
+            f"/Resources<</Font<</F1 {len(pages) * 2 + 3} 0 R>>>>>>"
+        )
         objects.append(f"<</Length {len(content)}>>stream\n{content}\nendstream")
     objects[1] = f"<</Type/Pages/Kids[{' '.join(kids)}]/Count {len(pages)}>>"
     objects.append("<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>")
@@ -34,34 +36,51 @@ def make_pdf(pages: list[list[str]], title: str | None = None) -> bytes:
     return out.encode("latin-1")
 
 
-TARIFF = make_pdf([
-    ["ABB card tariffs for individuals.", "Annual service fee of the classic card is 10 AZN.",
-     "Cash withdrawal at ABB ATMs is free of charge."],
-    ["SMS notifications cost 1 AZN per month and", "can be switched off in ABB mobile."],
-], title="ABB Tariffs")
+TARIFF = make_pdf(
+    [
+        [
+            "ABB card tariffs for individuals.",
+            "Annual service fee of the classic card is 10 AZN.",
+            "Cash withdrawal at ABB ATMs is free of charge.",
+        ],
+        ["SMS notifications cost 1 AZN per month and", "can be switched off in ABB mobile."],
+    ],
+    title="ABB Tariffs",
+)
 
 
 def test_a_pdf_becomes_one_page_with_a_section_per_pdf_page():
     page = page_from_file("abb_kart_tarifleri.pdf", TARIFF)
     assert page["title"] == "abb kart tarifleri" and page["url"] == "upload://abb_kart_tarifleri.pdf"
     assert page["category"] == "document" and page["lang"] == "en"
-    assert [s["heading_path"] for s in page["sections"]] == [["abb kart tarifleri", "Page 1"], ["abb kart tarifleri", "Page 2"]]
+    assert [s["heading_path"] for s in page["sections"]] == [
+        ["abb kart tarifleri", "Page 1"],
+        ["abb kart tarifleri", "Page 2"],
+    ]
     # the wrapped line "… per month and / can be switched off …" is one paragraph again
-    assert page["sections"][1]["paragraphs"] == ["SMS notifications cost 1 AZN per month and can be switched off in ABB mobile."]
+    assert page["sections"][1]["paragraphs"] == [
+        "SMS notifications cost 1 AZN per month and can be switched off in ABB mobile."
+    ]
 
 
 def test_text_files_and_languages():
-    page = page_from_file("qeyd.txt", "Kartın illik xidmət haqqı 10 AZN təşkil edir.\n\nSMS xidməti ayda 1 AZN-dir və ödənişsiz söndürülə bilər.".encode())
+    text = "Kartın illik xidmət haqqı 10 AZN təşkil edir.\n\nSMS xidməti ayda 1 AZN-dir və ödənişsiz söndürülə bilər."
+    page = page_from_file("qeyd.txt", text.encode())
     assert page["lang"] == "az" and page["title"] == "qeyd" and len(page["sections"]) == 1
     assert detect_language("Годовая плата за обслуживание карты составляет 10 манат") == "ru"
 
 
 def test_paragraphs_are_rebuilt_from_wrapped_lines():
     assert to_paragraphs("First line that wraps\ninto the next.\nNew sentence:\n\nAfter a blank") == [
-        "First line that wraps into the next.", "New sentence:", "After a blank"]
+        "First line that wraps into the next.",
+        "New sentence:",
+        "After a blank",
+    ]
 
 
-@pytest.mark.parametrize("name, data", [("scan.pdf", make_pdf([["x"]])), ("bad.pdf", b"not a pdf"), ("sheet.xlsx", b"x")])
+@pytest.mark.parametrize(
+    "name, data", [("scan.pdf", make_pdf([["x"]])), ("bad.pdf", b"not a pdf"), ("sheet.xlsx", b"x")]
+)
 def test_unreadable_documents_are_refused(name, data):
     with pytest.raises(UnreadableDocument):
         page_from_file(name, data)
@@ -83,4 +102,5 @@ def test_upload_endpoint_adds_documents_and_returns_their_pages():
 
 def test_glyph_names_left_by_some_fonts_become_letters():
     from ingestion_service.documents import _fix_glyph_names
+
     assert _fix_glyph_names("Münd/uni0259ricat /uni018Fsas") == "Mündəricat Əsas"

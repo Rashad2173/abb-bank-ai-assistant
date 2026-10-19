@@ -17,12 +17,33 @@ from chat_service.schemas import ChatRequest, Turn
 from service_common.inference_client import EmbeddingResult
 
 CHUNKS = {
-    "a": {"chunk_id": "a", "url": "https://abb-bank.az/atm#zaqatala", "title": "ATM — Zaqatala",
-          "text": "Zaqatala üzrə 12 nöqtə", "published": None, "is_active": None, "valid_until": None},
-    "b": {"chunk_id": "b", "url": "https://abb-bank.az/filiallar", "title": "Filiallar",
-          "text": "Zaqatala filialı", "published": None, "is_active": None, "valid_until": None},
-    "c": {"chunk_id": "c", "url": "https://abb-bank.az/kampaniyalar/x", "title": "Kampaniya",
-          "text": "Kampaniya başa çatıb", "published": None, "is_active": False, "valid_until": "2026-01-31"},
+    "a": {
+        "chunk_id": "a",
+        "url": "https://abb-bank.az/atm#zaqatala",
+        "title": "ATM — Zaqatala",
+        "text": "Zaqatala üzrə 12 nöqtə",
+        "published": None,
+        "is_active": None,
+        "valid_until": None,
+    },
+    "b": {
+        "chunk_id": "b",
+        "url": "https://abb-bank.az/filiallar",
+        "title": "Filiallar",
+        "text": "Zaqatala filialı",
+        "published": None,
+        "is_active": None,
+        "valid_until": None,
+    },
+    "c": {
+        "chunk_id": "c",
+        "url": "https://abb-bank.az/kampaniyalar/x",
+        "title": "Kampaniya",
+        "text": "Kampaniya başa çatıb",
+        "published": None,
+        "is_active": False,
+        "valid_until": "2026-01-31",
+    },
 }
 
 
@@ -79,21 +100,29 @@ class FakeGenerator:
 
     async def answer(self, question, chunks, history):
         self.seen_chunks = list(chunks)
-        return Generation(status=self.status, refusal_reason="none" if self.status != "out_of_scope" else "off_topic",
-                          language="az", answer=self.answer_text, source_ids=self.source_ids,
-                          input_tokens=100, output_tokens=20)
+        return Generation(
+            status=self.status,
+            refusal_reason="none" if self.status != "out_of_scope" else "off_topic",
+            language="az",
+            answer=self.answer_text,
+            source_ids=self.source_ids,
+            input_tokens=100,
+            output_tokens=20,
+        )
 
 
 def pipeline(settings=None, inference=None, generator=None, store=None):
     settings = settings or Settings(_env_file=None, openai_api_key="x")
     generator = generator or FakeGenerator()
-    return ChatPipeline(Retriever(store or FakeStore(), inference or FakeInference(), settings), generator,
-                        settings), generator
+    return ChatPipeline(
+        Retriever(store or FakeStore(), inference or FakeInference(), settings), generator, settings
+    ), generator
 
 
 # --------------------------------------------------------------------------- #
 # Retrieval and reranking
 # --------------------------------------------------------------------------- #
+
 
 async def test_reranked_chunks_go_to_the_llm_best_first():
     chat, generator = pipeline()
@@ -184,9 +213,17 @@ async def test_the_interaction_holds_question_answer_and_timings():
 # Guardrail
 # --------------------------------------------------------------------------- #
 
+
 def generation(status="answered", answer="", source_ids=()):
-    return Generation(status=status, refusal_reason="none", language="az", answer=answer,
-                      source_ids=list(source_ids), input_tokens=0, output_tokens=0)
+    return Generation(
+        status=status,
+        refusal_reason="none",
+        language="az",
+        answer=answer,
+        source_ids=list(source_ids),
+        input_tokens=0,
+        output_tokens=0,
+    )
 
 
 def test_citations_follow_the_text_order_and_unknown_labels_are_removed():
@@ -198,8 +235,10 @@ def test_citations_follow_the_text_order_and_unknown_labels_are_removed():
 
 
 def test_refusals_carry_no_sources():
-    checked = check_answer(generation(status="out_of_scope", answer="Bu mövzuda kömək edə bilmirəm [S1].",
-                                      source_ids=["S1"]), [CHUNKS["a"]])
+    checked = check_answer(
+        generation(status="out_of_scope", answer="Bu mövzuda kömək edə bilmirəm [S1].", source_ids=["S1"]),
+        [CHUNKS["a"]],
+    )
     assert checked.labels == [] and checked.cited == []
     assert checked.generation.answer == "Bu mövzuda kömək edə bilmirəm."
 
@@ -221,10 +260,16 @@ async def test_generator_sends_strict_schema_and_parses_the_answer():
 
     async def create(**kwargs):
         calls.append(kwargs)
-        payload = {"status": "answered", "refusal_reason": "none", "language": "az",
-                   "answer": " 12 [S1] ", "source_ids": ["S1"]}
-        return SimpleNamespace(output_text=json.dumps(payload),
-                               usage=SimpleNamespace(input_tokens=50, output_tokens=10))
+        payload = {
+            "status": "answered",
+            "refusal_reason": "none",
+            "language": "az",
+            "answer": " 12 [S1] ",
+            "source_ids": ["S1"],
+        }
+        return SimpleNamespace(
+            output_text=json.dumps(payload), usage=SimpleNamespace(input_tokens=50, output_tokens=10)
+        )
 
     client = SimpleNamespace(responses=SimpleNamespace(create=create))
     result = await Generator(client, "gpt-6-luna", "low").answer("Q?", [CHUNKS["a"]], [])
@@ -238,6 +283,7 @@ async def test_generator_sends_strict_schema_and_parses_the_answer():
 # API
 # --------------------------------------------------------------------------- #
 
+
 @pytest.fixture
 def api():
     app = build_app(Settings(_env_file=None, openai_api_key="x", analytics_url=""))
@@ -247,8 +293,7 @@ def api():
 
 
 def test_chat_endpoint_returns_the_answer_contract(api):
-    response = api.post("/v1/chat", json={"question": "Zaqatalada neçə bankomat var?"},
-                        headers={"X-Request-ID": "q1"})
+    response = api.post("/v1/chat", json={"question": "Zaqatalada neçə bankomat var?"}, headers={"X-Request-ID": "q1"})
     assert response.status_code == 200
     body = response.json()
     assert body["status"] == "answered" and body["request_id"] == "q1"
@@ -285,5 +330,6 @@ async def test_a_quoted_passage_reaches_planning_and_answering():
 
 def test_with_quote_leaves_plain_questions_alone():
     from chat_service.prompts import with_quote
+
     assert with_quote("Q?", None) == "Q?" and with_quote("Q?", "  ") == "Q?"
     assert with_quote("Q?", "passage").startswith("The user is replying to this part of an earlier answer:")

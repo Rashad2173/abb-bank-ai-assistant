@@ -8,12 +8,14 @@ import unicodedata
 
 # Look-alike characters that CMS editors paste instead of the Azerbaijani schwa.
 # Without this, "Əmanət" and "Әmanət" would be different words for search.
-_SCHWA_LOOKALIKES = str.maketrans({
-    "ә": "ə",  # Cyrillic small schwa  ә
-    "Ә": "Ə",  # Cyrillic capital schwa Ә
-    "ǝ": "ə",  # Latin small turned e  ǝ
-    "Ǝ": "Ə",  # Latin capital reversed E Ǝ
-})
+_SCHWA_LOOKALIKES = str.maketrans(
+    {
+        "ә": "ə",  # Cyrillic small schwa  ә
+        "Ә": "Ə",  # Cyrillic capital schwa Ә
+        "ǝ": "ə",  # Latin small turned e  ǝ
+        "Ǝ": "Ə",  # Latin capital reversed E Ǝ
+    }
+)
 
 _INVISIBLE_RE = re.compile("[​‌‍⁠﻿­]")
 _WHITESPACE_RE = re.compile(r"\s+")
@@ -99,6 +101,4 @@ def decode_cf_email(encoded: str) -> str:
     The first byte is an XOR key that is applied to every following byte.
     """
     key = int(encoded[:2], 16)
-    return "".join(
-        chr(int(encoded[i:i + 2], 16) ^ key) for i in range(2, len(encoded), 2)
-    )
+    return "".join(chr(int(encoded[i : i + 2], 16) ^ key) for i in range(2, len(encoded), 2))

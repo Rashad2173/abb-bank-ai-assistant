@@ -38,16 +38,15 @@ class Summary:
     recall: dict[int, float]
     complete: dict[int, float]
     mrr: float
-    by_category: dict[str, "Summary"] = field(default_factory=dict)
-    by_lang: dict[str, "Summary"] = field(default_factory=dict)
+    by_category: dict[str, Summary] = field(default_factory=dict)
+    by_lang: dict[str, Summary] = field(default_factory=dict)
 
 
 def evaluate_question(question: Question, ranking: list[str]) -> QuestionResult:
     """``ranking`` is the list of retrieved chunk ids, best first."""
     positions = {chunk_id: index for index, chunk_id in enumerate(ranking)}
     evidence_ranks = [
-        min((positions[cid] for cid in ref.chunk_ids if cid in positions), default=None)
-        for ref in question.evidence
+        min((positions[cid] for cid in ref.chunk_ids if cid in positions), default=None) for ref in question.evidence
     ]
     found = [r for r in evidence_ranks if r is not None]
     first = min(found) + 1 if found else None

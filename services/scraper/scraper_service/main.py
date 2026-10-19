@@ -55,8 +55,9 @@ def build_app(settings: Settings | None = None, runner: ScrapeRunner | None = No
         job = request.app.state.runner.jobs.get(job_id)
         if job is None or job.status != "done":
             raise HTTPException(404, "No finished job with this id")
-        return FileResponse(request.app.state.config.pages_path, media_type="application/x-ndjson",
-                            filename="abb_pages.jsonl")
+        return FileResponse(
+            request.app.state.config.pages_path, media_type="application/x-ndjson", filename="abb_pages.jsonl"
+        )
 
     return app
 

@@ -15,12 +15,19 @@ def html_with_payload(body: str, *entities: dict) -> str:
 
 
 def test_combines_html_cms_and_faq():
-    tabs = {"__component": "ui-sections.spain", "tabs": [{
-        "trigger": [{"title": "Tariflər"}],
-        "content": [{"terms": [{"label": "İllik faiz", "term": "22%"}]}],
-    }]}
-    faq = {"__component": "faq.repeatable-faq-group",
-           "groups": [{"items": [{"trigger": "Kart pulsuzdur?", "content": "<p>Bəli.</p>"}]}]}
+    tabs = {
+        "__component": "ui-sections.spain",
+        "tabs": [
+            {
+                "trigger": [{"title": "Tariflər"}],
+                "content": [{"terms": [{"label": "İllik faiz", "term": "22%"}]}],
+            }
+        ],
+    }
+    faq = {
+        "__component": "faq.repeatable-faq-group",
+        "groups": [{"items": [{"trigger": "Kart pulsuzdur?", "content": "<p>Bəli.</p>"}]}],
+    }
     html = html_with_payload("<h1>TamKart Gold</h1><p>Kredit kartı</p>", page_entity("ferdi/kartlar/tam", [tabs, faq]))
 
     content = extract_page("https://abb-bank.az/ferdi/kartlar/tam", "az", html)
@@ -37,10 +44,14 @@ def test_combines_html_cms_and_faq():
 
 
 def test_ignores_content_of_parent_pages():
-    parent_faq = {"__component": "faq.repeatable-faq-group",
-                  "groups": [{"items": [{"trigger": "Üst səhifənin sualı?", "content": "Cavab"}]}]}
-    parent = page_entity("ferdi/kartlar", [parent_faq, {"__component": "ui-sections.usa", "title": "Üst bölmə",
-                                                       "description": "Üst səhifənin mətni"}])
+    parent_faq = {
+        "__component": "faq.repeatable-faq-group",
+        "groups": [{"items": [{"trigger": "Üst səhifənin sualı?", "content": "Cavab"}]}],
+    }
+    parent = page_entity(
+        "ferdi/kartlar",
+        [parent_faq, {"__component": "ui-sections.usa", "title": "Üst bölmə", "description": "Üst səhifənin mətni"}],
+    )
     html = html_with_payload("<h1>Tam</h1>", page_entity("ferdi/kartlar/tam", [], parent=parent))
 
     content = extract_page("https://abb-bank.az/ferdi/kartlar/tam", "az", html)

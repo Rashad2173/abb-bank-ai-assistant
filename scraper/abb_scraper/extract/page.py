@@ -24,10 +24,23 @@ from .text import fingerprint, is_document_url, is_placeholder
 
 _LINK_IN_TEXT_RE = re.compile(r"\((https?://[^\s()]+)\)")
 # Link texts that say nothing about the document; the label before them is used instead.
-_GENERIC_LINK_TEXTS = frozenset(fingerprint(t) for t in (
-    "Yüklə", "Yükləyin", "Ətraflı", "Bax", "Endir", "Endirin", "Download", "More", "Details",
-    "Скачать", "Подробнее", "PDF",
-))
+_GENERIC_LINK_TEXTS = frozenset(
+    fingerprint(t)
+    for t in (
+        "Yüklə",
+        "Yükləyin",
+        "Ətraflı",
+        "Bax",
+        "Endir",
+        "Endirin",
+        "Download",
+        "More",
+        "Details",
+        "Скачать",
+        "Подробнее",
+        "PDF",
+    )
+)
 _MIN_WORDS = 2
 """A broken CMS entry has a one-word question *and* a one-word answer ("Məlumat" /
 "əməliyyatları."). A one-word title over a real explanation ("Məlumat" + 2 000
@@ -82,12 +95,12 @@ def documents_in(texts: Iterable[str]) -> list[Document]:
         for match in _LINK_IN_TEXT_RE.finditer(text):
             url = match.group(1)
             if is_document_url(url) and url not in found:
-                found[url] = Document(title=_document_title(text[:match.start()], url), url=url)
+                found[url] = Document(title=_document_title(text[: match.start()], url), url=url)
     return list(found.values())
 
 
 def _document_title(text_before: str, url: str) -> str:
-    """"Bütün kart tarifləri (PDF): Yüklə" → "Bütün kart tarifləri (PDF)"; else the file name."""
+    """ "Bütün kart tarifləri (PDF): Yüklə" → "Bütün kart tarifləri (PDF)"; else the file name."""
     text = _LINK_IN_TEXT_RE.sub("", text_before)
     parts = [part.strip(" ;-–") for part in text.split(":") if part.strip(" ;-–")]
     while parts and fingerprint(parts[-1]) in _GENERIC_LINK_TEXTS:

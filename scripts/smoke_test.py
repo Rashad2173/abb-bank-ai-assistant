@@ -62,18 +62,22 @@ def check_chat(report: Report) -> list[str]:
     session = f"smoke-{uuid.uuid4().hex[:8]}"
     request_ids = []
     for question, expected in QUESTIONS:
-        response = httpx.post(f"{SERVICES['chat']}/v1/chat", json={"question": question, "session_id": session},
-                              timeout=120)
+        response = httpx.post(
+            f"{SERVICES['chat']}/v1/chat", json={"question": question, "session_id": session}, timeout=120
+        )
         if not report.check(response.status_code == 200, question, f"HTTP {response.status_code}"):
             print("       ", response.text[:300])
             continue
         body = response.json()
         request_ids.append(body["request_id"])
         timings = body["timings"]
-        report.check(body["status"] == expected, f"status {body['status']!r} (expected {expected!r})",
-                     f"reranked={body['reranked']}, {timings['total_ms']:.0f} ms "
-                     f"(retrieval {timings['retrieval_ms']:.0f}, rerank {timings['rerank_ms']:.0f}, "
-                     f"LLM {timings['generation_ms']:.0f})")
+        report.check(
+            body["status"] == expected,
+            f"status {body['status']!r} (expected {expected!r})",
+            f"reranked={body['reranked']}, {timings['total_ms']:.0f} ms "
+            f"(retrieval {timings['retrieval_ms']:.0f}, rerank {timings['rerank_ms']:.0f}, "
+            f"LLM {timings['generation_ms']:.0f})",
+        )
         print("        answer:", body["answer"][:200].replace("\n", " "))
         for source in body["sources"]:
             print(f"        [{source['id']}] {source['title']} — {source['url']}")
@@ -103,9 +107,13 @@ def check_ingestion(report: Report, data: Path | None) -> None:
         time.sleep(2)
         job = httpx.get(f"{SERVICES['ingestion']}/v1/ingest/{job['job_id']}", timeout=10).json()
         print(f"        {job['status']}: {job['embedded']}/{job['to_embed']} embedded")
-    report.check(job["status"] == "done", "ingestion job",
-                 f"{job['chunks']} chunks, {job['unchanged']} unchanged, {job['to_embed']} embedded, "
-                 f"{job['deleted']} deleted" if job["status"] == "done" else job["error"])
+    report.check(
+        job["status"] == "done",
+        "ingestion job",
+        f"{job['chunks']} chunks, {job['unchanged']} unchanged, {job['to_embed']} embedded, {job['deleted']} deleted"
+        if job["status"] == "done"
+        else job["error"],
+    )
 
 
 def main() -> None:

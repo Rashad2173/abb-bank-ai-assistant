@@ -22,8 +22,9 @@ class AnalyticsClient:
         if self._http is None:
             return
         try:
-            response = await self._http.post("/v1/interactions", json=interaction,
-                                             headers={REQUEST_ID_HEADER: interaction["request_id"]})
+            response = await self._http.post(
+                "/v1/interactions", json=interaction, headers={REQUEST_ID_HEADER: interaction["request_id"]}
+            )
             response.raise_for_status()
         except Exception as exc:
             log.warning("interaction not recorded", extra={"error": f"{type(exc).__name__}: {exc}"})

@@ -1,3 +1,8 @@
+"""Settings of the chat service: dependencies, retrieval, limits and timeouts.
+
+Every field is read from the environment variable of the same name (or ``.env``).
+"""
+
 from __future__ import annotations
 
 from typing import Literal

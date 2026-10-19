@@ -22,10 +22,22 @@ def test_embedding_cache_round_trip(tmp_path):
 
 
 def test_row_holds_metadata_and_the_normalised_keyword_text():
-    chunk = Chunk(chunk_id="c-000", url="https://abb-bank.az/x", lang="az", category="campaigns", title="Kampaniya",
-                  heading_path=[], chunk_type="section", text="Kampaniya\n\nNağd kreditə endirim", token_count=5,
-                  page_index=0, sources=[], is_active=False, valid_until=date(2026, 10, 31),
-                  categories=["campaigns"])
+    chunk = Chunk(
+        chunk_id="c-000",
+        url="https://abb-bank.az/x",
+        lang="az",
+        category="campaigns",
+        title="Kampaniya",
+        heading_path=[],
+        chunk_type="section",
+        text="Kampaniya\n\nNağd kreditə endirim",
+        token_count=5,
+        page_index=0,
+        sources=[],
+        is_active=False,
+        valid_until=date(2026, 10, 31),
+        categories=["campaigns"],
+    )
     row = _row(chunk, np.array([0.6, 0.8], dtype=np.float32), {3: 0.4})
 
     assert row["text"] == chunk.text

@@ -1,7 +1,17 @@
 // Calls to the services. All go through /api/<service> — the Vite dev proxy or nginx
 // forwards them, so the browser only ever talks to its own origin.
 
-import type { ChatResponse, CorpusInfo, IngestJob, IngestMode, Interaction, Page, ScrapeJob, Stats, Turn } from "./types";
+import type {
+  ChatResponse,
+  CorpusInfo,
+  IngestJob,
+  IngestMode,
+  Interaction,
+  Page,
+  ScrapeJob,
+  Stats,
+  Turn,
+} from "./types";
 
 export class ApiError extends Error {
   constructor(
@@ -52,7 +62,7 @@ export const api = {
   /** PDF / TXT documents: the service extracts their text and returns the pages it built. */
   ingestFiles: (files: File[], mode: IngestMode) => {
     const form = new FormData();
-    files.forEach((file) => form.append("files", file));
+    for (const file of files) form.append("files", file);
     form.append("mode", mode);
     return call<{ job: IngestJob; pages: Page[] }>("/api/ingestion/v1/ingest/files", { method: "POST", body: form });
   },

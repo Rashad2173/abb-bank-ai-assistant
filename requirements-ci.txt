@@ -1,0 +1,19 @@
+# What the test suite needs — requirements-dev.txt without the model libraries.
+# PyTorch, FlagEmbedding and sentence-transformers are imported only when a model is
+# loaded, which no test does, so CI skips the multi-GB download.
+-r scraper/requirements.txt
+-r services/requirements.txt
+
+# retrieval/requirements.txt without torch, FlagEmbedding, sentence-transformers
+transformers==5.20.0
+openai==3.31.0
+python-dotenv==1.2.4
+numpy==2.5.4
+scipy==1.18.1
+pydantic==2.14.1
+pymilvus==3.0.2
+
+pytest==9.1.1
+pytest-asyncio==1.4.0
+respx==0.23.1
+ruff==0.16.9

@@ -43,9 +43,9 @@ async def test_crawls_sitemap_and_linked_pages(fast_config, site):
 
     records = {r.url: r for r in store.records()}
     assert set(records) == {f"{BASE}/", f"{BASE}/ferdi", f"{BASE}/ferdi/kartlar", f"{BASE}/flaky", f"{BASE}/gone"}
-    assert summary.found_via_links == 1                 # /ferdi/kartlar is not in the sitemap
-    assert records[f"{BASE}/flaky"].status == 200       # retried after the 503
-    assert records[f"{BASE}/gone"].cache_file is None   # 404s are recorded but not cached
+    assert summary.found_via_links == 1  # /ferdi/kartlar is not in the sitemap
+    assert records[f"{BASE}/flaky"].status == 200  # retried after the 503
+    assert records[f"{BASE}/gone"].cache_file is None  # 404s are recorded but not cached
     assert records[f"{BASE}/ferdi"].last_modified == "2025-01-01"
     assert "Kartlar" in store.load_html(records[f"{BASE}/ferdi/kartlar"].cache_file)
 

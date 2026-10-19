@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { api, ApiError } from "../api";
+import { ApiError, api } from "../api";
 import { errorText, useI18n } from "../i18n";
-import { parseData, ParseError, type ParsedData } from "../parse";
-import { clearData, loadData, loadMeta, saveData, type StoredMeta } from "../storage";
+import { type ParsedData, ParseError, parseData } from "../parse";
+import { clearData, loadData, loadMeta, type StoredMeta, saveData } from "../storage";
 import type { CorpusInfo, IngestJob, IngestMode, JobStatus, Page } from "../types";
 import { ModeChoice } from "./ModeChoice";
 
@@ -38,7 +38,13 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
   const input = useRef<HTMLInputElement>(null);
   const polling = useRef<number | null>(null);
 
-  useEffect(() => () => stopPolling(), []);
+  // Stop polling when the view is left.
+  useEffect(
+    () => () => {
+      if (polling.current !== null) window.clearInterval(polling.current);
+    },
+    [],
+  );
 
   function stopPolling() {
     if (polling.current !== null) window.clearInterval(polling.current);
@@ -89,7 +95,7 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
       if (documents) {
         const result = await api.ingestFiles(documents, mode);
         started = result.job;
-        keepDocuments(result.pages);
+        keepDocuments(documents, result.pages);
       } else {
         const data = parsed ?? parseStored();
         if (!data) {
@@ -127,8 +133,8 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
   }
 
   /** The text extracted from the documents is what the browser keeps (like an uploaded data file). */
-  function keepDocuments(pages: Page[]) {
-    const name = documents!.map((file) => file.name).join(", ");
+  function keepDocuments(files: File[], pages: Page[]) {
+    const name = files.map((file) => file.name).join(", ");
     try {
       setMeta(saveData(name, pages.map((page) => JSON.stringify(page)).join("\n"), pages.length));
       setSavedLocally(true);
@@ -150,6 +156,7 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
 
   return (
     <section className="upload">
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: drag and drop is a mouse shortcut; the "choose file" button inside is the keyboard path */}
       <div
         className={`dropzone ${dragging ? "dropzone-active" : ""}`}
         onDragOver={(event) => {
@@ -176,21 +183,25 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
             event.target.value = "";
           }}
         />
-        <button className="button" disabled={busy} onClick={() => input.current?.click()}>
+        <button type="button" className="button" disabled={busy} onClick={() => input.current?.click()}>
           {busy && !job ? t.reading : hasData ? t.replace : t.chooseFile}
         </button>
       </div>
 
-      {!hasData && (corpus?.chunks ?? 0) > 0 && (
+      {!hasData && corpus && corpus.chunks > 0 && (
         <div className="skip">
           <span className="muted">{t.skipHint}</span>
-          <button className="button" onClick={onSkip}>
-            {t.skip} ({corpus!.chunks.toLocaleString()} {t.chunks})
+          <button type="button" className="button" onClick={onSkip}>
+            {t.skip} ({corpus.chunks.toLocaleString()} {t.chunks})
           </button>
         </div>
       )}
 
-      {error && <p className="alert alert-error" role="alert">{error}</p>}
+      {error && (
+        <p className="alert alert-error" role="alert">
+          {error}
+        </p>
+      )}
 
       {hasData && (
         <div className="card">
@@ -218,7 +229,9 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
               <div className="label">{t.documentsLabel}</div>
               <ul className="doc-list">
                 {documents.map((file) => (
-                  <li key={file.name}>📄 {file.name} <span className="muted">· {Math.max(1, Math.round(file.size / 1024))} KB</span></li>
+                  <li key={file.name}>
+                    📄 {file.name} <span className="muted">· {Math.max(1, Math.round(file.size / 1024))} KB</span>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -228,22 +241,37 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
             <div className="facts">
               <Facts title={t.languages} counts={parsed.byLanguage} />
               <Facts title={t.categories} counts={parsed.byCategory} />
-              {parsed.skippedLines > 0 && <p className="muted">{parsed.skippedLines} {t.skipped}</p>}
+              {parsed.skippedLines > 0 && (
+                <p className="muted">
+                  {parsed.skippedLines} {t.skipped}
+                </p>
+              )}
             </div>
           )}
 
-          <ModeChoice mode={mode} disabled={busy} onChange={(option) => { modeChosen.current = true; setMode(option); }} />
+          <ModeChoice
+            mode={mode}
+            disabled={busy}
+            onChange={(option) => {
+              modeChosen.current = true;
+              setMode(option);
+            }}
+          />
 
           {job && <JobProgress job={job} />}
 
           <div className="card-actions">
-            <button className="button button-primary" disabled={busy} onClick={process}>
+            <button type="button" className="button button-primary" disabled={busy} onClick={process}>
               {busy && job ? t.processing : t.process}
             </button>
             {job?.status === "done" && (
-              <button className="button" onClick={onProcessed}>{t.goToChat}</button>
+              <button type="button" className="button" onClick={onProcessed}>
+                {t.goToChat}
+              </button>
             )}
-            <button className="button button-quiet" disabled={busy} onClick={remove}>{t.clear}</button>
+            <button type="button" className="button button-quiet" disabled={busy} onClick={remove}>
+              {t.clear}
+            </button>
           </div>
         </div>
       )}
@@ -269,7 +297,9 @@ function Facts({ title, counts }: { title: string; counts: Record<string, number
       <div className="label">{title}</div>
       <div className="chips">
         {entries.map(([name, count]) => (
-          <span key={name} className="chip">{name} <strong>{count.toLocaleString()}</strong></span>
+          <span key={name} className="chip">
+            {name} <strong>{count.toLocaleString()}</strong>
+          </span>
         ))}
       </div>
     </div>
@@ -283,11 +313,21 @@ function JobProgress({ job }: { job: IngestJob }) {
     <div className="job">
       <ol className="steps">
         {STEPS.map((step, index) => {
-          const state = job.status === "failed" ? "" : index < current || job.status === "done" ? "step-done" : index === current ? "step-current" : "";
+          const state =
+            job.status === "failed"
+              ? ""
+              : index < current || job.status === "done"
+                ? "step-done"
+                : index === current
+                  ? "step-current"
+                  : "";
           return (
             <li key={step} className={`step ${state}`}>
               {t.steps[step]}
-              {step === "embedding" && job.status === "embedding" && job.to_embed > 0 && ` (${job.embedded}/${job.to_embed})`}
+              {step === "embedding" &&
+                job.status === "embedding" &&
+                job.to_embed > 0 &&
+                ` (${job.embedded}/${job.to_embed})`}
             </li>
           );
         })}
@@ -297,7 +337,11 @@ function JobProgress({ job }: { job: IngestJob }) {
           {job.chunks.toLocaleString()} {t.chunks} · {t.jobResult(job.unchanged, job.to_embed, job.deleted)}
         </p>
       )}
-      {job.status === "failed" && <p className="alert alert-error">{t.steps.failed}: {job.error}</p>}
+      {job.status === "failed" && (
+        <p className="alert alert-error">
+          {t.steps.failed}: {job.error}
+        </p>
+      )}
     </div>
   );
 }

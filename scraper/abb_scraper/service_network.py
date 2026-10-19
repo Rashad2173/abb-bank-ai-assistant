@@ -21,7 +21,7 @@ from __future__ import annotations
 import json
 import logging
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import httpx
@@ -55,7 +55,7 @@ async def fetch_service_network(config: ScraperConfig) -> dict[str, Any]:
 
         filters = _unwrap(await call("getBranchFilters"))
         data = {
-            "fetched_at": datetime.now(timezone.utc).isoformat(),
+            "fetched_at": datetime.now(UTC).isoformat(),
             "branches": _unwrap(await call("getBranches", _UNDEFINED)),
             "sub_branches": _unwrap(await call("getSubBranches")),
             "abroad_offices": _unwrap(await call("getAbroadOffices")),
@@ -74,8 +74,11 @@ async def fetch_service_network(config: ScraperConfig) -> dict[str, Any]:
     config.service_network_path.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
     log.info(
         "Service network: %d branches, %d sub-branches, %d offices abroad, %d ATMs, %d terminals",
-        len(data["branches"]), len(data["sub_branches"]), len(data["abroad_offices"]),
-        len(data["atms"]), len(data["terminals"]),
+        len(data["branches"]),
+        len(data["sub_branches"]),
+        len(data["abroad_offices"]),
+        len(data["atms"]),
+        len(data["terminals"]),
     )
     return data
 
@@ -100,7 +103,10 @@ async def _discover_action_ids(client: httpx.AsyncClient, config: ScraperConfig)
 async def _call_action(client: httpx.AsyncClient, config: ScraperConfig, action_id: str, args: list[Any]) -> Any:
     """Invoke a server action the way the browser does and return its result."""
     response = await request(
-        client, config, "POST", config.base_url + LOCATOR_PAGE,
+        client,
+        config,
+        "POST",
+        config.base_url + LOCATOR_PAGE,
         headers={"Next-Action": action_id, "Accept": "text/x-component", "Content-Type": "text/plain;charset=UTF-8"},
         content=json.dumps(args),
     )

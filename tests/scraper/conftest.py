@@ -19,6 +19,4 @@ def product_page_html() -> str:
 
 @pytest.fixture
 def config(tmp_path: Path) -> ScraperConfig:
-    return ScraperConfig(
-        data_dir=tmp_path, concurrency=2, max_retries=2, boilerplate_min_pages=2, extract_workers=1
-    )
+    return ScraperConfig(data_dir=tmp_path, concurrency=2, max_retries=2, boilerplate_min_pages=2, extract_workers=1)

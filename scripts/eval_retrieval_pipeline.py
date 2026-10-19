@@ -12,7 +12,8 @@ Measured on the 200 retrieval questions (chunk-level evidence) and on the 56
 answer-quality questions (source page among the chunks given to the LLM).
 
     python scripts/eval_retrieval_pipeline.py    # → evaluation/reports/08_retrieval_pipeline.md (+ .json)
-    python scripts/eval_retrieval_pipeline.py --configs "both (chat service)" --report 09_retrieval_methods         --methods dense+sparse dense+bm25 dense+sparse+bm25
+    python scripts/eval_retrieval_pipeline.py --configs "both (chat service)" --report 09_retrieval_methods
+        --methods dense+sparse dense+bm25 dense+sparse+bm25   # (one command)
 """
 
 from __future__ import annotations
@@ -78,7 +79,7 @@ async def run_config(name, expand, procurement_filter, questions, retriever, gen
 
 def lang_breakdown(items, hits):
     by = {}
-    for item, hit in zip(items, hits):
+    for item, hit in zip(items, hits, strict=True):
         by.setdefault(item["lang"], []).append(hit)
     return {lang: f"{sum(v)}/{len(v)}" for lang, v in sorted(by.items())}
 
@@ -95,8 +96,9 @@ async def main() -> None:
     methods = args.methods or [settings.retrieval_method]
     paths = Paths()
     retrieval_questions = load_questions(paths.questions) + load_questions(paths.questions_b)
-    answer_items = [q for q in json.loads((ROOT / "evaluation/answers/answer_set.json").read_text(encoding="utf-8"))
-                    if q["sources"]]
+    answer_items = [
+        q for q in json.loads((ROOT / "evaluation/answers/answer_set.json").read_text(encoding="utf-8")) if q["sources"]
+    ]
 
     inference = InferenceClient(settings.inference_url, timeout=60)
     openai = AsyncOpenAI(api_key=settings.openai_api_key, max_retries=3)
@@ -111,32 +113,51 @@ async def main() -> None:
         expand, procurement_filter = CONFIGS[config]
         retriever = Retriever(store, inference, settings.model_copy(update={"retrieval_method": method}))
         results = await run_config(name, expand, procurement_filter, texts, retriever, generator)
-        ranked = [ids for ids, _, _ in results[:len(retrieval_questions)]]
-        summary = summarize([evaluate_question(q, r) for q, r in zip(retrieval_questions, ranked)], breakdown=True)
-        page_hits = [any(u in item["sources"] for u in urls)
-                     for item, (_, urls, _) in zip(answer_items, results[len(retrieval_questions):])]
+        ranked = [ids for ids, _, _ in results[: len(retrieval_questions)]]
+        summary = summarize(
+            [evaluate_question(q, r) for q, r in zip(retrieval_questions, ranked, strict=True)], breakdown=True
+        )
+        page_hits = [
+            any(u in item["sources"] for u in urls)
+            for item, (_, urls, _) in zip(answer_items, results[len(retrieval_questions) :], strict=True)
+        ]
         table.append((name, summary, sum(page_hits)))
         details[name] = {
-            "retrieval": {"complete@5": summary.complete[5], "recall@5": summary.recall[5],
-                          "recall@10": summary.recall[10], "mrr": summary.mrr,
-                          "recall@5_by_lang": {k: v.recall[5] for k, v in summary.by_lang.items()}},
+            "retrieval": {
+                "complete@5": summary.complete[5],
+                "recall@5": summary.recall[5],
+                "recall@10": summary.recall[10],
+                "mrr": summary.mrr,
+                "recall@5_by_lang": {k: v.recall[5] for k, v in summary.by_lang.items()},
+            },
             "answer_set_source_in_context": f"{sum(page_hits)}/{len(page_hits)}",
             "answer_set_by_lang": lang_breakdown(answer_items, page_hits),
         }
     await inference.close()
 
     n, m = len(retrieval_questions), len(answer_items)
-    lines = ["# Retrieval pipeline: query planning", "",
-             f"The chat service's QueryPlanner + Retriever on live Milvus ({', '.join(methods)} → bge-reranker-v2-m3 → "
-             f"top {settings.context_chunks} chunks). {n} retrieval questions (sets A + B, chunk-level evidence) and "
-             f"{m} answer-quality questions with a known source page.", "",
-             "| Configuration | All evidence in top 5 | R@5 | R@10 | MRR | R@5 EN | R@5 RU | Source page in context (answer set) |",
-             "|---|---:|---:|---:|---:|---:|---:|---:|"]
+    lines = [
+        "# Retrieval pipeline: query planning",
+        "",
+        f"The chat service's QueryPlanner + Retriever on live Milvus ({', '.join(methods)} → bge-reranker-v2-m3 → "
+        f"top {settings.context_chunks} chunks). {n} retrieval questions (sets A + B, chunk-level evidence) and "
+        f"{m} answer-quality questions with a known source page.",
+        "",
+        "| Configuration | All evidence in top 5 | R@5 | R@10 | MRR | R@5 EN | R@5 RU "
+        "| Source page in context (answer set) |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|",
+    ]
     for name, s, page_hits in table:
-        lines.append(f"| {name} | {round(s.complete[5] * s.count)}/{s.count} | {s.recall[5]:.1%} | {s.recall[10]:.1%} | "
-                     f"{s.mrr:.3f} | {s.by_lang['en'].recall[5]:.0%} | {s.by_lang['ru'].recall[5]:.0%} | {page_hits}/{m} |")
-    lines += ["", "Answer set, source page in context, by language: "
-              + "; ".join(f"{name}: {d['answer_set_by_lang']}" for name, d in details.items()), ""]
+        lines.append(
+            f"| {name} | {round(s.complete[5] * s.count)}/{s.count} | {s.recall[5]:.1%} | {s.recall[10]:.1%} | "
+            f"{s.mrr:.3f} | {s.by_lang['en'].recall[5]:.0%} | {s.by_lang['ru'].recall[5]:.0%} | {page_hits}/{m} |"
+        )
+    lines += [
+        "",
+        "Answer set, source page in context, by language: "
+        + "; ".join(f"{name}: {d['answer_set_by_lang']}" for name, d in details.items()),
+        "",
+    ]
     report.write_text("\n".join(lines), encoding="utf-8")
     report.with_suffix(".json").write_text(json.dumps(details, ensure_ascii=False, indent=1), encoding="utf-8")
     print("\n".join(lines))

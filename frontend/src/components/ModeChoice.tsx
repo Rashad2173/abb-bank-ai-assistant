@@ -3,7 +3,11 @@
 import { useI18n } from "../i18n";
 import type { IngestMode } from "../types";
 
-export function ModeChoice({ mode, onChange, disabled }: {
+export function ModeChoice({
+  mode,
+  onChange,
+  disabled,
+}: {
   mode: IngestMode;
   onChange: (mode: IngestMode) => void;
   disabled?: boolean;

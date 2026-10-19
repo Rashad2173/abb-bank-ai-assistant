@@ -34,7 +34,7 @@ class OpenAIEmbedder(Embedder):
         vectors = []
         for start in range(0, len(texts), _MAX_INPUTS_PER_REQUEST):
             response = self.client.embeddings.create(
-                model=self.model_id, input=texts[start:start + _MAX_INPUTS_PER_REQUEST]
+                model=self.model_id, input=texts[start : start + _MAX_INPUTS_PER_REQUEST]
             )
             vectors += [item.embedding for item in sorted(response.data, key=lambda d: d.index)]
             self.tokens_used += response.usage.total_tokens
