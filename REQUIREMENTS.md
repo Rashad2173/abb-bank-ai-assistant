@@ -68,6 +68,7 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 ## Extras (beyond the brief)
 - Learning the site from its link, with live progress (scraper service)
 - PDF / TXT document uploads; Add / Replace modes; only changed chunks are embedded
+- Answers streamed word by word (first words after ~3–4 s instead of the whole answer after ~5–7 s)
 - Query planning: follow-ups, quoting part of an answer, Azerbaijani search for EN / RU questions
 - Conversation sidebar, dark mode, AZ / EN / RU interface
 - Evaluation sets and reports for every stage (`evaluation/`)

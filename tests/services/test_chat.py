@@ -4,12 +4,13 @@ from types import SimpleNamespace
 import httpx
 import pytest
 from fastapi.testclient import TestClient
+from openai import OpenAIError
 
 from chat_service.config import Settings
-from chat_service.generator import Generation, Generator
+from chat_service.generator import AnswerDelta, Generation, Generator
 from chat_service.guardrail import check_answer
 from chat_service.main import build_app
-from chat_service.pipeline import ChatPipeline
+from chat_service.pipeline import ChatPipeline, Outcome
 from chat_service.prompts import format_sources
 from chat_service.query import is_about_procurement, is_proper_azerbaijani
 from chat_service.retrieval import Retriever
@@ -88,8 +89,11 @@ class FakeInference:
 class FakeGenerator:
     """Answers with the first two given sources; records what it was given."""
 
-    def __init__(self, status="answered", answer="12 bankomat var [S1] [S2].", source_ids=("S1", "S2")):
+    def __init__(
+        self, status="answered", answer="12 bankomat var [S1] [S2].", source_ids=("S1", "S2"), stream_error=False
+    ):
         self.status, self.answer_text, self.source_ids = status, answer, list(source_ids)
+        self.stream_error = stream_error
         self.seen_chunks = None
         self.planned = []
 
@@ -109,6 +113,14 @@ class FakeGenerator:
             input_tokens=100,
             output_tokens=20,
         )
+
+    async def answer_stream(self, question, chunks, history):
+        generation = await self.answer(question, chunks, history)
+        for start in range(0, len(self.answer_text), 4):
+            yield AnswerDelta(text=self.answer_text[start : start + 4], status=generation.status)
+            if self.stream_error:
+                raise OpenAIError("connection reset")
+        yield generation
 
 
 def pipeline(settings=None, inference=None, generator=None, store=None):
@@ -298,7 +310,15 @@ def test_chat_endpoint_returns_the_answer_contract(api):
     body = response.json()
     assert body["status"] == "answered" and body["request_id"] == "q1"
     assert [s["id"] for s in body["sources"]] == ["S1", "S2"]
-    assert set(body["timings"]) == {"rewrite_ms", "retrieval_ms", "rerank_ms", "generation_ms", "total_ms"}
+    assert set(body["timings"]) == {
+        "rewrite_ms",
+        "retrieval_ms",
+        "rerank_ms",
+        "generation_ms",
+        "first_token_ms",
+        "total_ms",
+    }
+    assert body["timings"]["first_token_ms"] is None  # only streamed answers have a first word
 
 
 def test_blank_and_too_long_questions_are_rejected(api):
@@ -333,3 +353,107 @@ def test_with_quote_leaves_plain_questions_alone():
 
     assert with_quote("Q?", None) == "Q?" and with_quote("Q?", "  ") == "Q?"
     assert with_quote("Q?", "passage").startswith("The user is replying to this part of an earlier answer:")
+
+
+# --------------------------------------------------------------------------- #
+# Streaming
+# --------------------------------------------------------------------------- #
+
+
+async def test_generator_streams_the_answer_text_and_returns_the_complete_answer():
+    payload = {
+        "status": "answered",
+        "refusal_reason": "none",
+        "language": "az",
+        "answer": " 12 [S1] ",
+        "source_ids": ["S1"],
+    }
+    raw = json.dumps(payload)
+    calls = []
+
+    async def events():
+        for start in range(0, len(raw), 5):
+            yield SimpleNamespace(type="response.output_text.delta", delta=raw[start : start + 5])
+        usage = SimpleNamespace(input_tokens=50, output_tokens=10)
+        yield SimpleNamespace(type="response.completed", response=SimpleNamespace(output_text=raw, usage=usage))
+
+    async def create(**kwargs):
+        calls.append(kwargs)
+        return events()
+
+    client = SimpleNamespace(responses=SimpleNamespace(create=create))
+    items = [item async for item in Generator(client, "gpt-6-luna", "low").answer_stream("Q?", [CHUNKS["a"]], [])]
+
+    assert calls[0]["stream"] is True and calls[0]["text"]["format"]["strict"] is True
+    deltas, final = items[:-1], items[-1]
+    assert "".join(d.text for d in deltas) == " 12 [S1] "
+    assert all(d.status == "answered" for d in deltas if d.text)
+    assert isinstance(final, Generation) and final.answer == "12 [S1]"
+
+
+async def test_a_failed_stream_is_an_openai_error():
+    async def events():
+        yield SimpleNamespace(type="response.output_text.delta", delta='{"status":"answered","answer":"12')
+        yield SimpleNamespace(type="response.failed")
+
+    async def create(**kwargs):
+        return events()
+
+    client = SimpleNamespace(responses=SimpleNamespace(create=create))
+    with pytest.raises(OpenAIError):
+        [item async for item in Generator(client, "gpt-6-luna", "low").answer_stream("Q?", [], [])]
+
+
+async def test_a_streamed_answer_is_checked_and_recorded_like_one_returned_at_once():
+    chat, _ = pipeline()
+    request = ChatRequest(question="Zaqatalada neçə bankomat var?")
+    items = [item async for item in chat.stream(await chat.prepare(request))]
+    outcome = items[-1]
+    at_once = await chat.run(request)
+
+    assert isinstance(outcome, Outcome)
+    assert outcome.response.answer == at_once.response.answer
+    assert outcome.response.sources == at_once.response.sources
+    assert outcome.response.timings.first_token_ms is not None
+    assert set(outcome.interaction) == set(at_once.interaction)  # what analytics stores is unchanged
+
+
+def stream_events(api, question="Zaqatalada neçə bankomat var?", request_id="s1"):
+    with api.stream("POST", "/v1/chat/stream", json={"question": question}, headers={"X-Request-ID": request_id}) as r:
+        assert r.status_code == 200
+        assert r.headers["content-type"].startswith("application/x-ndjson")
+        return [json.loads(line) for line in r.iter_lines() if line]
+
+
+def test_stream_endpoint_sends_sources_status_text_and_the_checked_answer(api):
+    events = stream_events(api)
+    kinds = [event["type"] for event in events]
+    assert kinds[:2] == ["sources", "status"] and kinds[-1] == "done" and "delta" in kinds
+
+    assert [s["id"] for s in events[0]["sources"]] == ["S1", "S2", "S3"]
+    assert events[1]["status"] == "answered"
+    text = "".join(event["text"] for event in events if event["type"] == "delta")
+    done = events[-1]["response"]
+    assert text == done["answer"] == "12 bankomat var [S1] [S2]."
+    assert done["request_id"] == "s1" and done["timings"]["first_token_ms"] is not None
+
+    at_once = api.post("/v1/chat", json={"question": "Zaqatalada neçə bankomat var?"}).json()
+    assert set(done) == set(at_once)  # the same contract as POST /v1/chat
+
+
+def test_a_failure_while_the_answer_streams_arrives_as_an_error_event(api):
+    api.app.state.pipeline, _ = pipeline(generator=FakeGenerator(stream_error=True))
+    events = stream_events(api, request_id="s2")
+    assert [event["type"] for event in events] == ["sources", "status", "delta", "error"]
+    assert events[-1]["error"]["code"] == "dependency_unavailable" and events[-1]["request_id"] == "s2"
+
+
+def test_a_failure_before_the_answer_starts_is_an_ordinary_json_error(api):
+    class BrokenStore(FakeStore):
+        def search(self, *args, **kwargs):
+            raise ConnectionError("Milvus is down")
+
+    api.app.state.pipeline, _ = pipeline(store=BrokenStore())
+    response = api.post("/v1/chat/stream", json={"question": "Zaqatalada neçə bankomat var?"})
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "dependency_unavailable"

@@ -1,6 +1,7 @@
 // Calls to the services. All go through /api/<service> — the Vite dev proxy or nginx
 // forwards them, so the browser only ever talks to its own origin.
 
+import { type StreamEvent, streamEvents } from "./stream";
 import type {
   ChatResponse,
   CorpusInfo,
@@ -24,7 +25,8 @@ export class ApiError extends Error {
   }
 }
 
-async function call<T>(path: string, init?: RequestInit): Promise<T> {
+/** The response, or an ApiError for network failures and error statuses. */
+async function send(path: string, init?: RequestInit): Promise<Response> {
   let response: Response;
   // A FormData body sets its own multipart content type.
   const json = !(init?.body instanceof FormData);
@@ -46,15 +48,46 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
       body?.request_id ?? response.headers.get("X-Request-ID"),
     );
   }
-  return response.json() as Promise<T>;
+  return response;
+}
+
+async function call<T>(path: string, init?: RequestInit): Promise<T> {
+  return (await send(path, init)).json() as Promise<T>;
+}
+
+/** A streamed answer: every event goes to ``onEvent``; resolves with the checked final answer. */
+async function stream(path: string, init: RequestInit, onEvent: (event: StreamEvent) => void): Promise<ChatResponse> {
+  const response = await send(path, init);
+  if (!response.body) throw new ApiError("no response body", 0, "network", null);
+  try {
+    for await (const event of streamEvents(response.body)) {
+      if (event.type === "error") {
+        throw new ApiError(event.error.message, 503, event.error.code, event.request_id);
+      }
+      if (event.type === "done") return event.response;
+      onEvent(event);
+    }
+  } catch (exc) {
+    if (exc instanceof ApiError) throw exc;
+    throw new ApiError("network", 0, "network", response.headers.get("X-Request-ID"));
+  }
+  throw new ApiError("the answer stream ended early", 0, "network", response.headers.get("X-Request-ID"));
 }
 
 export const api = {
-  chat: (question: string, history: Turn[], sessionId: string, quote?: string) =>
-    call<ChatResponse>("/api/chat/v1/chat", {
-      method: "POST",
-      body: JSON.stringify({ question, history, session_id: sessionId, quote: quote || null }),
-    }),
+  /** An answer word by word as it is written (the service also answers at once: POST /v1/chat). */
+  chatStream: (
+    question: string,
+    history: Turn[],
+    sessionId: string,
+    quote: string | undefined,
+    onEvent: (event: StreamEvent) => void,
+  ) =>
+    stream(
+      "/api/chat/v1/chat/stream",
+      { method: "POST", body: JSON.stringify({ question, history, session_id: sessionId, quote: quote || null }) },
+      onEvent,
+    ),
 
   ingest: (pages: Page[], mode: IngestMode) =>
     call<IngestJob>("/api/ingestion/v1/ingest", { method: "POST", body: JSON.stringify({ pages, mode }) }),

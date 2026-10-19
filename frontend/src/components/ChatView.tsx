@@ -8,7 +8,8 @@ import { ApiError, api } from "../api";
 import { citedPages, pageNumber } from "../citations";
 import { type Conversation, type Message, useConversations } from "../conversations";
 import { errorText, useI18n } from "../i18n";
-import type { Source, Turn } from "../types";
+import { citedSoFar, readableSoFar, type StreamEvent } from "../stream";
+import type { ChatStatus, Source, Turn } from "../types";
 
 const HISTORY_TURNS = 6;
 const SIDEBAR_KEY = "abb.sidebar";
@@ -23,6 +24,15 @@ function initialSidebar(): boolean {
   }
 }
 
+/** The answer being written: what has arrived so far. */
+interface Streaming {
+  conversationId: string;
+  text: string;
+  status: ChatStatus | null;
+  /** The chunks the model was given (S1 …); the streamed text cites them. */
+  sources: Source[];
+}
+
 function plain(answer: string): string {
   return answer.replace(/\s?\[S\d+\]/g, "").trim();
 }
@@ -33,6 +43,7 @@ export function ChatView() {
   const [draft, setDraft] = useState("");
   const [quote, setQuote] = useState<string | null>(null);
   const [pendingIn, setPendingIn] = useState<string | null>(null);
+  const [streaming, setStreaming] = useState<Streaming | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(initialSidebar);
   const selection = useRef<{ id: string; text: string } | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
@@ -45,6 +56,12 @@ export function ChatView() {
   useEffect(() => {
     bottom.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages.length, pendingIn, active.id]);
+
+  // Keep the growing answer in view (instant: a smooth scroll per word would lag behind).
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the dependency is the trigger, not a value read here
+  useEffect(() => {
+    bottom.current?.scrollIntoView({ block: "end" });
+  }, [streaming?.text.length]);
 
   async function ask(question: string) {
     const text = question.trim();
@@ -59,18 +76,31 @@ export function ChatView() {
     setDraft("");
     setQuote(null);
     setPendingIn(conversationId);
+    setStreaming({ conversationId, text: "", status: null, sources: [] });
     try {
       // One conversation = one session in the analytics.
-      const response = await api.chat(text, history, conversationId, sentQuote);
+      const response = await api.chatStream(text, history, conversationId, sentQuote, onStreamEvent);
+      // The checked answer replaces the streamed text (unknown citations removed, refusals without sources).
       append(conversationId, { id: response.request_id, role: "assistant", content: response.answer, response });
     } catch (exc) {
       const message = errorText(t, exc instanceof ApiError ? exc.code : "generic");
       const rid = exc instanceof ApiError && exc.requestId ? ` (request ${exc.requestId})` : "";
       append(conversationId, { id: crypto.randomUUID(), role: "assistant", content: "", error: message + rid });
     } finally {
+      setStreaming(null);
       setPendingIn(null);
       inputRef.current?.focus();
     }
+  }
+
+  function onStreamEvent(event: StreamEvent) {
+    setStreaming((current) => {
+      if (!current) return current;
+      if (event.type === "sources") return { ...current, sources: event.sources };
+      if (event.type === "status") return { ...current, status: event.status };
+      if (event.type === "delta") return { ...current, text: current.text + event.text };
+      return current;
+    });
   }
 
   function quoteMessage(message: Message) {
@@ -159,7 +189,7 @@ export function ChatView() {
             ☰
           </button>
         )}
-        <div className="chat-log" aria-live="polite">
+        <div className="chat-log" aria-live="polite" aria-busy={streaming !== null}>
           <div className="chat-column">
             {messages.length === 0 && (
               <div className="welcome">
@@ -191,7 +221,10 @@ export function ChatView() {
               ),
             )}
 
-            {pendingIn === active.id && (
+            {pendingIn === active.id && streaming?.conversationId === active.id && streaming.text && (
+              <StreamingMessage streaming={streaming} />
+            )}
+            {pendingIn === active.id && !streaming?.text && (
               <div className="msg-assistant msg-pending">
                 <img className="avatar" src="/assistant-mascot.png" alt="" aria-hidden />
                 <div className="msg-body">
@@ -332,30 +365,7 @@ function AssistantMessage({
         {response.status === "out_of_scope" && <span className="status-pill">{t.refused}</span>}
         {response.status === "no_information" && <span className="status-pill">{t.noInfo}</span>}
 
-        <div className="answer">
-          <ReactMarkdown
-            components={{
-              a: ({ href, children }) => {
-                const number = pageNumber(href);
-                const source = number ? pages[number - 1] : undefined;
-                if (number && source) {
-                  return (
-                    <a className="cite" href={source.url} target="_blank" rel="noreferrer" title={source.title}>
-                      {number}
-                    </a>
-                  );
-                }
-                return (
-                  <a href={href} target="_blank" rel="noreferrer">
-                    {children}
-                  </a>
-                );
-              },
-            }}
-          >
-            {markdown}
-          </ReactMarkdown>
-        </div>
+        <AnswerText markdown={markdown} pages={pages} />
 
         {pages.length > 0 && (
           <section className="sources" aria-label={t.sources}>
@@ -393,6 +403,8 @@ function AssistantMessage({
               total {Math.round(response.timings.total_ms)} · search {Math.round(response.timings.retrieval_ms)} ·
               rerank {Math.round(response.timings.rerank_ms)} · LLM {Math.round(response.timings.generation_ms)}
               {response.timings.rewrite_ms > 1 && ` · plan ${Math.round(response.timings.rewrite_ms)}`}
+              {response.timings.first_token_ms !== null &&
+                ` · first word ${Math.round(response.timings.first_token_ms)}`}
             </dd>
             <dt>model</dt>
             <dd>
@@ -401,6 +413,52 @@ function AssistantMessage({
           </dl>
         )}
       </div>
+    </div>
+  );
+}
+
+/** An answer while it is being written; replaced by the checked answer when it is complete. */
+function StreamingMessage({ streaming }: { streaming: Streaming }) {
+  const { t } = useI18n();
+  const text = readableSoFar(streaming.text);
+  const { pages, markdown } = citedPages(text, citedSoFar(text, streaming.sources));
+  return (
+    <div className={`msg-assistant msg-streaming status-${streaming.status ?? "answered"}`}>
+      <img className="avatar" src="/assistant-mascot.png" alt="" aria-hidden />
+      <div className="msg-body">
+        {streaming.status === "out_of_scope" && <span className="status-pill">{t.refused}</span>}
+        {streaming.status === "no_information" && <span className="status-pill">{t.noInfo}</span>}
+        <AnswerText markdown={markdown} pages={pages} />
+      </div>
+    </div>
+  );
+}
+
+function AnswerText({ markdown, pages }: { markdown: string; pages: Source[] }) {
+  return (
+    <div className="answer">
+      <ReactMarkdown
+        components={{
+          a: ({ href, children }) => {
+            const number = pageNumber(href);
+            const source = number ? pages[number - 1] : undefined;
+            if (number && source) {
+              return (
+                <a className="cite" href={source.url} target="_blank" rel="noreferrer" title={source.title}>
+                  {number}
+                </a>
+              );
+            }
+            return (
+              <a href={href} target="_blank" rel="noreferrer">
+                {children}
+              </a>
+            );
+          },
+        }}
+      >
+        {markdown}
+      </ReactMarkdown>
     </div>
   );
 }

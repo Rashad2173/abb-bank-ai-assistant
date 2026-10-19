@@ -16,6 +16,8 @@ export interface Timings {
   retrieval_ms: number;
   rerank_ms: number;
   generation_ms: number;
+  /** Streamed answers: from the question to the first word on screen. */
+  first_token_ms: number | null;
   total_ms: number;
 }
 

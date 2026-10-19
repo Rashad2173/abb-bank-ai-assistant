@@ -53,6 +53,8 @@ class Timings(BaseModel):
     retrieval_ms: float
     rerank_ms: float
     generation_ms: float
+    first_token_ms: float | None = None
+    """Streamed answers: from the request to the first word of the answer on screen."""
     total_ms: float
 
 

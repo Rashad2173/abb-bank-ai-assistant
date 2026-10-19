@@ -1,6 +1,6 @@
 """End-to-end check of the running services.
 
-    python scripts/smoke_test.py                       # health, readiness, chat → analytics
+    python scripts/smoke_test.py                       # health, readiness, chat (also streamed) → analytics
     python scripts/smoke_test.py --ingest data/abb_pages.jsonl   # also upload the data (diff → Milvus)
 
 Exit code 0 when every check passes, 1 otherwise.
@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import time
 import uuid
@@ -84,6 +85,48 @@ def check_chat(report: Report) -> list[str]:
     return request_ids
 
 
+def check_stream(report: Report) -> list[str]:
+    """The streamed answer: text arrives before the end, and the final answer is the usual contract."""
+    print("\nChat (streamed)")
+    question = "TamKart Classic kartının illik xidmət haqqı nə qədərdir?"
+    started = time.perf_counter()
+    first_word = completed = None
+    events = []
+    with httpx.stream("POST", f"{SERVICES['chat']}/v1/chat/stream", json={"question": question}, timeout=120) as r:
+        if not report.check(r.status_code == 200, question, f"HTTP {r.status_code}"):
+            return []
+        for line in r.iter_lines():
+            if not line:
+                continue
+            event = json.loads(line)
+            events.append(event)
+            if event["type"] == "delta" and first_word is None:
+                first_word = time.perf_counter() - started
+            elif event["type"] == "done":
+                completed = time.perf_counter() - started
+    kinds = [event["type"] for event in events]
+    report.check(kinds[:2] == ["sources", "status"] and kinds[-1] == "done", "events: sources, status, delta …, done")
+    if completed is None:
+        return []
+    report.check(
+        first_word is not None and first_word < completed,
+        "the first word arrives before the answer is complete",
+        f"first word {first_word:.1f} s, complete {completed:.1f} s, {kinds.count('delta')} pieces"
+        if first_word is not None
+        else "no text",
+    )
+    done = events[-1]["response"]
+    streamed = "".join(event["text"] for event in events if event["type"] == "delta")
+    # The checked answer may drop a citation label the model invented; the words are the same.
+    report.check(_words(streamed) == _words(done["answer"]), "the streamed text is the final answer")
+    print("        answer:", done["answer"][:200].replace("\n", " "))
+    return [done["request_id"]]
+
+
+def _words(answer: str) -> str:
+    return " ".join(re.sub(r"\[S\d+\]", "", answer).split())
+
+
 def check_analytics(report: Report, request_ids: list[str]) -> None:
     print("\nAnalytics")
     time.sleep(1)  # the chat service records after it has answered
@@ -122,7 +165,7 @@ def main() -> None:
     args = parser.parse_args()
     report = Report()
     check_operations(report)
-    request_ids = check_chat(report)
+    request_ids = check_chat(report) + check_stream(report)
     check_analytics(report, request_ids)
     check_ingestion(report, args.ingest)
     print(f"\n{'All checks passed' if not report.failures else f'{report.failures} check(s) failed'}")

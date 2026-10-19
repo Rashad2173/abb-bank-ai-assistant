@@ -56,7 +56,8 @@ Interactive API docs: `http://localhost:<port>/docs`.
 
 | Endpoint | Body → response |
 |----------|-----------------|
-| `POST chat /v1/chat` | `{question, history?, session_id?}` → `{answer, status, refusal_reason, language, sources[], standalone_question, reranked, model, timings, request_id}` |
+| `POST chat /v1/chat` | `{question, history?, session_id?, quote?}` → `{answer, status, refusal_reason, language, sources[], standalone_question, search_queries, reranked, model, timings, request_id}` |
+| `POST chat /v1/chat/stream` | the same request → `application/x-ndjson`, one event per line: `sources` (the chunks given to the model) → `status` → `delta` … (pieces of the answer) → `done` (the `/v1/chat` response, checked). Failures before the first byte are ordinary JSON errors; later ones arrive as an `error` event |
 | `POST analytics /v1/interactions` | one interaction (sent by chat) → stored row with `id`, `created_at` |
 | `GET analytics /v1/interactions` | `?limit&offset&status` → `{items, total}`, newest first |
 | `GET analytics /v1/stats` | `?days=30` → totals by status / refusal reason / language, per day, per hour, latency p50/p95, reranker and citation shares, tokens, top sources |
@@ -82,6 +83,7 @@ prompt_injection, harmful) or `no_information` (about ABB, but not in the source
 | Models in their own inference service | Only this service needs PyTorch and a GPU; chat and ingestion stay small and can run anywhere |
 | Reranker optional at request time | A slow (> 5 s) or failed reranker call falls back to Milvus' order — lower accuracy, but the user still gets an answer (`reranked: false`, counted on the dashboard) |
 | Structured LLM output (strict JSON schema) | The service knows whether a question was answered, refused or not covered without parsing free text |
+| Streaming the structured answer | The JSON is streamed as it is written; `chat_service/streaming.py` reads the `answer` field out of it piece by piece (escapes cut between pieces included), and the status is known before the text because strict output writes keys in schema order. The guardrail checks run on the complete answer, which replaces the streamed text |
 | Guardrail in layers, no framework | Input validation (schema) → scope rules in the prompt, decided in the same LLM call (no extra latency) → sources marked as data, not instructions → citation checks in code → measured with a test set |
 | Citations checked in code | Labels that do not match a given source are removed; refusals carry no sources; uncited answers are flagged (`grounded: false`) |
 | Recording after the response | The chat service sends the interaction to analytics as a background task; a failure is logged and never breaks chatting |

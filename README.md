@@ -40,7 +40,7 @@ All numbers are measured; the sets and reports are in [evaluation/](evaluation/R
 | **Retrieval** — the needed passage among the 10 given to the model (200 questions, 2 independent sets) | **94 %** · all evidence in the top 5: **174 / 200** |
 | **Answers** — 56 unseen questions graded against the source text | **54 correct, 1 partial, 1 wrong · 0 invented facts** |
 | **Guardrail** — independent set of 80 adversarial questions (16 injection techniques) | **80 / 80** · 0 legitimate questions refused · 0 prompt leaks |
-| **Speed** | ~3–7 s per answer (search ≈ 10 ms, reranking ≈ 1 s on a GPU, the LLM the rest) |
+| **Speed** | answers stream word by word: the first words after ~3–4 s, complete after ~3–7 s (search ≈ 10 ms, reranking ≈ 1 s on a GPU, the LLM the rest) |
 
 ## Quick start
 
@@ -78,7 +78,7 @@ docker compose up -d --build         # → http://localhost:8080
 documents, chunks, embeddings) — or upload <code>abb_pages.jsonl</code> or PDF / TXT documents.
 <b>Add</b> keeps what is indexed, <b>Replace</b> makes the upload the whole knowledge base; only new or
 changed chunks are embedded. The data is kept in the browser's localStorage (compressed: 21 MB → 1.5 M characters).</td>
-<td><b>2 · Chat.</b> Answers in the question's language with numbered sources, campaign status and dates.
+<td><b>2 · Chat.</b> Answers stream word by word, in the question's language, with numbered sources, campaign status and dates.
 Follow-up questions, quoting part of an answer, a conversation sidebar, dark mode, AZ / EN / RU interface.
 Off-topic questions, other banks, personal advice and prompt injection are refused.</td>
 </tr>
@@ -151,7 +151,7 @@ normalised) — fused with Reciprocal Rank Fusion. The top 30 are re-scored by t
 cross-encoder and the best 10 go to the model.
 
 **Generation** — `gpt-6-luna` through the OpenAI Responses API with a strict JSON schema (status, refusal
-reason, language, answer with `[S1]` citations). The prompt allows only the given sources, asks for the
+reason, language, answer with `[S1]` citations), streamed to the browser as it is written: the service reads the answer text out of the JSON while it is generated and sends it line by line (NDJSON); the final, checked answer replaces the streamed text. The prompt allows only the given sources, asks for the
 direct answer first and then the details a customer needs next, prefers tariff tables when the site contradicts
 itself, and never presents an ended campaign as available. Prompts are plain files in
 [services/chat/chat_service/prompts/](services/chat/chat_service/prompts/).
