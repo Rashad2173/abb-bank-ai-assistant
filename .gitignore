@@ -20,7 +20,7 @@ Thumbs.db
 docs/ABB_DATA_QUALITY_*
 
 # Personal notes (kept locally only)
-docs/DEVELOPMENT_LOG.md
+docs/DEVELOPMENT_LOG*
 
 # Build artefacts
 *.tsbuildinfo

@@ -39,17 +39,26 @@ All numbers are measured; the sets and reports are in [evaluation/](evaluation/R
 | **Scraping** — CMS text of the site present in the output | **99.9 %** of 15 646 lines |
 | **Retrieval** — the needed passage among the 10 given to the model (200 questions, 2 independent sets) | **94 %** · all evidence in the top 5: **174 / 200** |
 | **Answers** — 56 unseen questions graded against the source text | **54 correct, 1 partial, 1 wrong · 0 invented facts** |
+| **Without a GPU** — reranker off, 15 chunks to the model | 185 / 200 with all evidence in front of the model (186 with the GPU) |
 | **Guardrail** — independent set of 80 adversarial questions (16 injection techniques) | **80 / 80** · 0 legitimate questions refused · 0 prompt leaks |
 | **Speed** | answers stream word by word: the first words after ~3–4 s, complete after ~3–7 s (search ≈ 10 ms, reranking ≈ 1 s on a GPU, the LLM the rest) |
 
 ## Quick start
 
-Requires Docker (with the NVIDIA container runtime for the GPU — see below for CPU-only) and an OpenAI API key.
+Requires Docker and an OpenAI API key. Two ways to run it — pick the one that matches the machine:
+
+| | **With an NVIDIA GPU** (best accuracy) | **Without one** (Mac, most laptops) |
+|---|---|---|
+| Command | `docker compose up -d --build` | `docker compose -f docker-compose.yml -f docker-compose.cpu.yml up -d --build` |
+| Reranker | bge-reranker-v2-m3 on the GPU, ~1 s | off — on a CPU it would take ~45 s per question |
+| Chunks given to the model | 10, re-ranked | 15, in Milvus' hybrid order |
+| Questions with all their evidence in front of the model (200) | **186** | **185** |
+| Inference image | PyTorch with CUDA, 12.5 GB | CPU build of PyTorch, 2.6 GB |
 
 ```bash
 git clone https://github.com/Rashad2173/abb-bank-ai-assistant.git && cd abb-bank-ai-assistant
 cp .env.example .env                 # put OPENAI_API_KEY into .env
-docker compose up -d --build         # → http://localhost:8080
+docker compose up -d --build         # (or the CPU command above) → http://localhost:8080
 ```
 
 | Address | What |
@@ -58,13 +67,16 @@ docker compose up -d --build         # → http://localhost:8080
 | http://localhost:8001/docs … :8005/docs | Swagger UI of chat, analytics, ingestion, inference, scraper |
 | http://localhost:8000 | Attu — browse the Milvus collection (server address `milvus:19530`) |
 
-* **First start:** the inference service downloads its two models (~4.5 GB) into a volume.
+* **First start:** the inference service downloads its models (~4.5 GB with the reranker) into a volume.
 * **The search index starts empty:** open the app and learn the site from its link (or upload a file).
   A first crawl takes ~30 minutes (polite: 6 parallel requests); with an existing page cache
   (`SCRAPER_DATA=./data docker compose up -d`) about 3 minutes.
-* **No NVIDIA GPU:** `docker compose -f docker-compose.yml -f docker-compose.cpu.yml up -d --build` —
-  embeddings run on the CPU and the reranker is switched off (≈ 45 s per question on a CPU), so answers
-  come from Milvus' hybrid order.
+* **GPU mode** needs the NVIDIA driver and Docker's GPU support (Docker Desktop with WSL 2 on Windows,
+  the NVIDIA Container Toolkit on Linux). The CPU mode uses the CPU build of PyTorch, which also exists
+  for ARM; it has not been tried on an Apple Silicon Mac.
+* **Publishing it:** set `ACCESS_CODE` in `.env`. Visitors then enter the code once (kept for 30 days),
+  the API answers `401` without it, and questions are limited to 20 a minute per visitor. Empty — the
+  default — leaves the app open.
 
 ## Using the app
 
@@ -74,10 +86,11 @@ docker compose up -d --build         # → http://localhost:8080
 <td width="50%"><img src="assets/screenshots/guardrail.png" alt="Refused questions"></td>
 </tr>
 <tr>
-<td><b>1 · Data.</b> Learn the site from its link — every stage shown live (pages found and read,
-documents, chunks, embeddings) — or upload <code>abb_pages.jsonl</code> or PDF / TXT documents.
-<b>Add</b> keeps what is indexed, <b>Replace</b> makes the upload the whole knowledge base; only new or
-changed chunks are embedded. The data is kept in the browser's localStorage (compressed: 21 MB → 1.5 M characters).</td>
+<td><b>1 · Data.</b> The knowledge base and its state, and three ways in: the data already indexed,
+the site learned from its link — every stage shown live (pages found and read, documents, chunks,
+embeddings) — or <code>abb_pages.jsonl</code> / PDF / TXT uploads. <b>Add</b> keeps what is indexed,
+<b>Replace</b> makes the new data the whole knowledge base; only new or changed chunks are embedded.
+The data is kept in the browser's localStorage (compressed: 21 MB → 1.5 M characters).</td>
 <td><b>2 · Chat.</b> Answers stream word by word, in the question's language, with numbered sources, campaign status and dates.
 Follow-up questions, quoting part of an answer, a conversation sidebar, dark mode, AZ / EN / RU interface.
 Off-topic questions, other banks, personal advice and prompt injection are refused.</td>
@@ -167,7 +180,7 @@ removed, refusals carry no sources, uncited answers flagged) → measured on 144
 ├── retrieval/            chunking, Milvus store, benchmarks (abb_retrieval)
 ├── services/             chat · analytics · ingestion · inference · scraper (FastAPI) + service_common
 ├── frontend/             React app (Vite, TypeScript), nginx config
-├── evaluation/           test sets (retrieval / guardrail / answers) + reports 00–09
+├── evaluation/           test sets (retrieval / guardrail / answers) + reports 00–10
 ├── scripts/              smoke test, evaluation runners, Wikipedia → upload file
 ├── tests/                pytest suite
 ├── docker-compose.yml    the whole application (docker-compose.cpu.yml: machines without a GPU)
@@ -202,7 +215,8 @@ The offline pipeline (scrape → chunk → benchmark → Milvus check) and its c
 
 * The scraper is built for abb-bank.az and refuses other sites; other sources can be added as upload files.
 * Tables inside PDFs lose their column structure in text extraction; text-heavy PDFs work well.
-* The reranker needs a GPU for interactive answers; without one the chat falls back to Milvus' order.
+* The reranker needs a GPU for interactive answers; the CPU mode switches it off and gives the model 15
+  chunks instead, which recovers almost all of the difference (report 10).
 * Two same-shaped tables on one page can occasionally be mixed up in an answer (1 of 56 graded answers).
 
 ---

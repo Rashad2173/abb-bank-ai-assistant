@@ -56,7 +56,7 @@ Interactive API docs: `http://localhost:<port>/docs`.
 
 | Endpoint | Body → response |
 |----------|-----------------|
-| `POST chat /v1/chat` | `{question, history?, session_id?, quote?}` → `{answer, status, refusal_reason, language, sources[], standalone_question, search_queries, reranked, model, timings, request_id}` |
+| `POST chat /v1/chat` | `{question, history?, session_id?, quote?, rerank?}` (`rerank: false` answers from Milvus' order, as without a GPU) → `{answer, status, refusal_reason, language, sources[], standalone_question, search_queries, reranked, model, timings, request_id}` |
 | `POST chat /v1/chat/stream` | the same request → `application/x-ndjson`, one event per line: `sources` (the chunks given to the model) → `status` → `delta` … (pieces of the answer) → `done` (the `/v1/chat` response, checked). Failures before the first byte are ordinary JSON errors; later ones arrive as an `error` event |
 | `POST analytics /v1/interactions` | one interaction (sent by chat) → stored row with `id`, `created_at` |
 | `GET analytics /v1/interactions` | `?limit&offset&status` → `{items, total}`, newest first |
@@ -88,4 +88,6 @@ prompt_injection, harmful) or `no_information` (about ABB, but not in the source
 | Citations checked in code | Labels that do not match a given source are removed; refusals carry no sources; uncited answers are flagged (`grounded: false`) |
 | Recording after the response | The chat service sends the interaction to analytics as a background task; a failure is logged and never breaks chatting |
 | Ingestion diffs by content hash | An upload replaces the corpus, but only new or changed chunks are embedded — re-uploading the same 4 223 pages takes ~12 s |
+| CPU mode gives the model 15 chunks | Without the reranker, 15 chunks in Milvus' order put almost as many questions' evidence in front of the model as 10 re-ranked ones: 185 vs. 186 of 200 (evaluation report 10) |
+| Optional access code in nginx | A public demo spends the project's OpenAI budget: with `ACCESS_CODE` set, the UI and the API need the code (kept in a cookie), and questions are limited to 20 a minute per visitor. Empty (the default): open |
 | `.env` wins over machine variables | A stray `OPENAI_API_KEY` in the user's environment must not silently replace the project's key |
