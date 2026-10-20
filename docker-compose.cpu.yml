@@ -1,11 +1,16 @@
-# Machine without an NVIDIA GPU:
+# CPU mode — a machine without an NVIDIA GPU:
 #   docker compose -f docker-compose.yml -f docker-compose.cpu.yml up -d --build
 #
-# The embedding model runs on the CPU (fine for questions). The reranker is
-# switched off — on a CPU it needs ~45 s per question — so the chat answers from
-# Milvus' hybrid order (lower accuracy, see evaluation/reports/02).
+# The embedding model runs on the CPU (fine for questions: ~0.1–0.3 s). The
+# reranker is switched off — on a CPU it needs ~45 s per question — so the chat
+# answers from Milvus' hybrid order and gives the model 15 chunks instead of 10:
+# with 15, 185 of 200 questions have all their evidence in front of the model —
+# 186 with the reranker and 10 (evaluation/reports/10_without_reranker.md).
 services:
   inference:
+    build:
+      args:
+        TORCH_INDEX: https://download.pytorch.org/whl/cpu
     deploy: !reset {}
     environment:
       INFERENCE_DEVICE: cpu
@@ -13,3 +18,4 @@ services:
   chat:
     environment:
       RERANKER: none
+      CONTEXT_CHUNKS: "15"

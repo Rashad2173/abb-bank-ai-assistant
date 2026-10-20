@@ -1,8 +1,9 @@
 """Finding the chunks for a question: Milvus hybrid search, then reranking.
 
-Reranking is the one optional step: when the reranker is switched off, slow or
-down, the answer is built from Milvus' own order (lower accuracy, but the user
-still gets an answer) and the response says ``reranked: false``.
+Reranking is the one optional step: when the reranker is switched off (for the
+service, or for one question), slow or down, the answer is built from Milvus' own
+order (slightly lower accuracy — report 10 — but the user still gets an answer)
+and the response says ``reranked: false``.
 """
 
 from __future__ import annotations
@@ -40,13 +41,15 @@ class Retriever:
         self.inference = inference
         self.settings = settings
 
-    async def retrieve(self, plan: SearchPlan) -> Retrieval:
+    async def retrieve(self, plan: SearchPlan, rerank: bool = True) -> Retrieval:
+        """``rerank=False`` skips the reranker for this question (it is also skipped when the service has none)."""
+        rerank = rerank and self.settings.reranker == "http"
         started = time.perf_counter()
-        candidates = await self._candidates(plan)
+        candidates = await self._candidates(plan, self.settings.retrieval_candidates if rerank else None)
         retrieval_ms = _ms_since(started)
 
         started = time.perf_counter()
-        scores = await self._rerank_scores(plan.standalone, candidates)
+        scores = await self._rerank_scores(plan.standalone, candidates) if rerank else None
         rerank_ms = _ms_since(started)
 
         if scores is None:
@@ -65,15 +68,18 @@ class Retriever:
             rerank_ms=rerank_ms,
         )
 
-    async def _candidates(self, plan: SearchPlan) -> list[dict]:
-        """Every query searched in Milvus; several result lists are fused with Reciprocal Rank Fusion."""
+    async def _candidates(self, plan: SearchPlan, limit: int | None) -> list[dict]:
+        """Every query searched in Milvus; several result lists are fused with Reciprocal Rank Fusion.
+
+        ``limit``: candidates for the reranker; ``None`` (no reranking) fetches just the chunks the LLM gets.
+        """
+        limit = limit or self.settings.context_chunks
         with dependency("inference service"):
             embedding = await self.inference.embed(plan.queries, kind="query")
         queries = [
             Query(text=text, dense=np.asarray(embedding.dense[i], dtype=np.float32), sparse=embedding.sparse[i])
             for i, text in enumerate(plan.queries)
         ]
-        limit = self.settings.retrieval_candidates if self.settings.reranker == "http" else self.settings.context_chunks
         search_filter = "" if plan.include_procurement else PROCUREMENT_FILTER
         with dependency("Milvus"):
             rankings = await run_in_threadpool(
@@ -85,7 +91,7 @@ class Retriever:
             return await run_in_threadpool(self.store.fetch, ids)
 
     async def _rerank_scores(self, question: str, candidates: list[dict]) -> list[float] | None:
-        if self.settings.reranker == "none" or not candidates:
+        if not candidates:
             return None
         try:
             return await self.inference.rerank(

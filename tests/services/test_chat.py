@@ -72,11 +72,13 @@ class FakeInference:
     def __init__(self, scores=None, rerank_error=None):
         self.scores = scores or {"a": 0.9, "b": 0.4, "c": 0.01}
         self.rerank_error = rerank_error
+        self.reranked = 0
 
     async def embed(self, texts, kind="query"):
         return EmbeddingResult(dense=[[0.6, 0.8]] * len(texts), sparse=[{1: 0.5}] * len(texts))
 
     async def rerank(self, query, documents, timeout=None):
+        self.reranked += 1
         if self.rerank_error:
             raise self.rerank_error
         by_text = {c["text"]: self.scores[cid] for cid, c in CHUNKS.items()}
@@ -168,6 +170,18 @@ async def test_without_reranker_milvus_returns_only_the_context_size():
     await chat.run(ChatRequest(question="?"))
     assert [(method, limit) for method, limit, *_ in store.searches] == [("dense+sparse+bm25", 2)]
     assert len(generator.seen_chunks) == 2
+
+
+async def test_a_question_can_skip_the_reranker():
+    store, inference = FakeStore(), FakeInference()
+    settings = Settings(_env_file=None, openai_api_key="x", context_chunks=2)
+    chat, generator = pipeline(settings=settings, store=store, inference=inference)
+
+    outcome = await chat.run(ChatRequest(question="?", rerank=False))
+
+    assert inference.reranked == 0 and outcome.response.reranked is False
+    assert [(method, limit) for method, limit, *_ in store.searches] == [("dense+sparse+bm25", 2)]
+    assert [c["chunk_id"] for c in generator.seen_chunks] == ["b", "a"]  # Milvus' order
 
 
 async def test_history_is_rewritten_into_a_standalone_question():

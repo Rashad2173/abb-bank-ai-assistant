@@ -70,7 +70,9 @@ CMD ["sh", "-c", "uvicorn scraper_service.main:app --host 0.0.0.0 --port $PORT"]
 
 # --------------------------------------------------------------------------- #
 FROM base AS inference
-RUN pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cu128 \
+# CUDA wheels by default; docker-compose.cpu.yml passes the CPU index (a much smaller image).
+ARG TORCH_INDEX=https://download.pytorch.org/whl/cu128
+RUN pip install torch==2.11.0 --index-url ${TORCH_INDEX} \
  && pip install "transformers==5.20.0" "FlagEmbedding==1.4.2"
 RUN mkdir -p /models && chown app /models
 COPY services/common services/common

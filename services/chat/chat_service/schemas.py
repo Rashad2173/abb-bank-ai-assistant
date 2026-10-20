@@ -28,6 +28,8 @@ class ChatRequest(BaseModel):
     session_id: str | None = Field(default=None, max_length=64)
     quote: str | None = Field(default=None, max_length=2000)
     """A passage of an earlier answer the user is replying to ("which ones?" about a quoted list)."""
+    rerank: bool = True
+    """False: answer from Milvus' order without the reranker — to compare, or as on a machine without a GPU."""
 
     @field_validator("question")
     @classmethod

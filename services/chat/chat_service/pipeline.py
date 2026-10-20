@@ -67,7 +67,7 @@ class ChatPipeline:
             plan = await self.planner.plan(message, history, quoted=bool(request.quote))
         rewrite_ms = _ms_since(step)
 
-        retrieval = await self.retriever.retrieve(plan)
+        retrieval = await self.retriever.retrieve(plan, rerank=request.rerank)
         return Prepared(request, request_id(), history, message, plan, retrieval, started, rewrite_ms)
 
     async def run(self, request: ChatRequest) -> Outcome:
