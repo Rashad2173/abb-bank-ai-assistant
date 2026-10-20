@@ -52,13 +52,14 @@ export function useConversations() {
 
   useEffect(() => {
     try {
-      // Empty conversations are not worth keeping.
-      const kept = conversations.filter((c) => c.messages.length).slice(0, MAX_CONVERSATIONS);
+      // Empty conversations are not worth keeping — except the one that is open, so a new
+      // chat started from the data step is still there after a look at the dashboard.
+      const kept = conversations.filter((c) => c.messages.length || c.id === activeId).slice(0, MAX_CONVERSATIONS);
       localStorage.setItem(KEY, JSON.stringify(kept));
     } catch {
       /* storage full or blocked — conversations stay in memory */
     }
-  }, [conversations]);
+  }, [conversations, activeId]);
 
   const active = conversations.find((c) => c.id === activeId) ?? conversations[0];
 

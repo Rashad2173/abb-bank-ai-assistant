@@ -16,10 +16,9 @@ const STEPS: JobStatus[] = ["chunking", "comparing", "embedding", "writing", "do
 interface Props {
   corpus: CorpusInfo | null;
   onProcessed: () => void;
-  onSkip: () => void;
 }
 
-export function UploadView({ corpus, onProcessed, onSkip }: Props) {
+export function UploadView({ corpus, onProcessed }: Props) {
   const { t } = useI18n();
   const [meta, setMeta] = useState<StoredMeta | null>(loadMeta);
   const [parsed, setParsed] = useState<ParsedData | null>(null);
@@ -170,7 +169,7 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
           readFiles(Array.from(event.dataTransfer.files));
         }}
       >
-        <h1>{t.uploadTitle}</h1>
+        <h2>{t.uploadTitle}</h2>
         <p className="muted">{t.uploadHint}</p>
         <input
           ref={input}
@@ -187,15 +186,6 @@ export function UploadView({ corpus, onProcessed, onSkip }: Props) {
           {busy && !job ? t.reading : hasData ? t.replace : t.chooseFile}
         </button>
       </div>
-
-      {!hasData && corpus && corpus.chunks > 0 && (
-        <div className="skip">
-          <span className="muted">{t.skipHint}</span>
-          <button type="button" className="button" onClick={onSkip}>
-            {t.skip} ({corpus.chunks.toLocaleString()} {t.chunks})
-          </button>
-        </div>
-      )}
 
       {error && (
         <p className="alert alert-error" role="alert">

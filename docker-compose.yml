@@ -200,6 +200,9 @@ services:
   frontend:
     build: { context: frontend }
     restart: unless-stopped
+    environment:
+      # Set in .env for a public demo: visitors need the code first. Empty: open.
+      ACCESS_CODE: ${ACCESS_CODE:-}
     ports:
       - "8080:80"
     depends_on:

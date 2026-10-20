@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="az">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ABB Virtual Köməkçi</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <style>
+    :root { color-scheme: light dark; --bg: #f4f4f2; --surface: #fcfcfb; --text: #1a1a1a; --muted: #5f6368; --border: #dcdcd8; --accent: #0057b8; --error: #b3261e; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #161616; --surface: #1f1f1f; --text: #ececec; --muted: #a6a6a6; --border: #333; --accent: #6aa8ff; --error: #f2b8b5; } }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 16px; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    form { width: 100%; max-width: 360px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px 24px; display: grid; gap: 14px; }
+    img { height: 34px; width: auto; justify-self: start; background: #fff; border-radius: 6px; padding: 3px 6px; }
+    h1 { font-size: 1.1rem; margin: 4px 0 0; }
+    p { margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.45; }
+    input { font: inherit; padding: 0.65rem 0.75rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); }
+    input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+    button { font: inherit; font-weight: 600; padding: 0.65rem; border: 0; border-radius: 8px; background: var(--accent); color: #fff; cursor: pointer; }
+    .error { color: var(--error); min-height: 1.2em; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <form id="access">
+    <img src="/abb-logo.png" alt="ABB">
+    <h1>ABB Virtual Köməkçi</h1>
+    <p>Giriş kodunu daxil edin · Enter the access code · Введите код доступа</p>
+    <input id="code" name="code" type="password" autocomplete="current-password" required aria-label="Access code">
+    <button type="submit">Daxil ol · Enter · Войти</button>
+    <div class="error" id="error" role="alert"></div>
+  </form>
+  <script>
+    // The code is kept in a cookie (30 days); nginx lets requests with the right one through.
+    document.getElementById("access").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const code = document.getElementById("code").value.trim();
+      const secure = location.protocol === "https:" ? "; Secure" : "";
+      document.cookie = `abb_access=${encodeURIComponent(code)}; Max-Age=2592000; Path=/; SameSite=Lax${secure}`;
+      const check = await fetch("/api/chat/health", { cache: "no-store" }).catch(() => null);
+      if (check && check.ok) {
+        location.replace("/");
+      } else {
+        document.getElementById("error").textContent = "Kod yanlışdır · Wrong code · Неверный код";
+      }
+    });
+  </script>
+</body>
+</html>

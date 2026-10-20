@@ -4,7 +4,6 @@ import { api } from "./api";
 import { ChatView } from "./components/ChatView";
 import { DataStep } from "./components/DataStep";
 import { I18nContext, LANGS, type Lang, TEXTS } from "./i18n";
-import { loadMeta } from "./storage";
 import type { CorpusInfo } from "./types";
 
 // The dashboard (with the chart library) is loaded only when it is opened.
@@ -15,16 +14,6 @@ const LANG_KEY = "abb.lang";
 const LANGUAGE_NAMES: Record<Lang, string> = { az: "AZ · Azərbaycanca", en: "EN · English", ru: "RU · Русский" };
 const THEME_KEY = "abb.theme";
 type Theme = "light" | "dark";
-const STARTED_KEY = "abb.started";
-
-/** Has this browser been through the data step (processed an upload or chose the indexed data)? */
-function hasStarted(): boolean {
-  try {
-    return localStorage.getItem(STARTED_KEY) === "1" || loadMeta() !== null;
-  } catch {
-    return false;
-  }
-}
 
 function initialLang(): Lang {
   try {
@@ -40,6 +29,8 @@ export default function App() {
   const [theme, setTheme] = useState<Theme>(() => (document.documentElement.dataset.theme as Theme) ?? "light");
   const [corpus, setCorpus] = useState<CorpusInfo | null>(null);
   const [tab, setTab] = useState<Tab>("data");
+  // Coming from the data step opens a new conversation (the earlier ones stay in the sidebar).
+  const [newChat, setNewChat] = useState(false);
   const i18n = useMemo(() => ({ lang, t: TEXTS[lang] }), [lang]);
   const { t } = i18n;
 
@@ -55,21 +46,13 @@ export default function App() {
     refreshCorpus();
   }, [refreshCorpus]);
 
-  // The brief's flow: upload → processing → chat. A first visit therefore opens on the
-  // data step; the chat unlocks once the search index holds processed data. Visitors
-  // without a file can continue with the data that is already indexed, and returning
-  // visitors open straight on the chat.
+  // The brief's flow: upload → processing → chat. Every visit opens on the data step;
+  // the chat unlocks once the search index holds processed data, and visitors without a
+  // file can continue with the data that is already indexed.
   const chatReady = (corpus?.chunks ?? 0) > 0;
-  useEffect(() => {
-    if (chatReady && hasStarted()) setTab((current) => (current === "data" ? "chat" : current));
-  }, [chatReady]);
 
   const startChat = () => {
-    try {
-      localStorage.setItem(STARTED_KEY, "1");
-    } catch {
-      /* not remembered — fine */
-    }
+    setNewChat(true);
     setTab("chat");
   };
 
@@ -152,7 +135,7 @@ export default function App() {
               onSkip={startChat}
             />
           )}
-          {tab === "chat" && chatReady && <ChatView />}
+          {tab === "chat" && chatReady && <ChatView newChat={newChat} onNewChatStarted={() => setNewChat(false)} />}
           {tab === "dashboard" && (
             <Suspense fallback={<p className="muted">…</p>}>
               <DashboardView />

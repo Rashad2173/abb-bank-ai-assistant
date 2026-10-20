@@ -37,9 +37,19 @@ function plain(answer: string): string {
   return answer.replace(/\s?\[S\d+\]/g, "").trim();
 }
 
-export function ChatView() {
+export function ChatView({ newChat = false, onNewChatStarted }: { newChat?: boolean; onNewChatStarted?: () => void }) {
   const { t } = useI18n();
   const { conversations, active, select, append, start, remove } = useConversations();
+  const startedNew = useRef(false);
+
+  // Opened from the data step: start on an empty conversation, not the last one.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs once per request for a new chat
+  useEffect(() => {
+    if (!newChat || startedNew.current) return;
+    startedNew.current = true;
+    start();
+    onNewChatStarted?.();
+  }, [newChat]);
   const [draft, setDraft] = useState("");
   const [quote, setQuote] = useState<string | null>(null);
   const [pendingIn, setPendingIn] = useState<string | null>(null);

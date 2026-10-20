@@ -1053,53 +1053,203 @@ th:last-child {
   max-width: 80%;
 }
 
-/* Upload mode */
+/* Data step: what the assistant knows, and three ways in */
+.data-step {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.data-head {
+  display: grid;
+  gap: 0.4rem;
+}
+.data-head h1 {
+  font-size: 1.6rem;
+  margin: 0;
+}
+.data-head p {
+  margin: 0;
+  max-width: 62ch;
+  line-height: 1.5;
+}
+.corpus-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  justify-self: start;
+  margin: 0.35rem 0 0;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.corpus-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--good);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--good) 20%, transparent);
+}
+.corpus-empty .corpus-dot {
+  background: var(--warning);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--warning) 20%, transparent);
+}
+.source-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 0.75rem;
+}
+.source-card {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 0.35rem;
+  text-align: left;
+  padding: 1rem 1.05rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    transform 0.15s;
+}
+.source-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+.source-card-active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow:
+    0 0 0 1px var(--accent) inset,
+    var(--shadow);
+}
+.source-card-icon {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+.source-card-title {
+  font-weight: 700;
+  font-size: 1rem;
+}
+.source-card-text {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+.source-card-meta {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+.source-panel .upload {
+  max-width: none;
+}
+.ready-panel {
+  justify-items: start;
+}
+.ready-panel p {
+  margin: 0.3rem 0 0;
+}
+.ready-facts {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.3rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+.button-large {
+  padding: 0.7rem 1.4rem;
+  font-size: 1rem;
+}
+.stage-preview ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  counter-reset: stage;
+}
+.stage-preview li {
+  counter-increment: stage;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+.stage-preview li::before {
+  content: counter(stage);
+  display: grid;
+  place-items: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+/* Add / Replace: a small switch with the chosen option explained below */
 .mode {
   border: 0;
   margin: 0;
   padding: 0;
   display: grid;
   gap: 0.4rem;
+  min-width: 0;
 }
 .mode legend {
   padding: 0;
   margin-bottom: 0.3rem;
 }
-.mode-option {
-  display: flex;
-  gap: 0.6rem;
-  align-items: flex-start;
-  padding: 0.55rem 0.7rem;
+.mode-switch {
+  display: inline-flex;
+  justify-self: start;
   border: 1px solid var(--border);
   border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface);
+}
+.mode-option {
+  position: relative;
+  padding: 0.4rem 0.95rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
   cursor: pointer;
 }
-.mode-option > span {
-  display: grid;
-  gap: 0.1rem;
-  font-size: 0.88rem;
-}
 .mode-option input {
-  margin-top: 0.2rem;
-  accent-color: var(--accent);
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.mode-option:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 .mode-active {
-  border-color: var(--accent);
   background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
 }
-
-/* Data step: link or file */
-.data-view {
-  display: grid;
-  gap: 1rem;
-  max-width: 760px;
-  margin: 0 auto;
+.mode-hint {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
 }
-.source-switch {
-  justify-self: center;
-}
-.data-view .upload {
-  max-width: none;
+.mode-hint-warn {
+  color: var(--warning);
 }
 .scrape {
   display: grid;

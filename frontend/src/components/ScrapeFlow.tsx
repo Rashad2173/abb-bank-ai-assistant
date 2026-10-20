@@ -122,7 +122,7 @@ export function ScrapeFlow({ corpus, onDone }: Props) {
       {!job || job.status === "failed" ? (
         <form className="card scrape-form" onSubmit={start}>
           <div>
-            <h1>{t.scrapeTitle}</h1>
+            <h2>{t.scrapeTitle}</h2>
             <p className="muted">{t.scrapeHint}</p>
           </div>
           <div className="url-row">
@@ -137,6 +137,14 @@ export function ScrapeFlow({ corpus, onDone }: Props) {
             <button type="submit" className="button button-primary" disabled={!url.trim()}>
               {t.scrapeStart}
             </button>
+          </div>
+          <div className="stage-preview">
+            <div className="label">{t.whatHappens}</div>
+            <ol>
+              {STAGES.filter((stage) => stage !== "done").map((stage) => (
+                <li key={stage}>{t.scrapeStages[stage]}</li>
+              ))}
+            </ol>
           </div>
           <ModeChoice
             mode={mode}
