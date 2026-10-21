@@ -75,8 +75,9 @@ docker compose up -d --build         # (or the CPU command above) → http://loc
   the NVIDIA Container Toolkit on Linux). The CPU mode uses the CPU build of PyTorch, which also exists
   for ARM; it has not been tried on an Apple Silicon Mac.
 * **Publishing it:** set `ACCESS_CODE` in `.env`. Visitors then enter the code once (kept for 30 days),
-  the API answers `401` without it, and questions are limited to 20 a minute per visitor. Empty — the
-  default — leaves the app open.
+  or open a link that carries it (`https://<host>/?code=<code>`), the API answers `401` without it, and
+  questions are limited to 20 a minute per visitor. Search engines are asked not to index the pages.
+  Empty — the default — leaves the app open.
 
 ## Using the app
 

@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
   <title>ABB Virtual Köməkçi</title>
   <link rel="icon" type="image/png" href="/favicon.png">
   <style>
@@ -31,18 +32,26 @@
   </form>
   <script>
     // The code is kept in a cookie (30 days); nginx lets requests with the right one through.
-    document.getElementById("access").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const code = document.getElementById("code").value.trim();
+    async function enter(code) {
       const secure = location.protocol === "https:" ? "; Secure" : "";
       document.cookie = `abb_access=${encodeURIComponent(code)}; Max-Age=2592000; Path=/; SameSite=Lax${secure}`;
       const check = await fetch("/api/chat/health", { cache: "no-store" }).catch(() => null);
       if (check && check.ok) {
-        location.replace("/");
+        location.replace("/");   // also drops ?code= from the address bar
       } else {
         document.getElementById("error").textContent = "Kod yanlışdır · Wrong code · Неверный код";
       }
+    }
+    document.getElementById("access").addEventListener("submit", (event) => {
+      event.preventDefault();
+      enter(document.getElementById("code").value.trim());
     });
+    // A shared link can carry the code: /?code=… opens the app straight away.
+    const linked = new URLSearchParams(location.search).get("code");
+    if (linked) {
+      document.getElementById("code").value = linked;
+      enter(linked.trim());
+    }
   </script>
 </body>
 </html>
